@@ -247,6 +247,7 @@ static Key keys[] = {
 	{ A,            -1,     XK_bracketleft,incnmaster,             {.i = +1 } },
 	{ A,            -1,     XK_bracketright,incnmaster,            {.i = -1 } },
 	{ M,            -1,     XK_space,      focusmaster,            {0} },
+	{ A|C,          -1,     XK_space,      switchcol,              {0} },
 	{ A,            -1,     XK_h,          focusdir,               {.i = 0 } }, // left
 	{ A,            -1,     XK_l,          focusdir,               {.i = 1 } }, // right
 	{ A,            -1,     XK_k,          focusdir,               {.i = 2 } }, // up
@@ -270,6 +271,7 @@ static Key keys[] = {
 	{ A,            -1,     XK_Tab,        goback,                 {0} },
 	{ A|S,          -1,     XK_n,          shiftviewclients,       { .i = +1 } },
 	{ A|S,          -1,     XK_p,          shiftviewclients,       { .i = -1 } },
+	{ A|S,          -1,     XK_a,          winview,                {0} },
     /* Window manipulation */
 	{ A,            -1,     XK_semicolon,  zoom,                   {0} },
 	{ A|S,          -1,     XK_v,          transfer,               {0} },

@@ -304,6 +304,10 @@ static Key keys[] = {
 	{ A|S,          -1,     XK_minus,      incrgaps,               {.i = -1 } },
 	{ A|S,          -1,     XK_0,          defaultgaps,            {0} },
 	{ A|C,          -1,     XK_0,          togglegaps,             {0} },
+    /* Borderpx */
+	{ A|C,          -1,     XK_equal,      setborderpx,            {.i = +1 } },
+	{ A|C,          -1,     XK_minus,      setborderpx,            {.i = -1 } },
+	{ M,            -1,     XK_0,          setborderpx,            {.i = 0 } },
 	TAGKEYS(        -1,     XK_1,                                  0)
 	TAGKEYS(        -1,     XK_2,                                  1)
 	TAGKEYS(        -1,     XK_3,                                  2)
