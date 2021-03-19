@@ -95,7 +95,7 @@ enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, S
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetWMWindowTypeDialog, NetClientList, NetDesktopNames, NetDesktopViewport, NetNumberOfDesktops, NetCurrentDesktop, NetLast }; /* EWMH atoms */
+       NetClientList, NetDesktopNames, NetDesktopViewport, NetNumberOfDesktops, NetCurrentDesktop, NetLast }; /* EWMH atoms */
 enum { Manager, Xembed, XembedInfo, XLast }; /* Xembed atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkTabBar, ClkLtSymbol, ClkStatusText, ClkClientWin,
@@ -192,6 +192,7 @@ typedef struct {
 	const char *class;
 	const char *instance;
 	const char *title;
+	const char *wintype;
 	unsigned int tags;
 	int switchtag;
 	int iscentered;
@@ -251,6 +252,7 @@ static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
+static Atom getatomprop(Client *c, Atom prop);
 static void focuswin(const Arg* arg);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
@@ -283,6 +285,7 @@ static void removesystrayicon(Client *i);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
 static void resizebarwin(Monitor *m);
 static void resizeclient(Client *c, int x, int y, int w, int h);
+static void resizeclientpad(Client *c, int x, int y, int w, int h, int xpad, int ypad);
 static void resizemouse(const Arg *arg);
 static void resizerequest(XEvent *e);
 static void restack(Monitor *m);
@@ -345,7 +348,6 @@ static void updatesystray(void);
 static void updatesystrayicongeom(Client *i, int w, int h);
 static void updatesystrayiconstate(Client *i, XPropertyEvent *ev);
 static void updatetitle(Client *c);
-static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
 static void warp(const Client *c);
@@ -501,6 +503,7 @@ void
 applyrules(Client *c)
 {
 	const char *class, *instance;
+	Atom wintype;
 	unsigned int i, newtagset;
 	const Rule *r;
 	Monitor *m;
@@ -513,6 +516,7 @@ applyrules(Client *c)
 	XGetClassHint(dpy, c->win, &ch);
 	class    = ch.res_class ? ch.res_class : broken;
 	instance = ch.res_name  ? ch.res_name  : broken;
+	wintype  = getatomprop(c, netatom[NetWMWindowType]);
 
 	if (strstr(class, "Steam") || strstr(class, "steam_app_"))
 		c->issteam = 1;
@@ -521,7 +525,8 @@ applyrules(Client *c)
 		r = &rules[i];
 		if ((!r->title || strstr(c->name, r->title))
 		&& (!r->class || strstr(class, r->class))
-		&& (!r->instance || strstr(instance, r->instance)))
+		&& (!r->instance || strstr(instance, r->instance))
+		&& (!r->wintype || wintype == XInternAtom(dpy, r->wintype, False)))
 		{
 			c->isterminal = r->isterminal;
 			c->noswallow  = r->noswallow;
@@ -1211,7 +1216,7 @@ drawbar(Monitor *m)
 		    drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeInvMon]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
 
-		if (ulineall || m->tagset[m->seltags] & 1 << i) /* if there are conflicts, just move these lines directly underneath both 'drw_setscheme' and 'drw_text' :) */
+		if (occ & 1 << i || m->tagset[m->seltags] & 1 << i) /* if there are conflicts, just move these lines directly underneath both 'drw_setscheme' and 'drw_text' :) */
 			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
 
 		for (c = m->clients; c; c = c->next) {
@@ -1855,7 +1860,8 @@ manage(Window w, XWindowAttributes *wa)
         }
     }
 	configure(c); /* propagates border_width, if size doesn't change */
-	updatewindowtype(c);
+	if (getatomprop(c, netatom[NetWMState]) == netatom[NetWMFullscreen])
+		setfullscreen(c, 1);
 	updatesizehints(c);
 	updatewmhints(c);
 	updatemotifhints(c);
@@ -2116,6 +2122,7 @@ propertynotify(XEvent *e)
 			break;
 		case XA_WM_NORMAL_HINTS:
 			updatesizehints(c);
+			arrangemon(c->mon);
 			break;
 		case XA_WM_HINTS:
 			updatewmhints(c);
@@ -2126,8 +2133,6 @@ propertynotify(XEvent *e)
 		if (ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName])
 			updatetitle(c);
 			drawtab(c->mon);
-		if (ev->atom == netatom[NetWMWindowType])
-			updatewindowtype(c);
 		if (ev->atom == motifatom)
 			updatemotifhints(c);
 	}
@@ -2200,10 +2205,11 @@ removesystrayicon(Client *i)
 
 
 void
-resize(Client *c, int x, int y, int w, int h, int interact)
+resize(Client *c, int tx, int ty, int tw, int th, int interact)
 {
-	if (applysizehints(c, &x, &y, &w, &h, interact))
-		resizeclient(c, x, y, w, h);
+	int wh = tw, hh = th;
+	if (applysizehints(c, &tx, &ty, &wh, &hh, interact))
+		resizeclientpad(c, tx, ty, wh, hh, tw, th);
 }
 
 void
@@ -2217,8 +2223,15 @@ resizebarwin(Monitor *m) {
 void
 resizeclient(Client *c, int x, int y, int w, int h)
 {
-	XWindowChanges wc;
+	resizeclientpad(c, x, y, w, h, w, h);
+}
 
+/* This is essentially the resizeclient function renamed with two
+ * additional parameters, tw and th (for tile width and height). */
+void
+resizeclientpad(Client *c, int x, int y, int w, int h, int tw, int th)
+{
+	XWindowChanges wc;
 	c->oldx = c->x; c->x = wc.x = x;
 	c->oldy = c->y; c->y = wc.y = y;
 	c->oldw = c->w; c->w = wc.width = w;
@@ -2231,6 +2244,16 @@ resizeclient(Client *c, int x, int y, int w, int h)
 		c->w = wc.width += c->bw * 2;
 		c->h = wc.height += c->bw * 2;
 		wc.border_width = 0;
+	}
+	if (!c->isfloating) {
+		if (w != tw) {
+			wc.x += (tw - w) / 2;
+			c->w = tw;
+		}
+		if (h != th) {
+			wc.y += (th - h) / 2;
+			c->h = th;
+		}
 	}
 	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 	configure(c);
@@ -2679,7 +2702,6 @@ setup(void)
 	netatom[NetWMCheck] = XInternAtom(dpy, "_NET_SUPPORTING_WM_CHECK", False);
 	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
 	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
-	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
 	netatom[NetDesktopViewport] = XInternAtom(dpy, "_NET_DESKTOP_VIEWPORT", False);
 	netatom[NetNumberOfDesktops] = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
@@ -3657,20 +3679,6 @@ updatetitle(Client *c)
 		gettextprop(c->win, XA_WM_NAME, c->name, sizeof c->name);
 	if (c->name[0] == '\0') /* hack to mark broken clients */
 		strcpy(c->name, broken);
-}
-
-void
-updatewindowtype(Client *c)
-{
-	Atom state = getatomprop(c, netatom[NetWMState]);
-	Atom wtype = getatomprop(c, netatom[NetWMWindowType]);
-
-	if (state == netatom[NetWMFullscreen])
-		setfullscreen(c, 1);
-	if (wtype == netatom[NetWMWindowTypeDialog]) {
-		c->iscentered = 1;
-		c->isfloating = 1;
-	}
 }
 
 void
