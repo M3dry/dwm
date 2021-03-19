@@ -2626,6 +2626,14 @@ setlayout(const Arg *arg)
 		arrange(selmon);
 	else
 		drawbar(selmon);
+    if (selmon->sel) {
+        for (unsigned int i = 0; i < 9; i++) {
+            if (&layouts[i] == selmon->lt[selmon->sellt]) {
+	            XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSelLayout][i].pixel);
+                break;
+            }
+        }
+    }
 }
 
 void setcfact(const Arg *arg) {
