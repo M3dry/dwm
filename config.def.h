@@ -102,6 +102,7 @@ typedef struct {
 	const char *name;
 	const void *cmd;
 } Sp;
+
 const char *spcmd1[] = {"st", "-c", "spterm", "-t", "stSCP", "-g", "144x41", NULL };
 const char *spcmd2[] = {"st", "-c", "spmus", "-t", "cmusSCP", "-g", "144x41", "-e", "cmus", NULL };
 const char *spcmd3[] = {"qalculate-gtk", "--title", "spcal", NULL };
