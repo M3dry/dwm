@@ -1,0 +1,34 @@
+From 43fb204a53e3f1bee47f51a2f4e52e5bf242e314 Mon Sep 17 00:00:00 2001
+From: astier <aleksandrs.stier@uni-bielefeld.de>
+Date: Tue, 26 Feb 2019 01:04:55 +0100
+Subject: [PATCH] Attach clients from toggled tag into stack instead of master area
+
+New clients attach into the stack area when you toggle a new tag into
+view. This means your master area will remain unchanged when toggling
+views.
+---
+ dwm.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/dwm.c b/dwm.c
+index 4465af1..567fa8b 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -1739,6 +1739,15 @@ toggleview(const Arg *arg)
+ {
+ 	unsigned int newtagset = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
+ 
++	// the first visible client should be the same after we add a new tag
++	// we also want to be sure not to mutate the focus
++	Client *const c = nexttiled(selmon->clients);
++	if (c) {
++		Client * const selected = selmon->sel;
++		pop(c);
++		focus(selected);
++	}
++
+ 	if (newtagset) {
+ 		selmon->tagset[selmon->seltags] = newtagset;
+ 		focus(NULL);
+-- 
+2.20.1

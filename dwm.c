@@ -1204,10 +1204,16 @@ drawbar(Monitor *m)
 		    drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeInvMon]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
 
+		if (ulineall || m->tagset[m->seltags] & 1 << i) /* if there are conflicts, just move these lines directly underneath both 'drw_setscheme' and 'drw_text' :) */
+			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
+
 		for (c = m->clients; c; c = c->next) {
 			if (c->tags & (1 << i)) {
 		        drw_setscheme(drw, scheme[selmon->sel == c ? SchemeClientSel : m->tagset[m->seltags] & 1 << i ? SchemeClientInc : SchemeClientNorm]);
-				drw_rect(drw, x, 1 + (indn * 4), selmon->sel == c ? 10 : 4, 3, 4, urg & 1 << i);
+                if (selmon->sel == c)
+				    drw_rect(drw, x, 1 + (indn * 4), 10, 4, 4, urg & 1 << i);
+                else
+				    drw_rect(drw, x, 1 + (indn * 4), 4, 3, 4, urg & 1 << i);
 				indn++;
 			}
 		}
@@ -3054,6 +3060,15 @@ toggleview(const Arg *arg)
 {
 	unsigned int newtagset = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
 	int i;
+
+	// the first visible client should be the same after we add a new tag
+	// we also want to be sure not to mutate the focus
+	Client *const c = nexttiled(selmon->clients);
+	if (c) {
+		Client * const selected = selmon->sel;
+		pop(c);
+		focus(selected);
+	}
 
 	if (newtagset) {
 		if (newtagset == ~0) {

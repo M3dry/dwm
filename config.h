@@ -4,6 +4,10 @@
 /*  Display modes of the tab bar: never shown, always shown, shown only in  */
 /*  monocle mode in the presence of several windows.                        */
 /*  Modes after showtab_nmodes are disabled.                                */
+static const unsigned int ulinepad	= 5;	/* horizontal padding between the underline and tag */
+static const unsigned int ulinestroke	= 2;	/* thickness / height of the underline */
+static const unsigned int ulinevoffset	= 0;	/* how far above the bottom of the bar the line should appear */
+static const int ulineall 		= 0;	/* 1 to show underline on all tags, 0 for just the active ones */
 enum showtab_modes { showtab_never, showtab_auto, showtab_nmodes, showtab_always};
 static const int showtab			= showtab_auto; /* Default tab bar show mode */
 static const int toptab				= 0;   /* False means bottom tab bar */
@@ -32,7 +36,7 @@ static const char *fonts[]          = { "mononoki Nerd Font Mono:size=12:antiali
 static const char normfg[]                = "#5e5e5e";
 static const char selfg[]                 = "#51afef";
 static const char normbg[]                = "#111111";
-static const char selbg[]                 = "#292d3e";
+static const char selbg[]                 = "#111111";
 static const char normfloatwinborder[]    = "#000000";
 static const char selfloatwinborder[]     = "#ffffff";
 static const char normstickyborder[]      = "#000000";
@@ -59,7 +63,7 @@ static const char seltabbg[]              = "#111111";
 /* Client Indicators */
 static const char selindfg[]              = "#51afef";
 static const char normindfg[]             = "#ffffff";
-static const char incindfg[]              = "#98be65";
+static const char incindfg[]              = "#8acc35";
 /* Inverter mon */
 static const char invmonbg[]              = "#3071db";
 static const char invmonfg[]              = "#ffffff";
