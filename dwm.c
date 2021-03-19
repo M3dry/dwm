@@ -129,7 +129,7 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 	unsigned int switchtag;
-	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, needresize, iscentered, issticky, isterminal, noswallow, issteam;
+	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, needresize, iscentered, issticky, isterminal, noswallow, issteam, ispermanent;
 	int fakefullscreen;
 	pid_t pid;
 	Client *next;
@@ -197,6 +197,7 @@ typedef struct {
 	int switchtag;
 	int iscentered;
 	int isfloating;
+	int ispermanent;
 	int isterminal;
 	int noswallow;
 	int monitor;
@@ -266,6 +267,7 @@ static void incnmaster(const Arg *arg);
 static void inplacerotate(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
+static void killpermanent(const Arg *arg);
 static void killunsel(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
@@ -532,6 +534,7 @@ applyrules(Client *c)
 			c->noswallow  = r->noswallow;
 			c->iscentered = r->iscentered;
 			c->isfloating = r->isfloating;
+			c->ispermanent = r->ispermanent;
 			c->tags |= r->tags;
 			if ((r->tags & SPTAGMASK) && r->isfloating) {
 				c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
@@ -1765,6 +1768,22 @@ keypress(XEvent *e)
 void
 killclient(const Arg *arg)
 {
+	if (!selmon->sel || selmon->sel->ispermanent)
+		return;
+	if (!sendevent(selmon->sel->win, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
+		XGrabServer(dpy);
+		XSetErrorHandler(xerrordummy);
+		XSetCloseDownMode(dpy, DestroyAll);
+		XKillClient(dpy, selmon->sel->win);
+		XSync(dpy, False);
+		XSetErrorHandler(xerror);
+		XUngrabServer(dpy);
+	}
+}
+
+void
+killpermanent(const Arg *arg)
+{
 	if (!selmon->sel)
 		return;
 	if (!sendevent(selmon->sel->win, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
@@ -1783,7 +1802,7 @@ killunsel(const Arg *arg)
 {
 	Client *i = NULL;
 
-	if (!selmon->sel)
+	if (!selmon->sel || selmon->sel->ispermanent)
 		return;
 
 	for (i = selmon->clients; i; i = i->next) {
