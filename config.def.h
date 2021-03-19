@@ -252,8 +252,10 @@ static Key keys[] = {
 	{ A,            -1,     XK_l,          focusdir,               {.i = 1 } }, // right
 	{ A,            -1,     XK_k,          focusdir,               {.i = 2 } }, // up
 	{ A,            -1,     XK_j,          focusdir,               {.i = 3 } }, // down
-	{ M,            -1,     XK_h,          focusstack,             {.i = 0 } },
-	{ M,            -1,     XK_l,          focusstack,             {.i = 1 } },
+	{ M|S,          -1,     XK_j,          focusstack,             {.i = +1 } },
+	{ M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
+	{ M|C,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
+	{ M|C,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
     /* Layouts */
 	{ A,            -1,     XK_t,          setlayout,              {.v = &layouts[0]} },
 	{ A,            -1,     XK_v,          setlayout,              {.v = &layouts[1]} },
