@@ -129,26 +129,26 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
      *	_NET_WM_WINDOW_TYPE(ATOM) = wintype
 	 */
-	/* class      instance    title          wintype    tags mask     switchtotag     iscentered   isfloating   isterminal    noswallow   monitor */
+	/* class      instance    title          wintype    tags mask     switchtotag     iscentered   isfloating   ispermanent   isterminal    noswallow   monitor */
     /* Scratchpads */
-	{ "spterm",	  NULL,	      NULL,	         NULL,      SPTAG(0),	  0,              1,           1,			0,            0,          -1 }, /* St */
-	{ "spmus",	  NULL,	      NULL,	         NULL,      SPTAG(1),	  0,              1,           1,			0,            0,          -1 }, /* cmus */
-	{ NULL,		  NULL,	      "spcal",	     NULL,      SPTAG(2),	  0,              1,           1,			0,            0,          -1 }, /* qalculate-gtk */
+	{ "spterm",	  NULL,	      NULL,	         NULL,      SPTAG(0),	  0,              1,           1,			0,            0,            0,          -1 }, /* St */
+	{ "spmus",	  NULL,	      NULL,	         NULL,      SPTAG(1),	  0,              1,           1,			0,            0,            0,          -1 }, /* cmus */
+	{ NULL,		  NULL,	      "spcal",	     NULL,      SPTAG(2),	  0,              1,           1,			0,            0,            0,          -1 }, /* qalculate-gtk */
     /* Terminals */
-	{ "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           1,            0,          -1 },
-	{ "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           1,            0,          -1 },
-	{ "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           1,            0,          -1 },
+	{ "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+	{ "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+	{ "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     /* Noswallow */
-	{ NULL,       "Navigator",NULL,          NULL,      1,            1,              0,           0,           0,            1,          -1 }, /* firefox */
-	{ NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            1,          -1 }, /* xev */
-	{ "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            1,          -1 }, /* xephyr */
-	{ "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            1,          -1 }, /* gimp */
-	{ NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           1,           0,            1,          -1 },
+	{ NULL,       "Navigator",NULL,          NULL,      1,            1,              0,           0,           1,            0,            1,          -1 }, /* firefox */
+	{ NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            0,            1,          -1 }, /* xev */
+	{ "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            0,            1,          -1 }, /* xephyr */
+	{ "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          -1 }, /* gimp */
+	{ NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           1,           0,            0,            1,          -1 },
     /* Wintype */
-	{ NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,          -1 },
+	{ NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          -1 },
+	{ NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          -1 },
+	{ NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          -1 },
+	{ NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          -1 },
 };
 
 static const MonitorRule monrules[] = {
@@ -242,6 +242,7 @@ static Key keys[] = {
 	{ 0,-1, XF86XK_AudioRaiseVolume,       spawn,                  SHCMD("pamixer --allow-boost -i 1 ; killall dwmStatus && dwmStatus &") },
     /* DWM keybindings */
 	{ A,            -1,     XK_q,          killclient,             {0} },
+	{ A|C|S,        -1,     XK_x,          killpermanent,          {0} },
 	{ A|S,          -1,     XK_q,          killunsel,              {0} },
 	{ A,            -1,     XK_n,          togglebar,              {0} },
 	{ A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
