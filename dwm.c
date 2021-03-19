@@ -306,6 +306,7 @@ static void sigchld(int unused);
 static void sighup(int unused);
 static void sigterm(int unused);
 static void spawn(const Arg *arg);
+static void switchcol(const Arg *arg);
 static void swaptags(const Arg *arg);
 static Monitor *systraytomon(Monitor *m);
 static void tabmode(const Arg *arg);
@@ -324,6 +325,7 @@ static void togglesticky(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
+static void transfer(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
@@ -346,6 +348,7 @@ static void view(const Arg *arg);
 static void warp(const Client *c);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
+static void winview(const Arg* arg);
 static Client *wintosystrayicon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
@@ -2800,6 +2803,35 @@ spawn(const Arg *arg)
 }
 
 void
+switchcol(const Arg *arg)
+{
+	Client *c, *t;
+	int col = 0;
+	int i;
+
+	if (!selmon->sel)
+		return;
+	for (i = 0, c = nexttiled(selmon->clients); c ;
+	     c = nexttiled(c->next), i++) {
+		if (c == selmon->sel)
+			col = (i + 1) > selmon->nmaster;
+	}
+	if (i <= selmon->nmaster)
+		return;
+	for (c = selmon->stack; c; c = c->snext) {
+		if (!ISVISIBLE(c))
+			continue;
+		for (i = 0, t = nexttiled(selmon->clients); t && t != c;
+		     t = nexttiled(t->next), i++);
+		if (t && (i + 1 > selmon->nmaster) != col) {
+			focus(c);
+			restack(selmon);
+			break;
+		}
+	}
+}
+
+void
 swaptags(const Arg *arg)
 {
 	unsigned int newtag = arg->ui & TAGMASK;
@@ -3852,6 +3884,26 @@ wintomon(Window w)
 	return selmon;
 }
 
+/* Selects for the view of the focused window. The list of tags */
+/* to be displayed is matched to the focused window tag list. */
+void
+winview(const Arg* arg){
+	Window win, win_r, win_p, *win_c;
+	unsigned nc;
+	int unused;
+	Client* c;
+	Arg a;
+
+	if (!XGetInputFocus(dpy, &win, &unused)) return;
+	while(XQueryTree(dpy, win, &win_r, &win_p, &win_c, &nc)
+	      && win_p != win_r) win = win_p;
+
+	if (!(c = wintoclient(win))) return;
+
+	a.ui = c->tags;
+	view(&a);
+}
+
 /* There's no way to check accesses to destroyed windows, thus those cases are
  * ignored (especially on UnmapNotify's). Other types of errors call Xlibs
  * default error handler, which may call exit. */
@@ -3989,4 +4041,37 @@ focusmaster(const Arg *arg)
 
 	if (c)
 		focus(c);
+}
+
+void
+transfer(const Arg *arg) {
+	Client *c, *mtail = selmon->clients, *stail = NULL, *insertafter;
+	int transfertostack = 0, i, nmasterclients;
+
+	for (i = 0, c = selmon->clients; c; c = c->next) {
+		if (!ISVISIBLE(c) || c->isfloating) continue;
+		if (selmon->sel == c) { transfertostack = i < selmon->nmaster && selmon->nmaster != 0; }
+		if (i < selmon->nmaster) { nmasterclients++; mtail = c; }
+		stail = c;
+		i++;
+	}
+	if (!selmon->sel || selmon->sel->isfloating || i == 0) {
+		return;
+	} else if (transfertostack) {
+		selmon->nmaster = MIN(i, selmon->nmaster) - 1;
+		insertafter = stail;
+	} else {
+		selmon->nmaster = selmon->nmaster + 1;
+		insertafter = mtail;
+	}
+	if (insertafter != selmon->sel) {
+		detach(selmon->sel);
+		if (selmon->nmaster == 1 && !transfertostack) {
+		 attach(selmon->sel); // Head prepend case
+		} else {
+			selmon->sel->next = insertafter->next;
+			insertafter->next = selmon->sel;
+		}
+	}
+	arrange(selmon);
 }

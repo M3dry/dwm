@@ -4,10 +4,6 @@
 /*  Display modes of the tab bar: never shown, always shown, shown only in  */
 /*  monocle mode in the presence of several windows.                        */
 /*  Modes after showtab_nmodes are disabled.                                */
-static const unsigned int ulinepad	= 5;	/* horizontal padding between the underline and tag */
-static const unsigned int ulinestroke	= 2;	/* thickness / height of the underline */
-static const unsigned int ulinevoffset	= 0;	/* how far above the bottom of the bar the line should appear */
-static const int ulineall 		= 0;	/* 1 to show underline on all tags, 0 for just the active ones */
 enum showtab_modes { showtab_never, showtab_auto, showtab_nmodes, showtab_always};
 static const int showtab			= showtab_auto; /* Default tab bar show mode */
 static const int toptab				= 0;   /* False means bottom tab bar */
@@ -27,11 +23,15 @@ static const int topbar             = 1;   /* 0 means bottom bar */
 static const int horizpadbar        = 8;   /* horizontal padding for statusbar */
 static const int vertpadbar         = 0;   /* vertical padding for statusbar */
 static const int user_bh            = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
+static const unsigned int ulinepad	= 2;   /* horizontal padding between the underline and tag */
+static const int ulineall 		    = 0;   /* 1 to show underline on all tags, 0 for just the active ones */
+static const unsigned int ulinestroke	 = 2;   /* thickness / height of the underline */
+static const unsigned int ulinevoffset	 = 0;   /* how far above the bottom of the bar the line should appear */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing = 2;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
-static const int showsystray        = 1;     /* 0 means no systray */
-static const char *fonts[]          = { "mononoki Nerd Font Mono:size=12:antialias=true:autohint=true" };
+static const int showsystray             = 1;   /* 0 means no systray */
+static const char *fonts[]               = { "mononoki Nerd Font Mono:size=12:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#5e5e5e";
 static const char selfg[]                 = "#51afef";
@@ -247,6 +247,7 @@ static Key keys[] = {
 	{ A,            -1,     XK_bracketleft,incnmaster,             {.i = +1 } },
 	{ A,            -1,     XK_bracketright,incnmaster,            {.i = -1 } },
 	{ M,            -1,     XK_space,      focusmaster,            {0} },
+	{ A|C,          -1,     XK_space,      switchcol,              {0} },
 	{ A,            -1,     XK_h,          focusdir,               {.i = 0 } }, // left
 	{ A,            -1,     XK_l,          focusdir,               {.i = 1 } }, // right
 	{ A,            -1,     XK_k,          focusdir,               {.i = 2 } }, // up
@@ -270,8 +271,10 @@ static Key keys[] = {
 	{ A,            -1,     XK_Tab,        goback,                 {0} },
 	{ A|S,          -1,     XK_n,          shiftviewclients,       { .i = +1 } },
 	{ A|S,          -1,     XK_p,          shiftviewclients,       { .i = -1 } },
+	{ A|S,          -1,     XK_a,          winview,                {0} },
     /* Window manipulation */
 	{ A,            -1,     XK_semicolon,  zoom,                   {0} },
+	{ A|S,          -1,     XK_v,          transfer,               {0} },
 	{ M,            -1,     XK_j,          pushdown,               {0} },
 	{ M,            -1,     XK_k,          pushup,                 {0} },
 	{ A,            -1,     XK_space,      togglefloating,         {0} },
