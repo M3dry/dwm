@@ -20,6 +20,8 @@ static       int smartgaps          = 1;   /* 1 means no outer gap when there is
 static const int focusonwheel       = 0;
 static const int showbar            = 1;   /* 0 means no bar */
 static const int topbar             = 1;   /* 0 means bottom bar */
+static const int horizpadbar        = 8;   /* horizontal padding for statusbar */
+static const int vertpadbar         = 0;   /* vertical padding for statusbar */
 static const int user_bh            = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing = 2;   /* systray spacing */
@@ -55,8 +57,9 @@ static const char seltabfg[]              = "#3071db";
 static const char normtabbg[]             = "#111111";
 static const char seltabbg[]              = "#111111";
 /* Client Indicators */
-static const char normindfg[]             = "#ffffff";
 static const char selindfg[]              = "#51afef";
+static const char normindfg[]             = "#ffffff";
+static const char incindfg[]              = "#98be65";
 /* Inverter mon */
 static const char invmonbg[]              = "#3071db";
 static const char invmonfg[]              = "#ffffff";
@@ -91,6 +94,7 @@ static const char *colors[][10]  = {
 	[SchemeTabSel]      = { seltabfg,   seltabbg}, /* Tabs selected */
 	[SchemeClientSel]   = { selindfg }, /* Client indicators */
 	[SchemeClientNorm]  = { normindfg }, /* Client indicators unfocused */
+	[SchemeClientInc]   = { incindfg }, /* Client indicators unfocused */
 	[SchemeInvMon]      = { invmonfg,    invmonbg }, /* Unfocused monitors */
 	/* Win borders          tile            fibonacci            float            deck            nrowgrid            bstack            centeredmaster       monocle            gaplessgrid */
 	[SchemeNormLayout]  = { normtileborder, normfibonacciborder, normfloatborder, normdeckborder, normnrowgridborder, normbstackborder, normcenmasterborder, normmonocleborder, normgaplessgridborder },
@@ -210,17 +214,17 @@ static Key keys[] = {
 	{ C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
     /* Dmenu scripts */
 	{ A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
-	{ A|S,          -1,     XK_s,          spawn,                  SHCMD("switch") },
 	{ A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },
 	{ A|C,          -1,     XK_Return,     spawn,                  SHCMD("Booky 'st nvim' '><' 'Cconfig'") },
 	{ A|S,          -1,     XK_w,          spawn,                  SHCMD("Booky 'librewolf' ':' 'Bconfig'") },
-	{ A|S,          -1,     XK_e,          spawn,                  SHCMD("emoji-script") },
-	{ A|S,          XK_d,   XK_c,          spawn,                  SHCMD("calc") },
-	{ M,            XK_d,   XK_p,          spawn,                  SHCMD("passmenu2 -F -p 'Passwords:'") },
-	{ A|S,          -1,     XK_v,          spawn,                  SHCMD("manview") },
 	{ A,            -1,     XK_z,          spawn,                  SHCMD("music-changer cmus") },
-	{ A|S,          -1,     XK_a,          spawn,                  SHCMD("allmenu") },
-	{ A|C,          -1,     XK_q,          spawn,                  SHCMD("shut") },
+	{ A|S,          XK_d,   XK_s,          spawn,                  SHCMD("switch") },
+	{ A|S,          XK_d,   XK_e,          spawn,                  SHCMD("emoji-script") },
+	{ A|S,          XK_d,   XK_c,          spawn,                  SHCMD("calc") },
+	{ A|S,          XK_d,   XK_p,          spawn,                  SHCMD("passmenu2 -F -p 'Passwords:'") },
+	{ A|S,          XK_d,   XK_v,          spawn,                  SHCMD("manview") },
+	{ A|S,          XK_d,   XK_a,          spawn,                  SHCMD("allmenu") },
+	{ A|S,          XK_d,   XK_q,          spawn,                  SHCMD("shut") },
     /* MultiMedia keys */
 	{ 0,-1, XF86XK_AudioPrev,              spawn,                  SHCMD("playerctl --player cmus previous") },
 	{ 0,-1, XF86XK_AudioNext,              spawn,                  SHCMD("playerctl --player cmus next") },

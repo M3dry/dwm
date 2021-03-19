@@ -91,7 +91,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeInvMon, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeClientInc, SchemeInvMon, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
@@ -1206,8 +1206,8 @@ drawbar(Monitor *m)
 
 		for (c = m->clients; c; c = c->next) {
 			if (c->tags & (1 << i)) {
-		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeClientSel : SchemeClientNorm]);
-				drw_rect(drw, x, 1 + (indn * 3), selmon->sel == c ? 6 : 3, 2, 2, urg & 1 << i);
+		        drw_setscheme(drw, scheme[selmon->sel == c ? SchemeClientSel : m->tagset[m->seltags] & 1 << i ? SchemeClientInc : SchemeClientNorm]);
+				drw_rect(drw, x, 1 + (indn * 4), selmon->sel == c ? 10 : 4, 3, 4, urg & 1 << i);
 				indn++;
 			}
 		}
@@ -2556,12 +2556,6 @@ setlayout(const Arg *arg)
 		arrange(selmon);
 	else
 		drawbar(selmon);
-    for (unsigned int i = 0; i < 9; i++) {
-        if (&layouts[i] == selmon->lt[selmon->sellt]) {
-	        XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSelLayout][i].pixel);
-            break;
-        }
-    }
 }
 
 void setcfact(const Arg *arg) {
@@ -2617,8 +2611,8 @@ setup(void)
 	drw = drw_create(dpy, screen, root, sw, sh);
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
-	lrpad = drw->fonts->h;
-	bh = user_bh ? user_bh : drw->fonts->h + 2;
+	lrpad = drw->fonts->h + horizpadbar;
+	bh = user_bh ? user_bh + vertpadbar: drw->fonts->h + 2 + vertpadbar;
 	th = bh;
 	updategeom();
 	/* init atoms */
