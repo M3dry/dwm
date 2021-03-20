@@ -1802,7 +1802,7 @@ killunsel(const Arg *arg)
 {
 	Client *i = NULL;
 
-	if (!selmon->sel || selmon->sel->ispermanent)
+	if (!selmon->sel)
 		return;
 
 	for (i = selmon->clients; i; i = i->next) {
