@@ -215,7 +215,7 @@ static Key keys[] = {
 	{ A,            XK_e,   XK_d,          spawn,                  SHCMD("emacsclient -c -a '' --eval '(dired nil)'") },
 	{ A,            XK_e,   XK_f,          spawn,                  SHCMD("emacsclient -c -a '' --eval '(elfeed)'") },
 	{ A,            -1,     XK_w,          spawn,                  SHCMD("xdo activate -N LibreWolf || librewolf") },
-	{ A,            -1,     XK_o,          spawn,                  SHCMD("chromium") },
+	{ A,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
 	{ A,            -1,     XK_Escape,     spawn,                  SHCMD("xkill") },
 	{ C|A,          -1,     XK_d,          spawn,                  SHCMD("discord") },
 	{ A|S,          -1,     XK_u,          spawn,                  SHCMD("import my-stuff/Pictures/snips/$(date +'%H:%M:%S').png") },
