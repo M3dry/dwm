@@ -1,5 +1,32 @@
 #+TITLE: Dwm
 #+PROPERTY: header-args :C :tangle config.h :main no
+* Table of Contents :toc:
+- [[#variables][Variables]]
+- [[#colors][Colors]]
+- [[#scratchpads][Scratchpads]]
+- [[#tags-definition][Tags definition]]
+- [[#rules][Rules]]
+  - [[#client-rules][Client rules]]
+  - [[#monitor-rules][Monitor rules]]
+- [[#layouts][Layouts]]
+  - [[#layout-modifiers][Layout modifiers]]
+  - [[#layout-definitions][Layout definitions]]
+- [[#key-bindings][Key bindings]]
+  - [[#special-keys][Special keys]]
+  - [[#tag-functions][Tag functions]]
+  - [[#launching-applications][Launching applications]]
+  - [[#launching-dmenu-scripts][Launching dmenu scripts]]
+  - [[#multimedia-keys][Multimedia keys]]
+  - [[#generic-manipulation][Generic manipulation]]
+  - [[#changing-layouts-and-manipulating-them][Changing layouts and manipulating them]]
+  - [[#manipulating-windows][Manipulating windows]]
+  - [[#monitors][Monitors]]
+  - [[#moveresize][Moveresize]]
+  - [[#gaps][Gaps]]
+  - [[#window-border][Window border]]
+  - [[#tagkeys][Tagkeys]]
+  - [[#quit-and-restart][Quit and restart]]
+- [[#mouse-actions][Mouse actions]]
 
 * Variables
 #+BEGIN_SRC C
