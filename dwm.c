@@ -95,7 +95,7 @@ enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, S
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-       NetClientList, NetDesktopNames, NetDesktopViewport, NetNumberOfDesktops, NetCurrentDesktop, NetLast }; /* EWMH atoms */
+       NetClientList, NetDesktopNames, NetDesktopViewport, NetNumberOfDesktops, NetCurrentDesktop, NetWMWindowsOpacity, NetLast }; /* EWMH atoms */
 enum { Manager, Xembed, XembedInfo, XLast }; /* Xembed atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkTabBar, ClkLtSymbol, ClkStatusText, ClkClientWin,
@@ -135,6 +135,7 @@ struct Client {
 	Client *next;
 	Client *snext;
 	Client *swallowing;
+	double opacity;
 	Monitor *mon;
 	Window win;
 };
@@ -200,6 +201,7 @@ typedef struct {
 	int ispermanent;
 	int isterminal;
 	int noswallow;
+	double opacity;
 	int monitor;
 } Rule;
 
@@ -228,6 +230,7 @@ static void attach(Client *c);
 static void attachBelow(Client *c);
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
+static void changeopacity(const Arg *arg);
 static void checkotherwm(void);
 static void cleanup(void);
 static void cleanupmon(Monitor *mon);
@@ -276,6 +279,7 @@ static void monocle(Monitor *m);
 static void moveresize(const Arg *arg);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
+static void opacity(Client *c, double opacity);
 static void pop(Client *);
 static Client *prevtiled(Client *c);
 static void propertynotify(XEvent *e);
@@ -361,6 +365,9 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
+static void keyrelease(XEvent *e);
+static void combotag(const Arg *arg);
+static void comboview(const Arg *arg);
 
 static void focusmaster(const Arg *arg);
 
@@ -369,11 +376,6 @@ static int isdescprocess(pid_t p, pid_t c);
 static Client *swallowingclient(Window w);
 static Client *termforwin(const Client *c);
 static pid_t winpid(Window w);
-
-static void keyrelease(XEvent *e);
-static void combotag(const Arg *arg);
-static void comboview(const Arg *arg);
-
 
 /* variables */
 static Systray *systray =  NULL;
@@ -432,8 +434,6 @@ struct Pertag {
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
-
-/* function implementations */
 static int combo = 0;
 
 void
@@ -456,11 +456,7 @@ combotag(const Arg *arg) {
 }
 
 void
-comboview(const Arg *arg)
-{
-	int i;
-	unsigned int tmptag;
-
+comboview(const Arg *arg) {
 	unsigned newtags = arg->ui & TAGMASK;
     if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
         view(&((Arg) { .ui = 0 }));
@@ -474,29 +470,6 @@ comboview(const Arg *arg)
 		if (newtags)
 			selmon->tagset[selmon->seltags] = newtags;
 	}
-	if (arg->ui & TAGMASK) {
-		selmon->pertag->prevtag = selmon->pertag->curtag;
- 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
-		if (arg->ui == ~0)
-			selmon->pertag->curtag = 0;
-		else {
-			for (i=0; !(arg->ui & 1 << i); i++) ;
-			selmon->pertag->curtag = i + 1;
-		}
-	} else {
-		tmptag = selmon->pertag->prevtag;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
-		selmon->pertag->curtag = tmptag;
-	}
-	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-		togglebar(NULL);
-	focus(NULL);
-	arrange(selmon);
 	focus(NULL);
 	arrange(selmon);
 }
@@ -515,6 +488,7 @@ applyrules(Client *c)
 	c->iscentered = 0;
 	c->isfloating = 0;
 	c->tags = 0;
+	c->opacity = defaultopacity;
 	XGetClassHint(dpy, c->win, &ch);
 	class    = ch.res_class ? ch.res_class : broken;
 	instance = ch.res_name  ? ch.res_name  : broken;
@@ -536,6 +510,7 @@ applyrules(Client *c)
 			c->isfloating = r->isfloating;
 			c->ispermanent = r->ispermanent;
 			c->tags |= r->tags;
+			c->opacity = r->opacity;
 			if ((r->tags & SPTAGMASK) && r->isfloating) {
 				c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
 				c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
@@ -796,6 +771,21 @@ buttonpress(XEvent *e)
 		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state)){
 			buttons[i].func(((click == ClkTagBar || click == ClkTabBar) && buttons[i].arg.i == 0) ? &arg : &buttons[i].arg);
 		}
+}
+
+void
+changeopacity(const Arg *arg)
+{
+	if (!selmon->sel)
+		return;
+	selmon->sel->opacity+=arg->f;
+	if(selmon->sel->opacity > 1.0)
+		selmon->sel->opacity = 1.0;
+
+	if(selmon->sel->opacity < 0)
+		selmon->sel->opacity = 0;
+
+	opacity(selmon->sel, selmon->sel->opacity);
 }
 
 void
@@ -1847,6 +1837,7 @@ manage(Window w, XWindowAttributes *wa)
 		applyrules(c);
 		term = termforwin(c);
 	}
+	opacity(c, c->opacity);
 
 	if (c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
 		c->x = c->mon->mx + c->mon->mw - WIDTH(c);
@@ -2089,6 +2080,18 @@ nexttiled(Client *c)
 {
 	for (; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
 	return c;
+}
+
+void
+opacity(Client *c, double opacity)
+{
+	if(opacity >= 0 && opacity <= 1) {
+		unsigned long real_opacity[] = { opacity * 0xffffffff };
+		XChangeProperty(dpy, c->win, netatom[NetWMWindowsOpacity], XA_CARDINAL,
+				32, PropModeReplace, (unsigned char *)real_opacity,
+				1);
+	} else
+		XDeleteProperty(dpy, c->win, netatom[NetWMWindowsOpacity]);
 }
 
 void
@@ -2730,6 +2733,7 @@ setup(void)
 	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
 	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
+	netatom[NetWMWindowsOpacity] = XInternAtom(dpy, "_NET_WM_WINDOW_OPACITY", False);
 	netatom[NetDesktopViewport] = XInternAtom(dpy, "_NET_DESKTOP_VIEWPORT", False);
 	netatom[NetNumberOfDesktops] = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
 	netatom[NetCurrentDesktop] = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);

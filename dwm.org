@@ -38,6 +38,7 @@ static const unsigned int borderpx       = 2;   /* border pixel of windows */
 static const unsigned int snap           = 0;   /* snap pixel */
 static const int swallowfloating         = 1;   /* 1 means swallow floating windows by default */
 static const int decorhints              = 1;   /* 1 means respect decoration hints */
+static const double defaultopacity       = 1.0;
 static const unsigned int gappih         = 5;   /* horiz inner gap between windows */
 static const unsigned int gappiv         = 5;   /* vert inner gap between windows */
 static const unsigned int gappoh         = 0;   /* horiz outer gap between windows and screen edge */
@@ -166,27 +167,27 @@ static const Rule rules[] = {
 	 ,*	WM_NAME(STRING) = title
      ,*	_NET_WM_WINDOW_TYPE(ATOM) = wintype
 	 ,*/
-	/* class      instance    title          wintype    tags mask     switchtotag     iscentered   isfloating   ispermanent   isterminal    noswallow   monitor */
+	/* class      instance    title          wintype    tags mask     switchtotag     iscentered   isfloating   ispermanent   isterminal    noswallow   opacity   monitor */
     /* Scratchpads */
-	{ "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),	  0,              1,           1,           0,            0,            0,          -1 }, /* St */
-	{ "spmus",    NULL,       NULL,          NULL,      SPTAG(1),	  0,              1,           1,           0,            0,            0,          -1 }, /* cmus */
-	{ NULL,       NULL,       "spcal",       NULL,      SPTAG(2),	  0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
+	{ "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),	  0,              1,           1,           0,            0,            0,          1.0,      -1 }, /* St */
+	{ "spmus",    NULL,       NULL,          NULL,      SPTAG(1),	  0,              1,           1,           0,            0,            0,          1.0,      -1 }, /* cmus */
+	{ NULL,       NULL,       "spcal",       NULL,      SPTAG(2),	  0,              1,           1,           0,            0,            0,          1.0,      -1 }, /* qalculate-gtk */
     /* Terminals */
-	{ "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
-	{ "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
-	{ "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+	{ "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          1.0,      -1 },
+	{ "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          1.0,      -1 },
+	{ "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          1.0,      -1 },
     /* Noswallow */
-	{ NULL,       "Navigator",NULL,          NULL,      1,            1,              0,           0,           1,            0,            1,          -1 }, /* firefox */
-	{ NULL,       "chromium", NULL,          NULL,      1 << 3,       1,              0,           0,           1,            0,            1,          -1 }, /* chromium */
-	{ NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            0,            1,          -1 }, /* xev */
-	{ "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            0,            1,          -1 }, /* xephyr */
-	{ "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          -1 }, /* gimp */
-	{ NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           1,           0,            0,            1,          -1 },
+	{ NULL,       "Navigator",NULL,          NULL,      1,            1,              0,           0,           1,            0,            1,          1.0,      -1 }, /* firefox */
+	{ NULL,       "chromium", NULL,          NULL,      1 << 3,       1,              0,           0,           1,            0,            1,          1.0,      -1 }, /* chromium */
+	{ NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            0,            1,          1.0,      -1 }, /* xev */
+	{ "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            0,            1,          1.0,      -1 }, /* xephyr */
+	{ "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          1.0,      -1 }, /* gimp */
+	{ NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           1,           0,            0,            1,          1.0,      -1 },
     /* Wintype */
-	{ NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          -1 },
+	{ NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          1.0,      -1 },
+	{ NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          1.0,      -1 },
+	{ NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          1.0,      -1 },
+	{ NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          1.0,      -1 },
 };
 
 #+END_SRC
@@ -262,10 +263,10 @@ static const Layout layouts[] = {
 ** Tag functions
 #+BEGIN_SRC C
 #define TAGKEYS(CHAIN,KEY,TAG) \
-	{ A,       CHAIN,   KEY,   comboview,    {.ui = 1 << TAG} }, \
+	{ A,       CHAIN,   KEY,   comboview,         {.ui = 1 << TAG} }, \
 	{ C,       CHAIN,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
 	{ M,       CHAIN,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
-	{ A|S,     CHAIN,   KEY,   combotag,     {.ui = 1 << TAG} }, \
+	{ A|S,     CHAIN,   KEY,   combotag,          {.ui = 1 << TAG} }, \
 	{ A|C,     CHAIN,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
 	{ M|S,     CHAIN,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
 	{ A|M,     CHAIN,   KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
@@ -378,6 +379,8 @@ static Key keys[] = {
 	{ A,            -1,     XK_u,          togglescratch,          {.ui = 0 } },
     { A,            -1,     XK_i,          togglescratch,          {.ui = 1 } },
     { A,            -1,     XK_y,          togglescratch,          {.ui = 2 } },
+    { A|S,          -1,     XK_Up,         changeopacity,          {.f = +0.1}},
+    { A|S,          -1,     XK_Down,       changeopacity,          {.f = -0.1}},
 #+END_SRC
 ** Monitors
 #+BEGIN_SRC C
