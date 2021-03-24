@@ -61,24 +61,24 @@ static const char incindfg[]              = "#7986E7";
 static const char invmonbg[]              = "#3071db";
 static const char invmonfg[]              = "#ffffff";
 
-static const char normtileborder[]        = "#292d3e";
-static const char normfibonacciborder[]   = "#292d3e";
-static const char normfloatborder[]       = "#292d3e";
-static const char normdeckborder[]        = "#292d3e";
-static const char normnrowgridborder[]    = "#292d3e";
-static const char normbstackborder[]      = "#292d3e";
-static const char normcenmasterborder[]   = "#292d3e";
-static const char normmonocleborder[]     = "#292d3e";
-static const char normgaplessgridborder[] = "#292d3e";
-static const char seltileborder[]         = "#ff6c6b";
-static const char selfibonacciborder[]    = "#ff6c6b";
+static const char normtileborder[]        = "#1E1C31";
+static const char normfibonacciborder[]   = "#1E1C31";
+static const char normfloatborder[]       = "#1E1C31";
+static const char normdeckborder[]        = "#1E1C31";
+static const char normnrowgridborder[]    = "#1E1C31";
+static const char normbstackborder[]      = "#1E1C31";
+static const char normcenmasterborder[]   = "#1E1C31";
+static const char normmonocleborder[]     = "#1E1C31";
+static const char normgaplessgridborder[] = "#1E1C31";
+static const char seltileborder[]         = "#ff5370";
+static const char selfibonacciborder[]    = "#ff5370";
 static const char selfloatborder[]        = "#16cc31";
-static const char seldeckborder[]         = "#ff6c6b";
-static const char selnrowgridborder[]     = "#ff6c6b";
+static const char seldeckborder[]         = "#ff5370";
+static const char selnrowgridborder[]     = "#ff5370";
 static const char selbstackborder[]       = "#c678dd";
-static const char selcenmasterborder[]    = "#ff6c6b";
-static const char selmonocleborder[]      = "#ff6c6b";
-static const char selgaplessgridborder[]  = "#ff6c6b";
+static const char selcenmasterborder[]    = "#ff5370";
+static const char selmonocleborder[]      = "#ff5370";
+static const char selgaplessgridborder[]  = "#ff5370";
 
 static const char *colors[][10]  = {
     /* Tags/borders       fg            bg      float               sticky            sticky + float         fakefullscreen   fakefullscreen + float */
@@ -202,7 +202,7 @@ static Key keys[] = {
     { A,            XK_e,   XK_f,          spawn,                  SHCMD("emacsclient -c -e '(elfeed)'") },
     { A,            -1,     XK_w,          spawn,                  SHCMD("xdo activate -N LibreWolf || librewolf") },
     { A,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
-    { A,            -1,     XK_Escape,     spawn,                  SHCMD("xkill") },
+    { A|C,          -1,     XK_KP_Down,    spawn,                  SHCMD("xkill") },
     { C|A,          -1,     XK_d,          spawn,                  SHCMD("discord") },
     { A|S,          -1,     XK_u,          spawn,                  SHCMD("import my-stuff/Pictures/snips/$(date +'%H:%M:%S').png") },
     { A,            -1,     XK_p,          spawn,                  SHCMD("pcmanfm") },
