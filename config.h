@@ -25,10 +25,11 @@ static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display 
 static const int showsystray             = 1;   /* 0 means no systray */
 static const char *fonts[]               = { "mononoki Nerd Font Mono:size=12:antialias=true:autohint=true" };
 
-static const char normfg[]                = "#5e5e5e";
-static const char selfg[]                 = "#51afef";
-static const char normbg[]                = "#111111";
-static const char selbg[]                 = "#111111";
+static const char normfg[]                = "#4E5579";
+static const char selfg[]                 = "#ff5370";
+static const char normbg[]                = "#1E1C31";
+static const char selbg[]                 = "#1E1C31";
+
 static const char normfloatwinborder[]    = "#000000";
 static const char selfloatwinborder[]     = "#ffffff";
 static const char normstickyborder[]      = "#000000";
@@ -39,27 +40,27 @@ static const char normfakefullscr[]       = "#408ab2";
 static const char selfakefullscr[]        = "#b869e5";
 static const char normfakefullscrfloat[]  = "#289fe0";
 static const char selfakefullscrfloat[]   = "#9b1be5";
-/* Occupied */
-static const char occupiedfg[]            = "#ffffff";
-static const char occupiedbg[]            = "#111111";
+
+static const char occupiedfg[]            = "#7986E7";
+static const char occupiedbg[]            = "#1E1C31";
 static const char ocinvfg[]               = "#000000";
 static const char ocinvbg[]               = "#f0f0f0";
-/* Status */
-static const char statusfg[]              = "#f0f0f0";
-static const char statusbg[]              = "#111111";
-/* Tab Bar */
-static const char normtabfg[]             = "#ffffff";
-static const char seltabfg[]              = "#3071db";
-static const char normtabbg[]             = "#111111";
-static const char seltabbg[]              = "#111111";
-/* Client Indicators */
-static const char selindfg[]              = "#51afef";
-static const char normindfg[]             = "#ffffff";
-static const char incindfg[]              = "#8acc35";
-/* Inverter mon */
+
+static const char statusfg[]              = "#7986E7";
+static const char statusbg[]              = "#1E1C31";
+
+static const char normtabfg[]             = "#4E5579";
+static const char seltabfg[]              = "#7986E7";
+static const char normtabbg[]             = "#1E1C31";
+static const char seltabbg[]              = "#1E1C31";
+
+static const char selindfg[]              = "#ff5370";
+static const char normindfg[]             = "#7986E7";
+static const char incindfg[]              = "#7986E7";
+
 static const char invmonbg[]              = "#3071db";
 static const char invmonfg[]              = "#ffffff";
-/* Lay constout borders */
+
 static const char normtileborder[]        = "#292d3e";
 static const char normfibonacciborder[]   = "#292d3e";
 static const char normfloatborder[]       = "#292d3e";
@@ -80,26 +81,26 @@ static const char selmonocleborder[]      = "#ff6c6b";
 static const char selgaplessgridborder[]  = "#ff6c6b";
 
 static const char *colors[][10]  = {
-	/* Tags/borders       fg            bg      float               sticky            sticky + float         fakefullscreen   fakefullscreen + float */
-	[SchemeNorm]        = { normfg,     normbg, normfloatwinborder, normstickyborder, normstickyfloatborder, normfakefullscr, normfakefullscrfloat },
-	[SchemeSel]         = { selfg,      selbg,  selfloatwinborder,  selstickyborder,  selstickyfloatborder,  selfakefullscr,  selfakefullscrfloat },
-	[SchemeOccupied]    = { occupiedfg, occupiedbg },
-	[SchemeOccupiedInv] = { ocinvfg,    ocinvbg },
-	[SchemeStatus]      = { statusfg,   statusbg },
-	[SchemeTabNorm]     = { normtabfg,  normtabbg },
-	[SchemeTabSel]      = { seltabfg,   seltabbg},
-	[SchemeClientSel]   = { selindfg },
-	[SchemeClientNorm]  = { normindfg },
-	[SchemeClientInc]   = { incindfg },
-	[SchemeInvMon]      = { invmonfg,    invmonbg },
-	/* Win borders          tile            fibonacci            float            deck            nrowgrid            bstack            centeredmaster       monocle            gaplessgrid */
-	[SchemeNormLayout]  = { normtileborder, normfibonacciborder, normfloatborder, normdeckborder, normnrowgridborder, normbstackborder, normcenmasterborder, normmonocleborder, normgaplessgridborder },
-	[SchemeSelLayout]   = { seltileborder,  selfibonacciborder,  selfloatborder,  seldeckborder,  selnrowgridborder,  selbstackborder,  selcenmasterborder,  selmonocleborder,  selgaplessgridborder },
+    /* Tags/borders       fg            bg      float               sticky            sticky + float         fakefullscreen   fakefullscreen + float */
+    [SchemeNorm]        = { normfg,     normbg, normfloatwinborder, normstickyborder, normstickyfloatborder, normfakefullscr, normfakefullscrfloat },
+    [SchemeSel]         = { selfg,      selbg,  selfloatwinborder,  selstickyborder,  selstickyfloatborder,  selfakefullscr,  selfakefullscrfloat },
+    [SchemeOccupied]    = { occupiedfg, occupiedbg },
+    [SchemeOccupiedInv] = { ocinvfg,    ocinvbg },
+    [SchemeStatus]      = { statusfg,   statusbg },
+    [SchemeTabNorm]     = { normtabfg,  normtabbg },
+    [SchemeTabSel]      = { seltabfg,   seltabbg},
+    [SchemeClientSel]   = { selindfg },
+    [SchemeClientNorm]  = { normindfg },
+    [SchemeClientInc]   = { incindfg },
+    [SchemeInvMon]      = { invmonfg,    invmonbg },
+    /* Win borders          tile            fibonacci            float            deck            nrowgrid            bstack            centeredmaster       monocle            gaplessgrid */
+    [SchemeNormLayout]  = { normtileborder, normfibonacciborder, normfloatborder, normdeckborder, normnrowgridborder, normbstackborder, normcenmasterborder, normmonocleborder, normgaplessgridborder },
+    [SchemeSelLayout]   = { seltileborder,  selfibonacciborder,  selfloatborder,  seldeckborder,  selnrowgridborder,  selbstackborder,  selcenmasterborder,  selmonocleborder,  selgaplessgridborder },
 };
 
 typedef struct {
-	const char *name;
-	const void *cmd;
+    const char *name;
+    const void *cmd;
 } Sp;
 
 const char *spcmd1[] = {"st", "-c", "spterm", "-t", "stSCP", "-g", "144x41", NULL };
@@ -158,17 +159,17 @@ static const int attachbelow = 1;
 #include "vanitygaps.c"
 
 static const Layout layouts[] = {
-	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "(@)",      spiral },
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ "[D]",      deck },
-	{ "###",      nrowgrid },
-	{ "TTT",      bstack },
-	{ "|M|",      centeredmaster },
-	{ "[M]",      monocle },
-	{ "HHH",      gaplessgrid },
-	{ NULL,       NULL },
+    /* symbol     arrange function */
+    { "[]=",      tile },    /* first entry is default */
+    { "(@)",      spiral },
+    { "><>",      NULL },    /* no layout function means floating behavior */
+    { "[D]",      deck },
+    { "###",      nrowgrid },
+    { "TTT",      bstack },
+    { "|M|",      centeredmaster },
+    { "[M]",      monocle },
+    { "HHH",      gaplessgrid },
+    { NULL,       NULL },
 };
 
 #include <X11/XF86keysym.h>
@@ -179,154 +180,154 @@ static const Layout layouts[] = {
 #define C ControlMask
 
 #define TAGKEYS(CHAIN,KEY,TAG) \
-	{ A,       CHAIN,   KEY,   comboview,         {.ui = 1 << TAG} }, \
-	{ C,       CHAIN,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
-	{ M,       CHAIN,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
-	{ A|S,     CHAIN,   KEY,   combotag,          {.ui = 1 << TAG} }, \
-	{ A|C,     CHAIN,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
-	{ M|S,     CHAIN,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
-	{ A|M,     CHAIN,   KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-	{ A|M|S,   CHAIN,   KEY,   tagprevmon,   {.ui = 1 << TAG} },
+    { A,       CHAIN,   KEY,   comboview,         {.ui = 1 << TAG} }, \
+    { C,       CHAIN,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
+    { M,       CHAIN,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
+    { A|S,     CHAIN,   KEY,   combotag,          {.ui = 1 << TAG} }, \
+    { A|C,     CHAIN,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
+    { M|S,     CHAIN,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
+    { A|M,     CHAIN,   KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
+    { A|M|S,   CHAIN,   KEY,   tagprevmon,   {.ui = 1 << TAG} },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 static Key keys[] = {
-	{ A,            -1,     XK_Return,     spawn,                  SHCMD("$TERMINAL") },
-	{ A|S,          -1,     XK_c,          spawn,                  SHCMD("$TERMINAL htop") },
-	{ A|S,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
-	{ A|S,          -1,     XK_e,          spawn,                  SHCMD("$TERMINAL $EDITOR") },
-	{ A,            XK_e,   XK_e,          spawn,                  SHCMD("emacsclient -c -a emacs") },
-	{ A,            XK_e,   XK_c,          spawn,                  SHCMD("emacsclient -c -a '' --eval '(ibuffer)'") },
-	{ A,            XK_e,   XK_d,          spawn,                  SHCMD("emacsclient -c -a '' --eval '(dired nil)'") },
-	{ A,            XK_e,   XK_f,          spawn,                  SHCMD("emacsclient -c -a '' --eval '(elfeed)'") },
-	{ A,            -1,     XK_w,          spawn,                  SHCMD("xdo activate -N LibreWolf || librewolf") },
-	{ A,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
-	{ A,            -1,     XK_Escape,     spawn,                  SHCMD("xkill") },
-	{ C|A,          -1,     XK_d,          spawn,                  SHCMD("discord") },
-	{ A|S,          -1,     XK_u,          spawn,                  SHCMD("import my-stuff/Pictures/snips/$(date +'%H:%M:%S').png") },
-	{ A,            -1,     XK_p,          spawn,                  SHCMD("pcmanfm") },
-	{ A,            -1,     XK_a,          spawn,                  SHCMD("$TERMINAL vifmrun") },
-	{ C,            -1,     XK_m,          spawn,                  SHCMD("multimc") },
-	{ M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
-	{ C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
+    { A,            -1,     XK_Return,     spawn,                  SHCMD("$TERMINAL") },
+    { A|S,          -1,     XK_c,          spawn,                  SHCMD("$TERMINAL htop") },
+    { A|S,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
+    { A|S,          -1,     XK_e,          spawn,                  SHCMD("$TERMINAL $EDITOR") },
+    { A,            XK_e,   XK_e,          spawn,                  SHCMD("emacsclient -c -a emacs") },
+    { A,            XK_e,   XK_c,          spawn,                  SHCMD("emacsclient -c -e '(ibuffer)'") },
+    { A,            XK_e,   XK_d,          spawn,                  SHCMD("emacsclient -c -e '(dired nil)'") },
+    { A,            XK_e,   XK_f,          spawn,                  SHCMD("emacsclient -c -e '(elfeed)'") },
+    { A,            -1,     XK_w,          spawn,                  SHCMD("xdo activate -N LibreWolf || librewolf") },
+    { A,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
+    { A,            -1,     XK_Escape,     spawn,                  SHCMD("xkill") },
+    { C|A,          -1,     XK_d,          spawn,                  SHCMD("discord") },
+    { A|S,          -1,     XK_u,          spawn,                  SHCMD("import my-stuff/Pictures/snips/$(date +'%H:%M:%S').png") },
+    { A,            -1,     XK_p,          spawn,                  SHCMD("pcmanfm") },
+    { A,            -1,     XK_a,          spawn,                  SHCMD("$TERMINAL vifmrun") },
+    { C,            -1,     XK_m,          spawn,                  SHCMD("multimc") },
+    { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
+    { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
 
-	{ A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
-	{ A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },
-	{ A|C,          -1,     XK_Return,     spawn,                  SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'") },
-	{ A|S,          -1,     XK_w,          spawn,                  SHCMD("Booky 'librewolf' ':' 'Bconfig'") },
-	{ A,            -1,     XK_z,          spawn,                  SHCMD("music-changer cmus") },
-	{ A|S,          XK_d,   XK_s,          spawn,                  SHCMD("switch") },
-	{ A|S,          XK_d,   XK_e,          spawn,                  SHCMD("emoji-script") },
-	{ A|S,          XK_d,   XK_c,          spawn,                  SHCMD("calc") },
-	{ A|S,          XK_d,   XK_p,          spawn,                  SHCMD("passmenu2 -F -p 'Passwords:'") },
-	{ A|S,          XK_d,   XK_v,          spawn,                  SHCMD("manview") },
-	{ A|S,          XK_d,   XK_a,          spawn,                  SHCMD("allmenu") },
-	{ A|S,          XK_d,   XK_q,          spawn,                  SHCMD("shut") },
+    { A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
+    { A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },
+    { A|C,          -1,     XK_Return,     spawn,                  SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'") },
+    { A|S,          -1,     XK_w,          spawn,                  SHCMD("Booky 'librewolf' ':' 'Bconfig'") },
+    { A,            -1,     XK_z,          spawn,                  SHCMD("music-changer cmus") },
+    { A|S,          XK_d,   XK_s,          spawn,                  SHCMD("switch") },
+    { A|S,          XK_d,   XK_e,          spawn,                  SHCMD("emoji-script") },
+    { A|S,          XK_d,   XK_c,          spawn,                  SHCMD("calc") },
+    { A|S,          XK_d,   XK_p,          spawn,                  SHCMD("passmenu2 -F -p 'Passwords:'") },
+    { A|S,          XK_d,   XK_v,          spawn,                  SHCMD("manview") },
+    { A|S,          XK_d,   XK_a,          spawn,                  SHCMD("allmenu") },
+    { A|S,          XK_d,   XK_q,          spawn,                  SHCMD("shut") },
 
-	{ 0,-1, XF86XK_AudioPrev,              spawn,                  SHCMD("playerctl --player cmus previous") },
-	{ 0,-1, XF86XK_AudioNext,              spawn,                  SHCMD("playerctl --player cmus next") },
-	{ 0,-1, XF86XK_AudioPlay,              spawn,                  SHCMD("playerctl --player cmus play-pause") },
-	{ 0,-1, XF86XK_AudioLowerVolume,       spawn,                  SHCMD("pamixer --allow-boost -d 1 ; killall dwmStatus && dwmStatus &") },
-	{ 0,-1, XF86XK_AudioRaiseVolume,       spawn,                  SHCMD("pamixer --allow-boost -i 1 ; killall dwmStatus && dwmStatus &") },
+    { 0,-1, XF86XK_AudioPrev,              spawn,                  SHCMD("playerctl --player cmus previous") },
+    { 0,-1, XF86XK_AudioNext,              spawn,                  SHCMD("playerctl --player cmus next") },
+    { 0,-1, XF86XK_AudioPlay,              spawn,                  SHCMD("playerctl --player cmus play-pause") },
+    { 0,-1, XF86XK_AudioLowerVolume,       spawn,                  SHCMD("pamixer --allow-boost -d 1 ; killall dwmStatus && dwmStatus &") },
+    { 0,-1, XF86XK_AudioRaiseVolume,       spawn,                  SHCMD("pamixer --allow-boost -i 1 ; killall dwmStatus && dwmStatus &") },
 
-	{ A,            -1,     XK_q,          killclient,             {0} },
-	{ A|C|S,        -1,     XK_x,          killpermanent,          {0} },
-	{ A|S,          -1,     XK_q,          killunsel,              {0} },
-	{ A,            -1,     XK_n,          togglebar,              {0} },
-	{ A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
-	{ A|S,          -1,     XK_l,          setmfact,               {.f = +0.05} },
-	{ A|S,          -1,     XK_j,          setcfact,               {.f = +0.25} },
-	{ A|S,          -1,     XK_k,          setcfact,               {.f = -0.25} },
-	{ A|C,          -1,     XK_u,          setcfact,               {0} },
-	{ A,            -1,     XK_bracketleft,incnmaster,             {.i = +1 } },
-	{ A,            -1,     XK_bracketright,incnmaster,            {.i = -1 } },
-	{ M,            -1,     XK_space,      focusmaster,            {0} },
-	{ A|C,          -1,     XK_space,      switchcol,              {0} },
-	{ A,            -1,     XK_h,          focusdir,               {.i = 0 } }, // left
-	{ A,            -1,     XK_l,          focusdir,               {.i = 1 } }, // right
-	{ A,            -1,     XK_k,          focusdir,               {.i = 2 } }, // up
-	{ A,            -1,     XK_j,          focusdir,               {.i = 3 } }, // down
-	{ M|S,          -1,     XK_j,          focusstack,             {.i = +1 } },
-	{ M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
-	{ M|C,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
-	{ M|C,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
+    { A,            -1,     XK_q,          killclient,             {0} },
+    { A|C|S,        -1,     XK_x,          killpermanent,          {0} },
+    { A|S,          -1,     XK_q,          killunsel,              {0} },
+    { A,            -1,     XK_n,          togglebar,              {0} },
+    { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
+    { A|S,          -1,     XK_l,          setmfact,               {.f = +0.05} },
+    { A|S,          -1,     XK_j,          setcfact,               {.f = +0.25} },
+    { A|S,          -1,     XK_k,          setcfact,               {.f = -0.25} },
+    { A|C,          -1,     XK_u,          setcfact,               {0} },
+    { A,            -1,     XK_bracketleft,incnmaster,             {.i = +1 } },
+    { A,            -1,     XK_bracketright,incnmaster,            {.i = -1 } },
+    { M,            -1,     XK_space,      focusmaster,            {0} },
+    { A|C,          -1,     XK_space,      switchcol,              {0} },
+    { A,            -1,     XK_h,          focusdir,               {.i = 0 } }, // left
+    { A,            -1,     XK_l,          focusdir,               {.i = 1 } }, // right
+    { A,            -1,     XK_k,          focusdir,               {.i = 2 } }, // up
+    { A,            -1,     XK_j,          focusdir,               {.i = 3 } }, // down
+    { M|S,          -1,     XK_j,          focusstack,             {.i = +1 } },
+    { M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
+    { M|C,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
+    { M|C,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
 
-	{ A,            -1,     XK_t,          setlayout,              {.v = &layouts[0]} },
-	{ A,            -1,     XK_v,          setlayout,              {.v = &layouts[1]} },
-	{ A|S,          -1,     XK_f,          setlayout,              {.v = &layouts[2]} },
-	{ A,            -1,     XK_d,          setlayout,              {.v = &layouts[3]} },
-	{ A,            -1,     XK_g,          setlayout,              {.v = &layouts[4]} },
-	{ A,            -1,     XK_b,          setlayout,              {.v = &layouts[5]} },
-	{ A|S,          -1,     XK_m,          setlayout,              {.v = &layouts[6]} },
-	{ A,            -1,     XK_m,          setlayout,              {.v = &layouts[7]} },
-	{ A|S,          -1,     XK_g,          setlayout,              {.v = &layouts[8]} },
-	{ A|S,          -1,     XK_t,          tabmode,                {-1} },
-	{ A|C,          -1,     XK_i,          cyclelayout,            {.i = -1 } },
-	{ A|C,          -1,     XK_p,          cyclelayout,            {.i = +1 } },
-	{ A,            -1,     XK_0,          view,                   {.ui = ~0 } },
-	{ A,            -1,     XK_Tab,        goback,                 {0} },
-	{ A|S,          -1,     XK_n,          shiftviewclients,       { .i = +1 } },
-	{ A|S,          -1,     XK_p,          shiftviewclients,       { .i = -1 } },
-	{ A|S,          -1,     XK_a,          winview,                {0} },
+    { A,            -1,     XK_t,          setlayout,              {.v = &layouts[0]} },
+    { A,            -1,     XK_v,          setlayout,              {.v = &layouts[1]} },
+    { A|S,          -1,     XK_f,          setlayout,              {.v = &layouts[2]} },
+    { A,            -1,     XK_d,          setlayout,              {.v = &layouts[3]} },
+    { A,            -1,     XK_g,          setlayout,              {.v = &layouts[4]} },
+    { A,            -1,     XK_b,          setlayout,              {.v = &layouts[5]} },
+    { A|S,          -1,     XK_m,          setlayout,              {.v = &layouts[6]} },
+    { A,            -1,     XK_m,          setlayout,              {.v = &layouts[7]} },
+    { A|S,          -1,     XK_g,          setlayout,              {.v = &layouts[8]} },
+    { A|S,          -1,     XK_t,          tabmode,                {-1} },
+    { A|C,          -1,     XK_i,          cyclelayout,            {.i = -1 } },
+    { A|C,          -1,     XK_p,          cyclelayout,            {.i = +1 } },
+    { A,            -1,     XK_0,          view,                   {.ui = ~0 } },
+    { A,            -1,     XK_Tab,        goback,                 {0} },
+    { A|S,          -1,     XK_n,          shiftviewclients,       { .i = +1 } },
+    { A|S,          -1,     XK_p,          shiftviewclients,       { .i = -1 } },
+    { A|S,          -1,     XK_a,          winview,                {0} },
 
-	{ A,            -1,     XK_semicolon,  zoom,                   {0} },
-	{ A|S,          -1,     XK_v,          transfer,               {0} },
-	{ M,            -1,     XK_j,          pushdown,               {0} },
-	{ M,            -1,     XK_k,          pushup,                 {0} },
-	{ A,            -1,     XK_space,      togglefloating,         {0} },
-	{ A|S,          -1,     XK_space,      unfloatvisible,         {0} },
-	{ M,            -1,     XK_s,          togglesticky,           {0} },
-	{ A,            -1,     XK_f,          togglefullscr,          {0} },
-	{ A|C,          -1,     XK_f,          togglefakefullscreen,   {0} },
-	{ A,            -1,     XK_u,          togglescratch,          {.ui = 0 } },
+    { A,            -1,     XK_semicolon,  zoom,                   {0} },
+    { A|S,          -1,     XK_v,          transfer,               {0} },
+    { M,            -1,     XK_j,          pushdown,               {0} },
+    { M,            -1,     XK_k,          pushup,                 {0} },
+    { A,            -1,     XK_space,      togglefloating,         {0} },
+    { A|S,          -1,     XK_space,      unfloatvisible,         {0} },
+    { M,            -1,     XK_s,          togglesticky,           {0} },
+    { A,            -1,     XK_f,          togglefullscr,          {0} },
+    { A|C,          -1,     XK_f,          togglefakefullscreen,   {0} },
+    { A,            -1,     XK_u,          togglescratch,          {.ui = 0 } },
     { A,            -1,     XK_i,          togglescratch,          {.ui = 1 } },
     { A,            -1,     XK_y,          togglescratch,          {.ui = 2 } },
 
-	{ A,            -1,     XK_comma,      focusmon,               {.i = -1 } },
-	{ A,            -1,     XK_period,     focusmon,               {.i = +1 } },
-	{ A|S,          -1,     XK_comma,      tagmon,                 {.i = -1 } },
-	{ A|S,          -1,     XK_period,     tagmon,                 {.i = +1 } },
+    { A,            -1,     XK_comma,      focusmon,               {.i = -1 } },
+    { A,            -1,     XK_period,     focusmon,               {.i = +1 } },
+    { A|S,          -1,     XK_comma,      tagmon,                 {.i = -1 } },
+    { A|S,          -1,     XK_period,     tagmon,                 {.i = +1 } },
 
-	{ A|C,          -1,     XK_j,          moveresize,             {.v = "0x 25y 0w 0h" } },
-	{ A|C,          -1,     XK_k,          moveresize,             {.v = "0x -25y 0w 0h" } },
-	{ A|C,          -1,     XK_l,          moveresize,             {.v = "25x 0y 0w 0h" } },
-	{ A|C,          -1,     XK_h,          moveresize,             {.v = "-25x 0y 0w 0h" } },
-	{ M|C,          -1,     XK_j,          moveresize,             {.v = "0x 0y 0w 25h" } },
-	{ M|C,          -1,     XK_k,          moveresize,             {.v = "0x 0y 0w -25h" } },
-	{ M|C,          -1,     XK_l,          moveresize,             {.v = "0x 0y 25w 0h" } },
-	{ M|C,          -1,     XK_h,          moveresize,             {.v = "0x 0y -25w 0h" } },
+    { A|C,          -1,     XK_j,          moveresize,             {.v = "0x 25y 0w 0h" } },
+    { A|C,          -1,     XK_k,          moveresize,             {.v = "0x -25y 0w 0h" } },
+    { A|C,          -1,     XK_l,          moveresize,             {.v = "25x 0y 0w 0h" } },
+    { A|C,          -1,     XK_h,          moveresize,             {.v = "-25x 0y 0w 0h" } },
+    { M|C,          -1,     XK_j,          moveresize,             {.v = "0x 0y 0w 25h" } },
+    { M|C,          -1,     XK_k,          moveresize,             {.v = "0x 0y 0w -25h" } },
+    { M|C,          -1,     XK_l,          moveresize,             {.v = "0x 0y 25w 0h" } },
+    { M|C,          -1,     XK_h,          moveresize,             {.v = "0x 0y -25w 0h" } },
 
-	{ A|S,          -1,     XK_equal,      incrgaps,               {.i = +1 } },
-	{ A|S,          -1,     XK_minus,      incrgaps,               {.i = -1 } },
-	{ A|S,          -1,     XK_0,          defaultgaps,            {0} },
-	{ A|C,          -1,     XK_0,          togglegaps,             {0} },
+    { A|S,          -1,     XK_equal,      incrgaps,               {.i = +1 } },
+    { A|S,          -1,     XK_minus,      incrgaps,               {.i = -1 } },
+    { A|S,          -1,     XK_0,          defaultgaps,            {0} },
+    { A|C,          -1,     XK_0,          togglegaps,             {0} },
 
-	{ A|C,          -1,     XK_equal,      setborderpx,            {.i = +1 } },
-	{ A|C,          -1,     XK_minus,      setborderpx,            {.i = -1 } },
-	{ M,            -1,     XK_0,          setborderpx,            {.i = 0 } },
+    { A|C,          -1,     XK_equal,      setborderpx,            {.i = +1 } },
+    { A|C,          -1,     XK_minus,      setborderpx,            {.i = -1 } },
+    { M,            -1,     XK_0,          setborderpx,            {.i = 0 } },
 
-	TAGKEYS(        -1,     XK_1,                                  0)
-	TAGKEYS(        -1,     XK_2,                                  1)
-	TAGKEYS(        -1,     XK_3,                                  2)
-	TAGKEYS(        -1,     XK_4,                                  3)
-	TAGKEYS(        -1,     XK_5,                                  4)
-	TAGKEYS(        -1,     XK_6,                                  5)
-	TAGKEYS(        -1,     XK_7,                                  6)
-	TAGKEYS(        -1,     XK_8,                                  7)
-	TAGKEYS(        -1,     XK_9,                                  8)
+    TAGKEYS(        -1,     XK_1,                                  0)
+    TAGKEYS(        -1,     XK_2,                                  1)
+    TAGKEYS(        -1,     XK_3,                                  2)
+    TAGKEYS(        -1,     XK_4,                                  3)
+    TAGKEYS(        -1,     XK_5,                                  4)
+    TAGKEYS(        -1,     XK_6,                                  5)
+    TAGKEYS(        -1,     XK_7,                                  6)
+    TAGKEYS(        -1,     XK_8,                                  7)
+    TAGKEYS(        -1,     XK_9,                                  8)
 
-	{ M|S,          -1,     XK_Escape,     quit,                   {0} },
-	{ A|C|S,        -1,     XK_q,          quit,                   {1} },
+    { M|S,          -1,     XK_Escape,     quit,                   {0} },
+    { A|C|S,        -1,     XK_q,          quit,                   {1} },
 };
 
 static Button buttons[] = {
-	/* click                event mask      button          function        argument */
-	{ ClkClientWin,         A,              Button1,        movemouse,      {0} },
-	{ ClkClientWin,         A,              Button2,        togglefloating, {0} },
-	{ ClkClientWin,         A,              Button3,        resizemouse,    {0} },
-	{ ClkTagBar,            0,              Button1,        view,           {0} },
-	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
-	{ ClkTagBar,            A,              Button1,        tag,            {0} },
-	{ ClkTagBar,            A,              Button3,        toggletag,      {0} },
-	{ ClkTabBar,            0,              Button1,        focuswin,       {0} },
+    /* click                event mask      button          function        argument */
+    { ClkClientWin,         A,              Button1,        movemouse,      {0} },
+    { ClkClientWin,         A,              Button2,        togglefloating, {0} },
+    { ClkClientWin,         A,              Button3,        resizemouse,    {0} },
+    { ClkTagBar,            0,              Button1,        view,           {0} },
+    { ClkTagBar,            0,              Button3,        toggleview,     {0} },
+    { ClkTagBar,            A,              Button1,        tag,            {0} },
+    { ClkTagBar,            A,              Button3,        toggletag,      {0} },
+    { ClkTabBar,            0,              Button1,        focuswin,       {0} },
 };
