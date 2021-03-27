@@ -20,6 +20,7 @@
  *
  * To understand everything else, start reading main().
  */
+#include <ctype.h> /* for making tab label lowercase, very tiny standard library */
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
@@ -91,7 +92,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeClientInc, SchemeInvMon, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeLtsymbol, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeClientInc, SchemeInvMon, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
@@ -243,6 +244,7 @@ static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
+static int drawstatusbar(Monitor *m, int bh, char* text);
 static void drawtab(Monitor *m);
 static void drawtabs(void);
 static void expose(XEvent *e);
@@ -377,7 +379,7 @@ static pid_t winpid(Window w);
 static Systray *systray =  NULL;
 static Client *prevzoom = NULL;
 static const char broken[] = "broken";
-static char stext[256];
+static char stext[1024];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
@@ -417,6 +419,7 @@ static xcb_connection_t *xcon;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+unsigned int tagw[LENGTH(tags)];
 
 struct Pertag {
 	unsigned int curtag, prevtag; /* current and previous tag */
@@ -728,7 +731,7 @@ buttonpress(XEvent *e)
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
 		do
-			x += TEXTW(tags[i]);
+			x += tagw[i];
 		while (ev->x >= x && ++i < LENGTH(tags));
 		if (i < LENGTH(tags)) {
 			click = ClkTagBar;
@@ -801,7 +804,7 @@ cleanup(void)
 	}
 	for (i = 0; i < CurLast; i++)
 		drw_cur_free(drw, cursor[i]);
-	for (i = 0; i < LENGTH(colors); i++)
+	for (i = 0; i < LENGTH(colors) + 1; i++)
 		free(scheme[i]);
 	XDestroyWindow(dpy, wmcheckwin);
 	drw_free(drw);
@@ -1151,6 +1154,114 @@ dirtomon(int dir)
 	return m;
 }
 
+int
+drawstatusbar(Monitor *m, int bh, char* stext) {
+	int ret, i, w, x, len;
+	short isCode = 0;
+	char *text;
+	char *p;
+
+	len = strlen(stext) + 1 ;
+	if (!(text = (char*) malloc(sizeof(char)*len)))
+		die("malloc");
+	p = text;
+	memcpy(text, stext, len);
+
+	/* compute width of the status text */
+	w = 0;
+	i = -1;
+	while (text[++i]) {
+		if (text[i] == '^') {
+			if (!isCode) {
+				isCode = 1;
+				text[i] = '\0';
+				w += TEXTW(text) - lrpad;
+				text[i] = '^';
+				if (text[++i] == 'f')
+					w += atoi(text + ++i);
+			} else {
+				isCode = 0;
+				text = text + i + 1;
+				i = -1;
+			}
+		}
+	}
+	if (!isCode)
+		w += TEXTW(text) - lrpad;
+	else
+		isCode = 0;
+	text = p;
+
+	w += 2; /* 1px padding on both sides */
+	ret = x = m->ww - w;
+
+	drw_setscheme(drw, scheme[LENGTH(colors)]);
+	drw->scheme[ColFg] = scheme[SchemeStatus][ColFg];
+	drw->scheme[ColBg] = scheme[SchemeStatus][ColBg];
+	drw_rect(drw, x, 0, w, bh, 1, 1);
+	x++;
+
+	/* process status text */
+	i = -1;
+	while (text[++i]) {
+		if (text[i] == '^' && !isCode) {
+			isCode = 1;
+
+			text[i] = '\0';
+			w = TEXTW(text) - lrpad;
+			drw_text(drw, x, 0, w, bh, 0, text, 0);
+
+			x += w;
+
+			/* process code */
+			while (text[++i] != '^') {
+				if (text[i] == 'c') {
+					char buf[8];
+					memcpy(buf, (char*)text+i+1, 7);
+					buf[7] = '\0';
+					drw_clr_create(drw, &drw->scheme[ColFg], buf);
+					i += 7;
+				} else if (text[i] == 'b') {
+					char buf[8];
+					memcpy(buf, (char*)text+i+1, 7);
+					buf[7] = '\0';
+					drw_clr_create(drw, &drw->scheme[ColBg], buf);
+					i += 7;
+				} else if (text[i] == 'd') {
+					drw->scheme[ColFg] = scheme[SchemeStatus][ColFg];
+					drw->scheme[ColBg] = scheme[SchemeStatus][ColBg];
+				} else if (text[i] == 'r') {
+					int rx = atoi(text + ++i);
+					while (text[++i] != ',');
+					int ry = atoi(text + ++i);
+					while (text[++i] != ',');
+					int rw = atoi(text + ++i);
+					while (text[++i] != ',');
+					int rh = atoi(text + ++i);
+
+					drw_rect(drw, rx + x, ry, rw, rh, 1, 0);
+				} else if (text[i] == 'f') {
+					x += atoi(text + ++i);
+				}
+			}
+
+			text = text + i + 1;
+			i=-1;
+			isCode = 0;
+		}
+	}
+
+	if (!isCode) {
+		w = TEXTW(text) - lrpad;
+		drw_text(drw, x, 0, w, bh, 0, text, 0);
+	}
+
+	drw_setscheme(drw, scheme[SchemeNorm]);
+	free(p);
+
+	return ret;
+}
+
 void
 drawbar(Monitor *m)
 {
@@ -1160,6 +1271,8 @@ drawbar(Monitor *m)
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
+	char taglabel[64];
+	char *masterclientontag[LENGTH(tags)];
 	char *mstext;
 	char *rstext;
 	int msx;
@@ -1168,15 +1281,31 @@ drawbar(Monitor *m)
 		stw = getsystraywidth();
 
 	resizebarwin(m);
+	for (i = 0; i < LENGTH(tags); i++)
+		masterclientontag[i] = NULL;
+
 	for (c = m->clients; c; c = c->next) {
 		occ |= c->tags;
 		if (c->isurgent)
 			urg |= c->tags;
+		for (i = 0; i < LENGTH(tags); i++)
+			if (!masterclientontag[i] && c->tags & (1<<i)) {
+				XClassHint ch = { NULL, NULL };
+				XGetClassHint(dpy, c->win, &ch);
+				masterclientontag[i] = ch.res_class;
+				if (lcaselbl)
+					masterclientontag[i][0] = tolower(masterclientontag[i][0]);
+			}
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
 		indn = 0;
-		w = TEXTW(tags[i]);
+		if (masterclientontag[i])
+			snprintf(taglabel, 64, ptagf, tags[i], masterclientontag[i]);
+		else
+			snprintf(taglabel, 64, etagf, tags[i]);
+		masterclientontag[i] = taglabel;
+		tagw[i] = w = TEXTW(masterclientontag[i]);
         if (occ & 1 << i)
             if (m == selmon)
 		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeOccupied]);
@@ -1186,7 +1315,7 @@ drawbar(Monitor *m)
 		    drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
         else
 		    drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeInvMon]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, masterclientontag[i], urg & 1 << i);
 
 		if (occ & 1 << i || m->tagset[m->seltags] & 1 << i)
 			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
@@ -1206,7 +1335,7 @@ drawbar(Monitor *m)
 	}
 	w = blw = TEXTW(m->ltsymbol);
     if (m == selmon)
-	    drw_setscheme(drw, scheme[SchemeStatus]);
+	    drw_setscheme(drw, scheme[SchemeLtsymbol]);
     else
 	    drw_setscheme(drw, scheme[SchemeInvMon]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
@@ -1218,9 +1347,7 @@ drawbar(Monitor *m)
 	drw_rect(drw, x, 0, m->ww - x, bh, 1, 1);
 
 	if (m == selmon || 1) { /* status is only drawn on selected monitor */
-		rstext = strdup(stext);
-		tw = TEXTW(stext) - lrpad / 2 + 2; /* 2px right padding */
-		drw_text(drw, m->ww - tw - stw, 0, tw, bh, lrpad / 2 - 2, stext, 0);
+		sw = m->ww - drawstatusbar(m, bh, stext);
 	}
 
 	drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
@@ -1324,7 +1451,7 @@ drawtab(Monitor *m) {
 
 	/* cleans interspace between window names and current viewed tag label */
 	w = m->ww - view_info_w - x;
-	drw_text(drw, x, 0, w, th, 0, "", 0);
+	drw_text(drw, x - 5, 0, w, th, 0, "", 0);
 
 	/* view info */
 	x += w;
@@ -2712,7 +2839,8 @@ setup(void)
 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
 	/* init appearance */
-	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+	scheme = ecalloc(LENGTH(colors) + 1, sizeof(Clr *));
+	scheme[LENGTH(colors)] = drw_scm_create(drw, colors[0], 9);
 	for (i = 0; i < LENGTH(colors); i++)
 		scheme[i] = drw_scm_create(drw, colors[i], 9);
 	/* init system tray */

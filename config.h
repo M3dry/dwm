@@ -49,6 +49,9 @@ static const char ocinvbg[]               = "#f0f0f0";
 static const char statusfg[]              = "#7986E7";
 static const char statusbg[]              = "#1E1C31";
 
+static const char ltsymbolfg[]            = "#ff5370";
+static const char ltsymbolbg[]            = "#1E1C31";
+
 static const char normtabfg[]             = "#4E5579";
 static const char seltabfg[]              = "#7986E7";
 static const char normtabbg[]             = "#1E1C31";
@@ -87,6 +90,7 @@ static const char *colors[][10]  = {
     [SchemeOccupied]    = { occupiedfg, occupiedbg },
     [SchemeOccupiedInv] = { ocinvfg,    ocinvbg },
     [SchemeStatus]      = { statusfg,   statusbg },
+    [SchemeLtsymbol]    = { ltsymbolfg, ltsymbolbg },
     [SchemeTabNorm]     = { normtabfg,  normtabbg },
     [SchemeTabSel]      = { seltabfg,   seltabbg},
     [SchemeClientSel]   = { selindfg },
@@ -114,6 +118,10 @@ static Sp scratchpads[] = {
 };
 
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+
+static const char ptagf[] = "[%s: %s]"; /* format of a tag label */
+static const char etagf[] = "%s";    /* format of an empty tag */
+static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
 static const Rule rules[] = {

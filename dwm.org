@@ -1,13 +1,24 @@
 #+TITLE: Dwm
 #+PROPERTY: header-args :C :tangle config.h :main no
 
-* Table of contents :toc:
+* Table of contents :toc_4:
 - [[#variables][Variables]]
 - [[#colors][Colors]]
   - [[#color-variables][Color variables]]
+    - [[#selected-bar-colors][Selected bar colors]]
+    - [[#special-window-border-colors][Special window border colors]]
+    - [[#occupied-tag-colors][Occupied tag colors]]
+    - [[#status-colors][Status colors]]
+    - [[#ltsymbol-colors][Ltsymbol colors]]
+    - [[#tab-bar-colors][Tab bar colors]]
+    - [[#client-indicator-colors][Client indicator colors]]
+    - [[#unselected-monitors-colors][Unselected monitors colors]]
+    - [[#layout-border-colors][Layout border colors]]
   - [[#colors-array][Colors array]]
 - [[#scratchpads][Scratchpads]]
-- [[#tags-definition][Tags definition]]
+- [[#tags-variables][Tags variables]]
+  - [[#number-of-tags][Number of tags]]
+  - [[#master-name][Master name]]
 - [[#rules][Rules]]
   - [[#client-rules][Client rules]]
   - [[#monitor-rules][Monitor rules]]
@@ -94,6 +105,11 @@ static const char ocinvbg[]               = "#f0f0f0";
 static const char statusfg[]              = "#7986E7";
 static const char statusbg[]              = "#1E1C31";
 #+END_SRC
+*** Ltsymbol colors
+#+BEGIN_SRC C
+static const char ltsymbolfg[]            = "#ff5370";
+static const char ltsymbolbg[]            = "#1E1C31";
+#+END_SRC
 *** Tab bar colors
 #+BEGIN_SRC C
 static const char normtabfg[]             = "#4E5579";
@@ -142,6 +158,7 @@ static const char *colors[][10]  = {
     [SchemeOccupied]    = { occupiedfg, occupiedbg },
     [SchemeOccupiedInv] = { ocinvfg,    ocinvbg },
     [SchemeStatus]      = { statusfg,   statusbg },
+    [SchemeLtsymbol]    = { ltsymbolfg, ltsymbolbg },
     [SchemeTabNorm]     = { normtabfg,  normtabbg },
     [SchemeTabSel]      = { seltabfg,   seltabbg},
     [SchemeClientSel]   = { selindfg },
@@ -170,9 +187,16 @@ static Sp scratchpads[] = {
    {"spcal",       spcmd3},
 };
 #+END_SRC
-* Tags definition
+* Tags variables
+** Number of tags
 #+BEGIN_SRC C
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+#+END_SRC
+** Master name
+#+BEGIN_SRC C
+static const char ptagf[] = "[%s: %s]"; /* format of a tag label */
+static const char etagf[] = "%s";    /* format of an empty tag */
+static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 #+END_SRC
 * Rules
 ** Client rules
