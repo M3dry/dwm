@@ -458,7 +458,7 @@ combotag(const Arg *arg) {
 void
 comboview(const Arg *arg) {
 	unsigned newtags = arg->ui & TAGMASK;
-    if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
+	if(arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
         view(&((Arg) { .ui = 0 }));
         return;
     }
@@ -542,7 +542,9 @@ applyrules(Client *c)
 		XFree(ch.res_class);
 	if (ch.res_name)
 		XFree(ch.res_name);
-	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : (c->mon->tagset[c->mon->seltags] & ~SPTAGMASK);
+	if(c->tags & TAGMASK)                    c->tags = c->tags & TAGMASK;
+	else if(c->mon->tagset[c->mon->seltags]) c->tags = c->mon->tagset[c->mon->seltags] & ~SPTAGMASK;
+	else                                     c->tags = 1;
 }
 
 int
@@ -1036,7 +1038,7 @@ createmon(void)
 	const MonitorRule *mr;
 
 	m = ecalloc(1, sizeof(Monitor));
-	m->tagset[0] = m->tagset[1] = 1;
+	m->tagset[0] = m->tagset[1] = startontag ? 1 : 0;
 	m->mfact = mfact;
 	m->nmaster = nmaster;
 	m->showbar = showbar;
@@ -2599,7 +2601,7 @@ sendmon(Client *c, Monitor *m)
 	detach(c);
 	detachstack(c);
 	c->mon = m;
-	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
+	c->tags = (m->tagset[m->seltags] ? m->tagset[m->seltags] : 1);
 	if( attachbelow )
 		attachBelow(c);
 	else
@@ -3211,9 +3213,23 @@ unfloatvisible(const Arg *arg)
 {
     Client *c;
 
-    for (c = selmon->clients; c; c = c->next)
-        if (ISVISIBLE(c) && c->isfloating)
+    for (c = selmon->clients; c; c = c->next) {
+        if (ISVISIBLE(c) && c->isfloating) {
             c->isfloating = c->isfixed;
+            if (selmon->sel->issticky)
+		        XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColSticky].pixel);
+            else if (selmon->sel->fakefullscreen)
+		        XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFakeFullscr].pixel);
+            else {
+                for (unsigned int i = 0; i < 9; i++) {
+                    if (&layouts[i] == selmon->lt[selmon->sellt]) {
+		                XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSelLayout][i].pixel);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     if (arg && arg->v)
         setlayout(arg);
@@ -3311,31 +3327,9 @@ toggleview(const Arg *arg)
 		focus(selected);
 	}
 
-	if (newtagset) {
-		if (newtagset == ~0) {
-			selmon->pertag->prevtag = selmon->pertag->curtag;
-			selmon->pertag->curtag = 0;
-		}
-		/* test if the user did not select the same tag */
-		if (!(newtagset & 1 << (selmon->pertag->curtag - 1))) {
-			selmon->pertag->prevtag = selmon->pertag->curtag;
-			for (i=0; !(newtagset & 1 << i); i++) ;
-			selmon->pertag->curtag = i + 1;
-		}
-		selmon->tagset[selmon->seltags] = newtagset;
-
-		/* apply settings for this view */
-		selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-		selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-		selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-		if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-			togglebar(NULL);
-		prevmon = NULL;
-		focus(NULL);
-		arrange(selmon);
-	}
+	selmon->tagset[selmon->seltags] = newtagset;
+	focus(NULL);
+	arrange(selmon);
 	updatecurrentdesktop();
 }
 
@@ -3861,7 +3855,7 @@ view(const Arg *arg)
 	int i;
 	unsigned int tmptag;
 
-    if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
+	if(arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
         view(&((Arg) { .ui = 0 }));
         return;
     }

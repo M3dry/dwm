@@ -4,6 +4,7 @@ static const int toptab                  = 0;   /* False means bottom tab bar */
 static const unsigned int borderpx       = 2;   /* border pixel of windows */
 static const unsigned int snap           = 0;   /* snap pixel */
 static const int swallowfloating         = 1;   /* 1 means swallow floating windows by default */
+static const int startontag              = 1;   /* 0 means no tag active on start */
 static const int decorhints              = 1;   /* 1 means respect decoration hints */
 static const unsigned int gappih         = 5;   /* horiz inner gap between windows */
 static const unsigned int gappiv         = 5;   /* vert inner gap between windows */
@@ -189,10 +190,10 @@ static const Layout layouts[] = {
 #define C ControlMask
 
 #define TAGKEYS(CHAIN,KEY,TAG) \
-    { A,       CHAIN,   KEY,   comboview,         {.ui = 1 << TAG} }, \
+    { A,       CHAIN,   KEY,   comboview,    {.ui = 1 << TAG} }, \
     { C,       CHAIN,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
     { M,       CHAIN,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
-    { A|S,     CHAIN,   KEY,   combotag,          {.ui = 1 << TAG} }, \
+    { A|S,     CHAIN,   KEY,   combotag,     {.ui = 1 << TAG} }, \
     { A|C,     CHAIN,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
     { M|S,     CHAIN,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
     { A|M,     CHAIN,   KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
