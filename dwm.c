@@ -20,7 +20,7 @@
  *
  * To understand everything else, start reading main().
  */
-#include <ctype.h> /* for making tab label lowercase, very tiny standard library */
+#include <ctype.h> /* for tolower function, very tiny standard library */
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
@@ -712,7 +712,7 @@ unswallow(Client *c)
 void
 buttonpress(XEvent *e)
 {
-	unsigned int i, x, click;
+	unsigned int i, x, click, occ = 0;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
@@ -730,9 +730,14 @@ buttonpress(XEvent *e)
 	}
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
-		do
+		for (c = m->clients; c; c = c->next)
+			occ |= c->tags == 255 ? 0 : c->tags;
+		do {
+			/* do not reserve space for vacant tags */
+			if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+				continue;
 			x += tagw[i];
-		while (ev->x >= x && ++i < LENGTH(tags));
+		} while (ev->x >= x && ++i < LENGTH(tags));
 		if (i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
@@ -1266,16 +1271,11 @@ void
 drawbar(Monitor *m)
 {
     int indn;
-	int x, w, tw = 0, stw = 0;
-	int boxs = drw->fonts->h / 9;
-	int boxw = drw->fonts->h / 6 + 2;
+	int x, w, stw = 0;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
-	char taglabel[64];
+	char tagdisp[64];
 	char *masterclientontag[LENGTH(tags)];
-	char *mstext;
-	char *rstext;
-	int msx;
 
 	if(showsystray && m == systraytomon(m))
 		stw = getsystraywidth();
@@ -1285,7 +1285,7 @@ drawbar(Monitor *m)
 		masterclientontag[i] = NULL;
 
 	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags;
+		occ |= c->tags == 255 ? 0 : c->tags;
 		if (c->isurgent)
 			urg |= c->tags;
 		for (i = 0; i < LENGTH(tags); i++)
@@ -1294,17 +1294,25 @@ drawbar(Monitor *m)
 				XGetClassHint(dpy, c->win, &ch);
 				masterclientontag[i] = ch.res_class;
 				if (lcaselbl)
-					masterclientontag[i][0] = tolower(masterclientontag[i][0]);
+				masterclientontag[i][0] = tolower(masterclientontag[i][0]);
 			}
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
+		/* do not draw vacant tags */
+		if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+		continue;
+
 		indn = 0;
+		/* do not draw vacant tags */
+		if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+		continue;
+
 		if (masterclientontag[i])
-			snprintf(taglabel, 64, ptagf, tags[i], masterclientontag[i]);
+			snprintf(tagdisp, 64, ptagf, tags[i], masterclientontag[i]);
 		else
-			snprintf(taglabel, 64, etagf, tags[i]);
-		masterclientontag[i] = taglabel;
+			snprintf(tagdisp, 64, etagf, tags[i]);
+		masterclientontag[i] = tagdisp;
 		tagw[i] = w = TEXTW(masterclientontag[i]);
         if (occ & 1 << i)
             if (m == selmon)
