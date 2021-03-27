@@ -20,7 +20,7 @@
  *
  * To understand everything else, start reading main().
  */
-#include <ctype.h> /* for tolower function, very tiny standard library */
+#include <ctype.h>
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
@@ -335,6 +335,7 @@ static void togglesticky(const Arg *arg);
 static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
+static void togglevacant(const Arg *arg);
 static void transfer(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
@@ -730,21 +731,34 @@ buttonpress(XEvent *e)
 	}
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
-		for (c = m->clients; c; c = c->next)
-			occ |= c->tags == 255 ? 0 : c->tags;
-		do {
-			/* do not reserve space for vacant tags */
-			if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-				continue;
-			x += tagw[i];
-		} while (ev->x >= x && ++i < LENGTH(tags));
-		if (i < LENGTH(tags)) {
-			click = ClkTagBar;
-			arg.ui = 1 << i;
-		} else if (ev->x < x + blw)
-			click = ClkLtSymbol;
-		else
-			click = ClkStatusText;
+        if (vacanttags) {
+		    for (c = m->clients; c; c = c->next)
+		    	occ |= c->tags == 255 ? 0 : c->tags;
+		    do {
+		    	/* do not reserve space for vacant tags */
+		    	if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+		    		continue;
+		    	x += tagw[i];
+		    } while (ev->x >= x && ++i < LENGTH(tags));
+		    if (i < LENGTH(tags)) {
+		    	click = ClkTagBar;
+		    	arg.ui = 1 << i;
+		    } else if (ev->x < x + blw)
+		    	click = ClkLtSymbol;
+		    else
+		    	click = ClkStatusText;
+        } else  {
+		    do
+ 			    x += TEXTW(tags[i]);
+		    while (ev->x >= x && ++i < LENGTH(tags));
+		    if (i < LENGTH(tags)) {
+		    	click = ClkTagBar;
+		    	arg.ui = 1 << i;
+		    } else if (ev->x < x + blw)
+		    	click = ClkLtSymbol;
+		    else
+		    	click = ClkStatusText;
+        }
 	}
 	if(ev->window == selmon->tabwin) {
 		i = 0; x = 0;
@@ -1285,7 +1299,10 @@ drawbar(Monitor *m)
 		masterclientontag[i] = NULL;
 
 	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags == 255 ? 0 : c->tags;
+        if (vacanttags)
+		    occ |= c->tags == 255 ? 0 : c->tags;
+        else 
+		    occ |= c->tags;
 		if (c->isurgent)
 			urg |= c->tags;
 		for (i = 0; i < LENGTH(tags); i++)
@@ -1299,14 +1316,12 @@ drawbar(Monitor *m)
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
-		/* do not draw vacant tags */
-		if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-		continue;
-
 		indn = 0;
-		/* do not draw vacant tags */
-		if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-		continue;
+        if (vacanttags) {
+		    /* do not draw vacant tags */
+		    if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+		    continue;
+        }
 
 		if (masterclientontag[i])
 			snprintf(tagdisp, 64, ptagf, tags[i], masterclientontag[i]);
@@ -1314,15 +1329,17 @@ drawbar(Monitor *m)
 			snprintf(tagdisp, 64, etagf, tags[i]);
 		masterclientontag[i] = tagdisp;
 		tagw[i] = w = TEXTW(masterclientontag[i]);
-        if (occ & 1 << i)
-            if (m == selmon)
-		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeOccupied]);
+        if (vacanttags) {
+            if (occ & 1 << i)
+		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : m == selmon ? SchemeOccupied : SchemeOccupiedInv]);
             else
-		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeOccupiedInv]);
-        else if (m == selmon)
-		    drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-        else
-		    drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeInvMon]);
+		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeInvMon]);
+        } else {
+            if (occ & 1 << i)
+		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : m == selmon ? SchemeOccupied : SchemeOccupiedInv]);
+            else
+		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : m == selmon ? SchemeNorm : SchemeInvMon]);
+        }
 		drw_text(drw, x, 0, w, bh, lrpad / 2, masterclientontag[i], urg & 1 << i);
 
 		if (occ & 1 << i || m->tagset[m->seltags] & 1 << i)
@@ -1332,9 +1349,9 @@ drawbar(Monitor *m)
 			if (c->tags & (1 << i)) {
 		        drw_setscheme(drw, scheme[selmon->sel == c ? SchemeClientSel : m->tagset[m->seltags] & 1 << i ? SchemeClientInc : SchemeClientNorm]);
                 if (selmon->sel == c)
-				    drw_rect(drw, x, 1 + (indn * 4), 9, 4, 4, urg & 1 << i);
+				    drw_rect(drw, x, 1 + (indn * 4), 8, 3, 4, urg & 1 << i);
                 else
-				    drw_rect(drw, x, 1 + (indn * 4), 4, 3, 4, urg & 1 << i);
+				    drw_rect(drw, x, 1 + (indn * 4), 4, 2, 3, urg & 1 << i);
 				indn++;
 			}
 		}
@@ -3320,6 +3337,12 @@ toggleview(const Arg *arg)
 		arrange(selmon);
 	}
 	updatecurrentdesktop();
+}
+
+void
+togglevacant(const Arg *arg)
+{
+    vacanttags = vacanttags == 0 ? 1 : 0;
 }
 
 void

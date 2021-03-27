@@ -23,6 +23,7 @@ static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows sel
 static const unsigned int systrayspacing = 2;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray             = 1;   /* 0 means no systray */
+static       unsigned int vacanttags     = 1;   /* 0 means no vacant tags */
 static const char *fonts[]               = { "mononoki Nerd Font Mono:size=12:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#4E5579";
@@ -119,7 +120,7 @@ static Sp scratchpads[] = {
 
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
-static const char ptagf[] = "[%s: %s]"; /* format of a tag label */
+static const char ptagf[] = "[%s:%s]"; /* format of a tag label */
 static const char etagf[] = "%s";    /* format of an empty tag */
 static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 
@@ -240,6 +241,7 @@ static Key keys[] = {
 
     { A,            -1,     XK_q,          killclient,             {0} },
     { A|C|S,        -1,     XK_x,          killpermanent,          {0} },
+    { M|S,          -1,     XK_v,          togglevacant,           {0} },
     { A|S,          -1,     XK_q,          killunsel,              {0} },
     { A,            -1,     XK_n,          togglebar,              {0} },
     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
