@@ -127,38 +127,43 @@ static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
 static const Rule rules[] = {
-	/* xprop(1):
-	 *	WM_CLASS(STRING) = instance, class
-	 *	WM_NAME(STRING) = title
-     *	_NET_WM_WINDOW_TYPE(ATOM) = wintype
-	 */
-	/* class      instance    title          wintype    tags mask     switchtotag     iscentered   isfloating   ispermanent   isterminal    noswallow   monitor */
+    /* xprop(1):
+     *  WM_CLASS(STRING) = instance, class
+     *  WM_NAME(STRING) = title
+     *  _NET_WM_WINDOW_TYPE(ATOM) = wintype
+     */
+    /* class      instance    title          wintype    tags mask     switchtotag     iscentered   isfloating   ispermanent   isterminal    noswallow   monitor  xkb layout*/
     /* Scratchpads */
-	{ "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),	  0,              1,           1,           0,            0,            0,          -1 }, /* St */
-	{ "spmus",    NULL,       NULL,          NULL,      SPTAG(1),	  0,              1,           1,           0,            0,            0,          -1 }, /* cmus */
-	{ NULL,       NULL,       "spcal",       NULL,      SPTAG(2),	  0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
+    { "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           1,           0,            0,            0,          -1,      0 }, /* St */
+    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              1,           1,           0,            0,            0,          -1,      0 }, /* cmus */
+    { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           1,           0,            0,            0,          -1,      0 }, /* qalculate-gtk */
     /* Terminals */
-	{ "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
-	{ "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
-	{ "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+    { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1,      0 },
+    { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1,      0 },
+    { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1,      0 },
     /* Noswallow */
-	{ NULL,       "Navigator",NULL,          NULL,      1,            1,              0,           0,           1,            0,            1,          -1 }, /* firefox */
-	{ NULL,       "chromium", NULL,          NULL,      1 << 3,       1,              0,           0,           1,            0,            1,          -1 }, /* chromium */
-	{ NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            0,            1,          -1 }, /* xev */
-	{ "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            0,            1,          -1 }, /* xephyr */
-	{ "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          -1 }, /* gimp */
-	{ NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           1,           0,            0,            1,          -1 },
+    { NULL,       "Navigator",NULL,          NULL,      1,            1,              0,           0,           1,            0,            1,          -1,      0 }, /* firefox */
+    { NULL,       "chromium", NULL,          NULL,      1 << 3,       1,              0,           0,           1,            0,            1,          -1,      1 }, /* chromium */
+    { NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            0,            1,          -1,      0 }, /* xev */
+    { "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            0,            1,          -1,      0 }, /* xephyr */
+    { "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          -1,      0 }, /* gimp */
+    { NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           1,           0,            0,            1,          -1,      0 },
     /* Wintype */
-	{ NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          -1 },
-	{ NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          -1,      0 },
+    { NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          -1,      0 },
+    { NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          -1,      0 },
+    { NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          -1,      0 },
 };
 
 static const MonitorRule monrules[] = {
-	/* monitor  tag  layout  mfact  nmaster  showbar  topbar */
-	{  1,       -1,  5,      -1,    -1,      -1,      -1     }, // use a different layout for the second monitor
-	{  -1,      -1,  0,      -1,    -1,      -1,      -1     }, // default
+   /* monitor  tag  layout  mfact  nmaster  showbar  topbar */
+   {  1,       -1,  5,      -1,    -1,      -1,      -1     }, // use a different layout for the second monitor
+   {  -1,      -1,  0,      -1,    -1,      -1,      -1     }, // default
+};
+
+static const char *xkb_layouts [] = {
+    "en",
+    "cz",
 };
 
 static const float mfact     = 0.5;
@@ -190,10 +195,10 @@ static const Layout layouts[] = {
 #define C ControlMask
 
 #define TAGKEYS(CHAIN,KEY,TAG) \
-    { A,       CHAIN,   KEY,   comboview,    {.ui = 1 << TAG} }, \
+    { A,       CHAIN,   KEY,   comboview,         {.ui = 1 << TAG} }, \
     { C,       CHAIN,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
     { M,       CHAIN,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
-    { A|S,     CHAIN,   KEY,   combotag,     {.ui = 1 << TAG} }, \
+    { A|S,     CHAIN,   KEY,   combotag,          {.ui = 1 << TAG} }, \
     { A|C,     CHAIN,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
     { M|S,     CHAIN,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
     { A|M,     CHAIN,   KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
@@ -242,8 +247,8 @@ static Key keys[] = {
 
     { A,            -1,     XK_q,          killclient,             {0} },
     { A|C|S,        -1,     XK_x,          killpermanent,          {0} },
-    { M|S,          -1,     XK_v,          togglevacant,           {0} },
     { A|S,          -1,     XK_q,          killunsel,              {0} },
+    { M|S,          -1,     XK_v,          togglevacant,           {0} },
     { A,            -1,     XK_n,          togglebar,              {0} },
     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
     { A|S,          -1,     XK_l,          setmfact,               {.f = +0.05} },

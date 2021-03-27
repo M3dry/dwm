@@ -37,6 +37,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
+#include <X11/XKBlib.h>
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
@@ -119,6 +120,7 @@ typedef struct {
 
 typedef struct Monitor Monitor;
 typedef struct Client Client;
+typedef struct XkbInfo XkbInfo;
 struct Client {
 	char name[256];
 	float mina, maxa;
@@ -138,6 +140,14 @@ struct Client {
 	Client *swallowing;
 	Monitor *mon;
 	Window win;
+    XkbInfo *xkb;
+};
+
+struct XkbInfo {
+    XkbInfo *next;
+    XkbInfo *prev;
+    int group;
+    Window w;
 };
 
 typedef struct {
@@ -202,6 +212,7 @@ typedef struct {
 	int isterminal;
 	int noswallow;
 	int monitor;
+   int xkb_layout;
 } Rule;
 
 typedef struct {
@@ -237,6 +248,7 @@ static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
 static Monitor *createmon(void);
+static XkbInfo *createxkb(Window w);
 static void cyclelayout(const Arg *arg);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
@@ -248,6 +260,7 @@ static int drawstatusbar(Monitor *m, int bh, char* text);
 static void drawtab(Monitor *m);
 static void drawtabs(void);
 static void expose(XEvent *e);
+static XkbInfo *findxkb(Window w);
 static Client *findbefore(Client *c);
 static void focus(Client *c);
 static void focusdir(const Arg *arg);
@@ -363,6 +376,7 @@ static Client *wintosystrayicon(Window w);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
+static void xkbeventnotify(XEvent *e);
 static void zoom(const Arg *arg);
 static void keyrelease(XEvent *e);
 static void combotag(const Arg *arg);
@@ -388,6 +402,7 @@ static int th = 0;           /* tab bar geometry */
 static int lrpad;            /* sum of left and right padding for text */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
+static int xkbEventType = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ButtonRelease] = keyrelease,
@@ -414,6 +429,8 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon, *prevmon;
 static Window root, wmcheckwin;
+static XkbInfo xkbGlobal;
+static XkbInfo *xkbSaved = NULL;
 static KeySym keychain = -1;
 
 static xcb_connection_t *xcon;
@@ -517,6 +534,9 @@ applyrules(Client *c)
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
+            if(r->xkb_layout > -1 ) {
+                c->xkb->group = r->xkb_layout;
+            }
 
 			if (r->switchtag) {
 				selmon = c->mon;
@@ -1120,6 +1140,26 @@ cyclelayout(const Arg *arg) {
 	}
 }
 
+static XkbInfo *
+createxkb(Window w){
+    XkbInfo *xkb;
+
+    xkb = malloc(sizeof *xkb);
+    if (xkb == NULL) {
+        die("fatal: could not malloc() %u bytes\n", sizeof *xkb);
+    }
+    xkb->group = xkbGlobal.group;
+    xkb->w = w;
+    xkb->next = xkbSaved;
+    if (xkbSaved != NULL) {
+        xkbSaved->prev = xkb;
+    }
+    xkb->prev = NULL;
+    xkbSaved = xkb;
+
+    return xkb;
+}
+
 void
 destroynotify(XEvent *e)
 {
@@ -1288,6 +1328,7 @@ drawbar(Monitor *m)
 {
     int indn;
 	int x, w, stw = 0;
+    int ww = 0;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 	char tagdisp[64];
@@ -1344,7 +1385,7 @@ drawbar(Monitor *m)
         }
 		drw_text(drw, x, 0, w, bh, lrpad / 2, masterclientontag[i], urg & 1 << i);
 
-		if (occ & 1 << i || m->tagset[m->seltags] & 1 << i)
+		if (!vacanttags && (occ & 1 << i || m->tagset[m->seltags] & 1 << i))
 			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
 
 		for (c = m->clients; c; c = c->next) {
@@ -1510,6 +1551,18 @@ findbefore(Client *c)
 		return NULL;
 	for (tmp = selmon->clients; tmp && tmp->next != c; tmp = tmp->next);
 	return tmp;
+}
+
+XkbInfo *
+findxkb(Window w)
+{
+    XkbInfo *xkb;
+    for (xkb = xkbSaved; xkb != NULL; xkb=xkb->next) {
+        if (xkb->w == w) {
+            return xkb;
+        }
+    }
+    return NULL;
 }
 
 void
@@ -1949,6 +2002,7 @@ manage(Window w, XWindowAttributes *wa)
 	Client *c, *t = NULL, *term = NULL;
 	Window trans = None;
 	XWindowChanges wc;
+    XkbInfo *xkb;
 
 	c = ecalloc(1, sizeof(Client));
 	c->win = w;
@@ -1962,6 +2016,14 @@ manage(Window w, XWindowAttributes *wa)
 	c->cfact = 1.0;
 
 	updatetitle(c);
+
+    /* Setting current xkb state must be before applyrules */
+    xkb = findxkb(c->win);
+    if (xkb == NULL) {
+        xkb = createxkb(c->win);
+    }
+    c->xkb = xkb;
+
 	if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
 		c->mon = t->mon;
 		c->tags = t->tags;
@@ -2531,8 +2593,14 @@ run(void)
 	/* main event loop */
 	XSync(dpy, False);
 	while (running && !XNextEvent(dpy, &ev))
+    {
+        if(ev.type == xkbEventType) {
+            xkbeventnotify(&ev);
+            continue;
+        }
 		if (handler[ev.type])
 			handler[ev.type](&ev); /* call handler */
+    }
 }
 
 void
@@ -2715,6 +2783,7 @@ setfocus(Client *c)
 		XChangeProperty(dpy, root, netatom[NetActiveWindow],
 			XA_WINDOW, 32, PropModeReplace,
 			(unsigned char *) &(c->win), 1);
+        XkbLockGroup(dpy, XkbUseCoreKbd, c->xkb->group);
 	}
 	sendevent(c->win, wmatom[WMTakeFocus], NoEventMask, wmatom[WMTakeFocus], CurrentTime, 0, 0, 0);
 }
@@ -2815,6 +2884,7 @@ setup(void)
 {
 	int i;
 	XSetWindowAttributes wa;
+    XkbStateRec xkbstate;
 	Atom utf8string;
 
 	/* clean up any zombies immediately */
@@ -2898,6 +2968,16 @@ setup(void)
 		|LeaveWindowMask|StructureNotifyMask|PropertyChangeMask;
 	XChangeWindowAttributes(dpy, root, CWEventMask|CWCursor, &wa);
 	XSelectInput(dpy, root, wa.event_mask);
+
+    /* get xkb extension info, events and current state */
+    if (!XkbQueryExtension(dpy, NULL, &xkbEventType, NULL, NULL, NULL)) {
+		fputs("warning: can not query xkb extension\n", stderr);
+    }
+    XkbSelectEventDetails(dpy, XkbUseCoreKbd, XkbStateNotify,
+                          XkbAllStateComponentsMask, XkbGroupStateMask);
+    XkbGetState(dpy, XkbUseCoreKbd, &xkbstate);
+    xkbGlobal.group = xkbstate.locked_group;
+
 	grabkeys();
 	focus(NULL);
 }
@@ -3336,7 +3416,8 @@ toggleview(const Arg *arg)
 void
 togglevacant(const Arg *arg)
 {
-    vacanttags = vacanttags == 0 ? 1 : 0;
+    vacanttags = vacanttags ? 0 : 1;
+	drawbars();
 }
 
 void
@@ -3376,6 +3457,7 @@ unmanage(Client *c, int destroyed)
 	Monitor *m = c->mon;
 	unsigned int switchtag = c->switchtag;
 	XWindowChanges wc;
+    XkbInfo *xkb;
 
 	if (c->swallowing) {
 		unswallow(c);
@@ -3404,6 +3486,18 @@ unmanage(Client *c, int destroyed)
 		XSetErrorHandler(xerror);
 		XUngrabServer(dpy);
 	}
+    else {
+        xkb = findxkb(c->win);
+        if (xkb != NULL) {
+            if (xkb->prev) {
+                xkb->prev->next = xkb->next;
+            }
+            if (xkb->next) {
+                xkb->next->prev = xkb->prev;
+            }
+            free(xkb);
+        }
+    }
 	free(c);
 
 	if (!s) {
@@ -4149,6 +4243,21 @@ systraytomon(Monitor *m) {
 	if(systraypinningfailfirst && n < systraypinning)
 		return mons;
 	return t;
+}
+
+void xkbeventnotify(XEvent *e)
+{
+    XkbEvent *ev;
+
+    ev = (XkbEvent *) e;
+    switch (ev->any.xkb_type) {
+    case XkbStateNotify:
+        xkbGlobal.group = ev->state.locked_group;
+        if (selmon != NULL && selmon->sel != NULL) {
+            selmon->sel->xkb->group = xkbGlobal.group;
+        }
+        break;
+    }
 }
 
 void
