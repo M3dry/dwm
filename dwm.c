@@ -132,7 +132,7 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 	unsigned int switchtag;
-	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, needresize, iscentered, issticky, isterminal, noswallow, issteam, ispermanent;
+	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, needresize, issticky, isterminal, noswallow, issteam, ispermanent;
 	int fakefullscreen;
 	pid_t pid;
 	Client *next;
@@ -206,7 +206,6 @@ typedef struct {
 	const char *wintype;
 	unsigned int tags;
 	int switchtag;
-	int iscentered;
 	int isfloating;
 	int ispermanent;
 	int isterminal;
@@ -502,7 +501,6 @@ applyrules(Client *c)
 	XClassHint ch = { NULL, NULL };
 
 	/* rule matching */
-	c->iscentered = 0;
 	c->isfloating = 0;
 	c->tags = 0;
 	XGetClassHint(dpy, c->win, &ch);
@@ -522,7 +520,6 @@ applyrules(Client *c)
 		{
 			c->isterminal = r->isterminal;
 			c->noswallow  = r->noswallow;
-			c->iscentered = r->iscentered;
 			c->isfloating = r->isfloating;
 			c->ispermanent = r->ispermanent;
 			c->tags |= r->tags;
@@ -1385,7 +1382,7 @@ drawbar(Monitor *m)
         }
 		drw_text(drw, x, 0, w, bh, lrpad / 2, masterclientontag[i], urg & 1 << i);
 
-		if (!vacanttags && (occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+		if (underlinetags && ((underlinevacant) ? vacanttags : !vacanttags && (occ & 1 << i || m->tagset[m->seltags] & 1 << i)))
 			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
 
 		for (c = m->clients; c; c = c->next) {
@@ -2068,15 +2065,13 @@ manage(Window w, XWindowAttributes *wa)
 		setfullscreen(c, 1);
 	updatesizehints(c);
 	updatewmhints(c);
+	c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+	c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
 	updatemotifhints(c);
 	c->sfx = c->x;
 	c->sfy = c->y;
 	c->sfw = c->w;
 	c->sfh = c->h;
-	if (c->iscentered) {
-		c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
-		c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
-	}
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, 0);
 	if (!c->isfloating)
