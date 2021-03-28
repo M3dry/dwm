@@ -375,6 +375,7 @@ static Key keys[] = {
     { A|S,          -1,     XK_q,          killunsel,              {0} },
     { M|S,          -1,     XK_v,          togglevacant,           {0} },
     { A,            -1,     XK_n,          togglebar,              {0} },
+    { A,            -1,     XK_r,          reorganizetags,         {0} },
     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
     { A|S,          -1,     XK_l,          setmfact,               {.f = +0.05} },
     { A|S,          -1,     XK_j,          setcfact,               {.f = +0.25} },
