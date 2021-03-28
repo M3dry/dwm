@@ -3,16 +3,35 @@
 
 * Table of contents :toc_4:
 - [[#variables][Variables]]
+  - [[#tab-bar][Tab bar]]
+  - [[#bar][Bar]]
+    - [[#showbar][Showbar]]
+    - [[#bar-position][Bar position]]
+    - [[#bad-padding][Bad padding]]
+    - [[#bar-height][Bar height]]
+    - [[#systray][Systray]]
+    - [[#vacant-tags][Vacant tags]]
+    - [[#underline][Underline]]
+      - [[#underline-size][Underline size]]
+      - [[#enable-underline][Enable underline]]
+  - [[#gaps][Gaps]]
+  - [[#swallow-floating][Swallow floating]]
+  - [[#border-px][Border px]]
+  - [[#snap][Snap]]
+  - [[#start-on-tag][Start on tag]]
+  - [[#decoration-hints][Decoration hints]]
+  - [[#focus-on-wheel][Focus on wheel]]
+  - [[#fonts][Fonts]]
 - [[#colors][Colors]]
   - [[#color-variables][Color variables]]
-    - [[#selected-bar-colors][Selected bar colors]]
+    - [[#selected-monitor-colors][Selected monitor colors]]
+    - [[#unselected-monitors-colors][Unselected monitors colors]]
     - [[#special-window-border-colors][Special window border colors]]
     - [[#occupied-tag-colors][Occupied tag colors]]
     - [[#status-colors][Status colors]]
     - [[#ltsymbol-colors][Ltsymbol colors]]
     - [[#tab-bar-colors][Tab bar colors]]
     - [[#client-indicator-colors][Client indicator colors]]
-    - [[#unselected-monitors-colors][Unselected monitors colors]]
     - [[#layout-border-colors][Layout border colors]]
   - [[#colors-array][Colors array]]
 - [[#scratchpads][Scratchpads]]
@@ -37,53 +56,109 @@
   - [[#manipulating-windows][Manipulating windows]]
   - [[#monitors][Monitors]]
   - [[#moveresize][Moveresize]]
-  - [[#gaps][Gaps]]
+  - [[#gaps-1][Gaps]]
   - [[#window-border][Window border]]
   - [[#tagkeys][Tagkeys]]
   - [[#quit-and-restart][Quit and restart]]
 - [[#mouse-actions][Mouse actions]]
 
 * Variables
+** Tab bar
 #+BEGIN_SRC C
 enum showtab_modes { showtab_never, showtab_auto, showtab_nmodes, showtab_always};
 static const int showtab                   = showtab_auto; /* Default tab bar show mode */
 static const int toptab                    = 0;   /* False means bottom tab bar */
-static const unsigned int borderpx         = 2;   /* border pixel of windows */
-static const unsigned int snap             = 0;   /* snap pixel */
-static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
-static const int startontag                = 1;   /* 0 means no tag active on start */
-static const int decorhints                = 1;   /* 1 means respect decoration hints */
+#+END_SRC
+** Bar
+*** Showbar
+#+BEGIN_SRC C
+static const int showbar                   = 1;   /* 0 means no bar */
+#+END_SRC
+*** Bar position
+#+BEGIN_SRC C
+static const int topbar                    = 1;   /* 0 means bottom bar */
+#+END_SRC
+*** Bad padding
+#+BEGIN_SRC C
+static const int horizpadbar               = 0;   /* horizontal padding for statusbar */
+static const int vertpadbar                = 0;   /* vertical padding for statusbar */
+#+END_SRC
+*** Bar height
+#+BEGIN_SRC C
+static const int user_bh                   = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
+#+END_SRC
+*** Systray
+#+BEGIN_SRC C
+static const unsigned int systraypinning   = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
+static const unsigned int systrayspacing   = 2;   /* systray spacing */
+static const int systraypinningfailfirst   = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
+static const int showsystray               = 1;   /* 0 means no systray */
+#+END_SRC
+*** Vacant tags
+#+BEGIN_SRC C
+static       unsigned int vacanttags       = 1;   /* 0 means no vacant tags */
+#+END_SRC
+*** Underline
+**** Underline size
+#+BEGIN_SRC C
+static const unsigned int ulinepad         = 2;   /* horizontal padding between the underline and tag */
+static const unsigned int ulinestroke      = 2;   /* thickness / height of the underline */
+static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of the bar the line should appear */
+#+END_SRC
+**** Enable underline
+#+BEGIN_SRC C
+static const unsigned int underlinetags    = 0;   /* 0 means no underline */
+static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
+#+END_SRC
+** Gaps
+#+begin_src C
 static const unsigned int gappih           = 5;   /* horiz inner gap between windows */
 static const unsigned int gappiv           = 5;   /* vert inner gap between windows */
 static const unsigned int gappoh           = 0;   /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = 0;   /* vert outer gap between windows and screen edge */
 static       int smartgaps                 = 1;   /* 1 means no outer gap when there is only one window */
+#+end_src
+** Swallow floating
+#+BEGIN_SRC C
+static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
+#+END_SRC
+** Border px
+#+BEGIN_SRC C
+static const unsigned int borderpx         = 2;   /* border pixel of windows */
+#+END_SRC
+** Snap
+#+BEGIN_SRC C
+static const unsigned int snap             = 0;   /* snap pixel */
+#+END_SRC
+** Start on tag
+#+BEGIN_SRC C
+static const int startontag                = 1;   /* 0 means no tag active on start */
+#+END_SRC
+** Decoration hints
+#+BEGIN_SRC C
+static const int decorhints                = 1;   /* 1 means respect decoration hints */
+#+END_SRC
+** Focus on wheel
+#+BEGIN_SRC C
 static const int focusonwheel              = 0;
-static const int showbar                   = 1;   /* 0 means no bar */
-static const int topbar                    = 1;   /* 0 means bottom bar */
-static const int horizpadbar               = 8;   /* horizontal padding for statusbar */
-static const int vertpadbar                = 0;   /* vertical padding for statusbar */
-static const int user_bh                   = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
-static const unsigned int ulinepad         = 2;   /* horizontal padding between the underline and tag */
-static const unsigned int ulinestroke      = 2;   /* thickness / height of the underline */
-static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of the bar the line should appear */
-static const unsigned int systraypinning   = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
-static const unsigned int systrayspacing   = 2;   /* systray spacing */
-static const int systraypinningfailfirst   = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
-static const int showsystray               = 1;   /* 0 means no systray */
-static const unsigned int underlinetags    = 0;   /* 0 means no underline */
-static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
-static       unsigned int vacanttags       = 1;   /* 0 means no vacant tags */
+#+END_SRC
+** Fonts
+#+BEGIN_SRC C
 static const char *fonts[]                 = { "mononoki Nerd Font Mono:size=12:antialias=true:autohint=true" };
 #+END_SRC
 * Colors
 ** Color variables
-*** Selected bar colors
+*** Selected monitor colors
 #+BEGIN_SRC C
 static const char normfg[]                = "#4E5579";
 static const char selfg[]                 = "#ff5370";
 static const char normbg[]                = "#1E1C31";
 static const char selbg[]                 = "#1E1C31";
+#+END_SRC
+*** Unselected monitors colors
+#+BEGIN_SRC C
+static const char invmonbg[]              = "#3071db";
+static const char invmonfg[]              = "#ffffff";
 #+END_SRC
 *** Special window border colors
 #+BEGIN_SRC C
@@ -127,11 +202,6 @@ static const char seltabbg[]              = "#1E1C31";
 static const char selindfg[]              = "#ff5370";
 static const char normindfg[]             = "#7986E7";
 static const char incindfg[]              = "#7986E7";
-#+END_SRC
-*** Unselected monitors colors
-#+BEGIN_SRC C
-static const char invmonbg[]              = "#3071db";
-static const char invmonfg[]              = "#ffffff";
 #+END_SRC
 *** Layout border colors
 #+BEGIN_SRC C
