@@ -336,9 +336,6 @@ static void tabmode(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagwith(const Arg *arg);
 static void tagmon(const Arg *arg);
-static void focusnextmon(const Arg *arg);
-static void focusprevmon(const Arg *arg);
-static void focusothermon(const Arg *arg, int dir);
 static void tagnextmon(const Arg *arg);
 static void tagprevmon(const Arg *arg);
 static void tagothermon(const Arg *arg, int dir);
@@ -1699,7 +1696,6 @@ focusmon(const Arg *arg)
 	prevmon = selmon;
 	selmon = m;
 	focus(NULL);
-	warp(selmon->sel);
 }
 
 void
@@ -2652,34 +2648,6 @@ scan(void)
 		}
 		if (wins)
 			XFree(wins);
-	}
-}
-
-void
-focusnextmon(const Arg *arg)
-{
-	focusothermon(arg, 1);
-}
-
-void
-focusprevmon(const Arg *arg)
-{
-	focusothermon(arg, -1);
-}
-
-void
-focusothermon(const Arg *arg, int dir)
-{
-	Client *sel;
-	Monitor *newmon;
-
-	if (!selmon->sel || !mons->next)
-		return;
-	newmon = dirtomon(dir);
-	if (arg->ui & TAGMASK) {
-		sel->tags = arg->ui & TAGMASK;
-		focus(NULL);
-		arrange(newmon);
 	}
 }
 

@@ -219,8 +219,6 @@ static const Layout layouts[] = {
     { A|S,     -1,   KEY,   combotag,     {.ui = 1 << TAG} }, \
     { A|C,     -1,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
     { M|S,     -1,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
-    { C|M,     XK_l, KEY,   focusnextmon, {.ui = 1 << TAG} }, \
-    { C|M,     XK_h, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
     { A|M,     XK_l, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
     { A|M,     XK_h, KEY,   tagprevmon,   {.ui = 1 << TAG} },
 
