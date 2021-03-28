@@ -212,15 +212,15 @@ static const Layout layouts[] = {
 #define S ShiftMask
 #define C ControlMask
 
-#define TAGKEYS(CHAIN,KEY,TAG) \
-    { A,       CHAIN,   KEY,   comboview,         {.ui = 1 << TAG} }, \
-    { C,       CHAIN,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
-    { M,       CHAIN,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
-    { A|S,     CHAIN,   KEY,   combotag,          {.ui = 1 << TAG} }, \
-    { A|C,     CHAIN,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
-    { M|S,     CHAIN,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
-    { A|M,     CHAIN,   KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|M|S,   CHAIN,   KEY,   tagprevmon,   {.ui = 1 << TAG} },
+#define TAGKEYS(KEY,TAG) \
+    { A,       -1,   KEY,   comboview,    {.ui = 1 << TAG} }, \
+    { C,       -1,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
+    { M,       -1,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
+    { A|S,     -1,   KEY,   combotag,     {.ui = 1 << TAG} }, \
+    { A|C,     -1,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
+    { M|S,     -1,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
+    { A|M,     XK_l, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
+    { A|M,     XK_h, KEY,   tagprevmon,   {.ui = 1 << TAG} },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
@@ -341,15 +341,15 @@ static Key keys[] = {
     { A|C,          -1,     XK_minus,      setborderpx,            {.i = -1 } },
     { M,            -1,     XK_0,          setborderpx,            {.i = 0 } },
 
-    TAGKEYS(        -1,     XK_1,                                  0)
-    TAGKEYS(        -1,     XK_2,                                  1)
-    TAGKEYS(        -1,     XK_3,                                  2)
-    TAGKEYS(        -1,     XK_4,                                  3)
-    TAGKEYS(        -1,     XK_5,                                  4)
-    TAGKEYS(        -1,     XK_6,                                  5)
-    TAGKEYS(        -1,     XK_7,                                  6)
-    TAGKEYS(        -1,     XK_8,                                  7)
-    TAGKEYS(        -1,     XK_9,                                  8)
+    TAGKEYS(                XK_1,                                  0)
+    TAGKEYS(                XK_2,                                  1)
+    TAGKEYS(                XK_3,                                  2)
+    TAGKEYS(                XK_4,                                  3)
+    TAGKEYS(                XK_5,                                  4)
+    TAGKEYS(                XK_6,                                  5)
+    TAGKEYS(                XK_7,                                  6)
+    TAGKEYS(                XK_8,                                  7)
+    TAGKEYS(                XK_9,                                  8)
 
     { M|S,          -1,     XK_Escape,     quit,                   {0} },
     { A|C|S,        -1,     XK_q,          quit,                   {1} },
