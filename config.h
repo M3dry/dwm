@@ -95,10 +95,10 @@ static const char normmonocleborder[]     = "#1E1C31";
 static const char normgaplessgridborder[] = "#1E1C31";
 static const char seltileborder[]         = "#ff5370";
 static const char selfibonacciborder[]    = "#ff5370";
-static const char selfloatborder[]        = "#16cc31";
+static const char selfloatborder[]        = "#ff5370";
 static const char seldeckborder[]         = "#ff5370";
 static const char selnrowgridborder[]     = "#ff5370";
-static const char selbstackborder[]       = "#c678dd";
+static const char selbstackborder[]       = "#ff5370";
 static const char selcenmasterborder[]    = "#ff5370";
 static const char selmonocleborder[]      = "#ff5370";
 static const char selgaplessgridborder[]  = "#ff5370";
@@ -271,9 +271,10 @@ static Key keys[] = {
     { A,            -1,     XK_r,          reorganizetags,         {0} },
     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
     { A|S,          -1,     XK_l,          setmfact,               {.f = +0.05} },
+    { A|C,          -1,     XK_u,          setmfact,               {.f = mfact + 1} },
     { A|S,          -1,     XK_j,          setcfact,               {.f = +0.25} },
     { A|S,          -1,     XK_k,          setcfact,               {.f = -0.25} },
-    { A|C,          -1,     XK_u,          setcfact,               {0} },
+    { M|C,          -1,     XK_u,          setcfact,               {0} },
     { A,            -1,     XK_bracketleft,incnmaster,             {.i = +1 } },
     { A,            -1,     XK_bracketright,incnmaster,            {.i = -1 } },
     { M,            -1,     XK_space,      focusmaster,            {0} },

@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details.
+/*, stw* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
  * driven through handling X events. In contrast to other X clients, a window
@@ -255,7 +255,7 @@ static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
-static int drawstatusbar(Monitor *m, int bh, char* text);
+static int drawstatusbar(Monitor *m, int bh, char* text, int stw);
 static void drawtab(Monitor *m);
 static void drawtabs(void);
 static void expose(XEvent *e);
@@ -1214,7 +1214,7 @@ dirtomon(int dir)
 }
 
 int
-drawstatusbar(Monitor *m, int bh, char* stext) {
+drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
 	int ret, i, w, x, len;
 	short isCode = 0;
 	char *text;
@@ -1267,8 +1267,8 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
 			isCode = 1;
 
 			text[i] = '\0';
-			w = TEXTW(text) - lrpad;
-			drw_text(drw, x, 0, w, bh, 0, text, 0);
+            w = TEXTW(text) - lrpad;
+			drw_text(drw, x - stw, 0, w, bh, 0, text, 0);
 
 			x += w;
 
@@ -1412,7 +1412,8 @@ drawbar(Monitor *m)
 	drw_rect(drw, x, 0, m->ww - x, bh, 1, 1);
 
 	if (m == selmon || 1) { /* status is only drawn on selected monitor */
-		sw = m->ww - drawstatusbar(m, bh, stext);
+		sw = TEXTW(stext) - lrpad / 2 + 2; /* 2px right padding */
+		sw = m->ww - drawstatusbar(m, bh, stext, stw);
 	}
 
 	drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
