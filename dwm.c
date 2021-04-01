@@ -321,6 +321,7 @@ static void setcurrentdesktop(void);
 static void setdesktopnames(void);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
+static void setlasttag(int tagbit);
 static void setlayout(const Arg *arg);
 static void setcfact(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -334,6 +335,7 @@ static void sigchld(int unused);
 static void sighup(int unused);
 static void sigterm(int unused);
 static void spawn(const Arg *arg);
+static void spawndefault();
 static void switchcol(const Arg *arg);
 static void swaptags(const Arg *arg);
 static Monitor *systraytomon(Monitor *m);
@@ -440,6 +442,9 @@ static KeySym keychain = -1;
 
 static xcb_connection_t *xcon;
 
+static int lastchosentag[8];
+static int previouschosentag[8];
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 unsigned int tagw[LENGTH(tags)];
@@ -487,6 +492,7 @@ comboview(const Arg *arg) {
 	if (combo) {
 		selmon->tagset[selmon->seltags] |= newtags;
 	} else {
+	    setlasttag(arg->ui);
 		selmon->seltags ^= 1;	/*toggle tagset*/
 		combo = 1;
 		if (newtags)
@@ -2918,6 +2924,24 @@ setfullscreen(Client *c, int fullscreen)
 }
 
 void
+setlasttag(int tagbit) {
+	const int mon = selmon->num;
+	if (tagbit > 0) {
+		int i = 1, pos = 0;
+		while (!(i & tagbit)) {
+			i = i << 1;
+			++pos;
+		}
+		previouschosentag[mon] = lastchosentag[mon];
+		lastchosentag[mon] = pos;
+	} else {
+		const int tempTag = lastchosentag[mon];
+		lastchosentag[mon] = previouschosentag[mon];
+		previouschosentag[mon] = tempTag;
+	}
+}
+
+void
 setlayout(const Arg *arg)
 {
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt]) {
@@ -3240,6 +3264,17 @@ swaptags(const Arg *arg)
 }
 
 void
+spawndefault()
+{
+	const char *app = defaulttagapps[lastchosentag[selmon->num]];
+	if (app) {
+		const char *defaultcmd[] = {app, NULL};
+		Arg a = {.v = defaultcmd};
+		spawn(&a);
+	}
+}
+
+void
 tag(const Arg *arg)
 {
 	if (selmon->sel && arg->ui & TAGMASK) {
@@ -3503,6 +3538,7 @@ toggleview(const Arg *arg)
 	}
 
 	selmon->tagset[selmon->seltags] = newtagset;
+	setlasttag(newtagset);
 	focus(NULL);
 	arrange(selmon);
 	updatecurrentdesktop();
@@ -4049,6 +4085,7 @@ view(const Arg *arg)
         return;
     }
 	prevmon = NULL;
+	setlasttag(arg->ui);
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if (arg->ui & TAGMASK) {
 		selmon->pertag->prevtag = selmon->pertag->curtag;

@@ -143,6 +143,8 @@ static const char ptagf[] = "[%s:%s]"; /* format of a tag label */
 static const char etagf[] = "%s";    /* format of an empty tag */
 static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 
+static const char *defaulttagapps[] = { "firefox", "emacsclient -c", "discord", "chromium", NULL, NULL, NULL, NULL, "gimp" };
+
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
 static const Rule rules[] = {
     /* xprop(1):
@@ -243,6 +245,7 @@ static Key keys[] = {
     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
     { A,            -1,     XK_s,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
+    { A|S,          -1,     XK_r,          spawndefault,           {0} },
 
     { A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
     { A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },

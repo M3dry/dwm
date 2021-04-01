@@ -35,9 +35,10 @@
     - [[#layout-border-colors][Layout border colors]]
   - [[#colors-array][Colors array]]
 - [[#scratchpads][Scratchpads]]
-- [[#tags-variables][Tags variables]]
+- [[#tag][Tag]]
   - [[#number-of-tags][Number of tags]]
-  - [[#master-name][Master name]]
+  - [[#master-window-name][Master window name]]
+  - [[#default-applications][Default applications]]
 - [[#rules][Rules]]
   - [[#client-rules][Client rules]]
   - [[#monitor-rules][Monitor rules]]
@@ -263,17 +264,22 @@ static Sp scratchpads[] = {
    {"spcal",       spcmd3},
 };
 #+END_SRC
-* Tags variables
+* Tag
 ** Number of tags
 #+BEGIN_SRC C
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #+END_SRC
-** Master name
+** Master window name
 #+BEGIN_SRC C
 static const char ptagf[] = "[%s:%s]"; /* format of a tag label */
 static const char etagf[] = "%s";    /* format of an empty tag */
 static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 #+END_SRC
+** Default applications
+#+BEGIN_SRC C
+static const char *defaulttagapps[] = { "firefox", "emacsclient -c", "discord", "chromium", NULL, NULL, NULL, NULL, "gimp" };
+#+END_SRC
+
 * Rules
 ** Client rules
 #+BEGIN_SRC C
@@ -415,6 +421,7 @@ static Key keys[] = {
     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
     { A,            -1,     XK_s,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
+    { A|S,          -1,     XK_r,          spawndefault,           {0} },
 #+END_SRC
 *** Launch dmenu scripts
 #+BEGIN_SRC C
