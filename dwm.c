@@ -1324,7 +1324,7 @@ drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
 void
 drawbar(Monitor *m)
 {
-    int indn;
+    int indn, cnum = 0;
 	int x, w, stw = 0;
     int ww = 0;
 	unsigned int i, occ = 0, urg = 0;
@@ -1358,6 +1358,7 @@ drawbar(Monitor *m)
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
 		indn = 0;
+		cnum = 0;
         if (vacanttags)
 		    /* do not draw vacant tags */
 		    if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
@@ -1386,12 +1387,17 @@ drawbar(Monitor *m)
 			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
 
 		for (c = m->clients; c; c = c->next) {
+			if (c->tags & (1 << i))
+				cnum++;
+		}
+
+		for (c = m->clients; c && cnum > 1; c = c->next) {
 			if (c->tags & (1 << i)) {
-		        drw_setscheme(drw, scheme[selmon->sel == c ? SchemeClientSel : m->tagset[m->seltags] & 1 << i ? SchemeClientInc : SchemeClientNorm]);
-                if (selmon->sel == c && indn != 0)
-				    drw_rect(drw, x, 1 + (indn * 2), 8, 2, 4, urg & 1 << i);
-                else if (indn != 0)
-				    drw_rect(drw, x, 1 + (indn * 2), 4, 1, 3, urg & 1 << i);
+				drw_setscheme(drw, scheme[selmon->sel == c ? SchemeClientSel : m->tagset[m->seltags] & 1 << i ? SchemeClientInc : SchemeClientNorm]);
+				if (selmon->sel == c)
+					drw_rect(drw, x, 1 + (indn * 2), 8, 2, 4, urg & 1 << i);
+				else
+					drw_rect(drw, x, 1 + (indn * 2), 4, 1, 3, urg & 1 << i);
 				indn++;
 			}
 		}
