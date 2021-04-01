@@ -45,6 +45,7 @@
 - [[#layouts][Layouts]]
   - [[#layout-modifiers][Layout modifiers]]
   - [[#layout-definitions][Layout definitions]]
+  - [[#layoutmenu][Layoutmenu]]
 - [[#key-bindings][Key bindings]]
   - [[#special-keys][Special keys]]
   - [[#tag-functions][Tag functions]]
@@ -365,6 +366,10 @@ static const Layout layouts[] = {
     { NULL,       NULL },
 };
 #+END_SRC
+** Layoutmenu
+#+BEGIN_SRC C
+static const char *layoutmenu_cmd = "layoutmenu.sh";
+#+END_SRC
 * Key bindings
 ** Special keys
 + Mod4Mask = Modkey
@@ -461,8 +466,8 @@ static Key keys[] = {
     { A,            -1,     XK_j,          focusdir,               {.i = 3 } }, // down
     { M|S,          -1,     XK_j,          focusstack,             {.i = +1 } },
     { M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
-    { M|C,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
-    { M|C,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
+    { M|A,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
+    { M|A,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
 #+END_SRC
 ** Changing layouts and manipulating them
 #+BEGIN_SRC C
@@ -559,6 +564,7 @@ static Key keys[] = {
 #+BEGIN_SRC C
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
+    { ClkLtSymbol,          0,              Button1,        layoutmenu,     {0} },
     { ClkClientWin,         A,              Button1,        movemouse,      {0} },
     { ClkClientWin,         A,              Button2,        togglefloating, {0} },
     { ClkClientWin,         A,              Button3,        resizemouse,    {0} },

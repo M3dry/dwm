@@ -205,6 +205,8 @@ static const Layout layouts[] = {
     { NULL,       NULL },
 };
 
+static const char *layoutmenu_cmd = "layoutmenu.sh";
+
 #include <X11/XF86keysym.h>
 
 #define M Mod4Mask
@@ -284,8 +286,8 @@ static Key keys[] = {
     { A,            -1,     XK_j,          focusdir,               {.i = 3 } }, // down
     { M|S,          -1,     XK_j,          focusstack,             {.i = +1 } },
     { M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
-    { M|C,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
-    { M|C,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
+    { M|A,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
+    { M|A,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
 
     { A,            -1,     XK_t,          setlayout,              {.v = &layouts[0]} },
     { A,            -1,     XK_v,          setlayout,              {.v = &layouts[1]} },
@@ -357,6 +359,7 @@ static Key keys[] = {
 
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
+    { ClkLtSymbol,          0,              Button1,        layoutmenu,     {0} },
     { ClkClientWin,         A,              Button1,        movemouse,      {0} },
     { ClkClientWin,         A,              Button2,        togglefloating, {0} },
     { ClkClientWin,         A,              Button3,        resizemouse,    {0} },
@@ -365,4 +368,35 @@ static Button buttons[] = {
     { ClkTagBar,            A,              Button1,        tag,            {0} },
     { ClkTagBar,            A,              Button3,        toggletag,      {0} },
     { ClkTabBar,            0,              Button1,        focuswin,       {0} },
+};
+
+/* signal definitions */
+/* signum must be greater than 0 */
+/* trigger signals using `xsetroot -name "fsignal:<signame> [<type> <value>]"` */
+#include "dwmc.c"
+static Signal signals[] = {
+	/* signum           function */
+	{ "focusstack",     focusstack },
+	{ "setmfact",       setmfact },
+	{ "togglebar",      togglebar },
+	{ "incnmaster",     incnmaster },
+	{ "togglefloating", togglefloating },
+	{ "focusmon",       focusmon },
+	{ "tagmon",         tagmon },
+	{ "zoom",           zoom },
+	{ "view",           view },
+	{ "viewall",        viewall },
+	{ "viewex",         viewex },
+	{ "toggleview",     view },
+	{ "toggleviewex",   toggleviewex },
+	{ "tag",            tag },
+	{ "tagall",         tagall },
+	{ "tagex",          tagex },
+	{ "toggletag",      tag },
+	{ "toggletagex",    toggletagex },
+	{ "killclient",     killclient },
+	{ "quit",           quit },
+	{ "setlayout",      setlayout },
+	{ "setlayoutex",    setlayoutex },
+	{ "layoutmenu",     layoutmenu },
 };
