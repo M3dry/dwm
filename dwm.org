@@ -45,12 +45,11 @@
 - [[#layouts][Layouts]]
   - [[#layout-modifiers][Layout modifiers]]
   - [[#layout-definitions][Layout definitions]]
-  - [[#layoutmenu][Layoutmenu]]
 - [[#key-bindings][Key bindings]]
   - [[#special-keys][Special keys]]
   - [[#tag-functions][Tag functions]]
   - [[#launch-applications][Launch applications]]
-  - [[#launch-dmenu-scripts][Launch dmenu scripts]]
+    - [[#launch-dmenu-scripts][Launch dmenu scripts]]
   - [[#multimedia-keys][Multimedia keys]]
   - [[#generic-manipulation][Generic manipulation]]
   - [[#changing-layouts-and-manipulating-them][Changing layouts and manipulating them]]
@@ -62,6 +61,7 @@
   - [[#tagkeys][Tagkeys]]
   - [[#quit-and-restart][Quit and restart]]
 - [[#mouse-actions][Mouse actions]]
+- [[#dwmc][dwmc]]
 
 * Variables
 ** Tab bar
@@ -366,10 +366,6 @@ static const Layout layouts[] = {
     { NULL,       NULL },
 };
 #+END_SRC
-** Layoutmenu
-#+BEGIN_SRC C
-static const char *layoutmenu_cmd = "layoutmenu.sh";
-#+END_SRC
 * Key bindings
 ** Special keys
 + Mod4Mask = Modkey
@@ -417,9 +413,10 @@ static Key keys[] = {
     { A,            -1,     XK_p,          spawn,                  SHCMD("pcmanfm") },
     { C,            -1,     XK_m,          spawn,                  SHCMD("multimc") },
     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
+    { A,            -1,     XK_s,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
 #+END_SRC
-** Launch dmenu scripts
+*** Launch dmenu scripts
 #+BEGIN_SRC C
     { A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
     { A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },
@@ -497,7 +494,7 @@ static Key keys[] = {
     { M,            -1,     XK_k,          pushup,                 {0} },
     { A,            -1,     XK_space,      togglefloating,         {0} },
     { A|S,          -1,     XK_space,      unfloatvisible,         {0} },
-    { M,            -1,     XK_s,          togglesticky,           {0} },
+    { A|S,          -1,     XK_s,          togglesticky,           {0} },
     { A,            -1,     XK_f,          togglefullscr,          {0} },
     { A|C,          -1,     XK_f,          togglefakefullscreen,   {0} },
     { A,            -1,     XK_u,          togglescratch,          {.ui = 0 } },
@@ -564,7 +561,7 @@ static Key keys[] = {
 #+BEGIN_SRC C
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
-    { ClkLtSymbol,          0,              Button1,        layoutmenu,     {0} },
+    { ClkLtSymbol,          0,              Button1,        spawn,          SHCMD("xmenu.sh -p 0x0") },
     { ClkClientWin,         A,              Button1,        movemouse,      {0} },
     { ClkClientWin,         A,              Button2,        togglefloating, {0} },
     { ClkClientWin,         A,              Button3,        resizemouse,    {0} },
@@ -573,5 +570,22 @@ static Button buttons[] = {
     { ClkTagBar,            A,              Button1,        tag,            {0} },
     { ClkTagBar,            A,              Button3,        toggletag,      {0} },
     { ClkTabBar,            0,              Button1,        focuswin,       {0} },
+};
+#+END_SRC
+* dwmc
+#+BEGIN_SRC C
+#include "dwmc.c"
+static Signal signals[] = {
+    /* signum           function */
+    { "togglebar",      togglebar },
+    { "togglevacant",   togglevacant },
+    { "focusmon",       focusmon },
+    { "tagmon",         tagmon },
+    { "quit",           quit },
+    { "viewex",         viewex },
+    { "toggleviewex",   toggleviewex },
+    { "tagex",          tagex },
+    { "toggletagex",    toggletagex },
+    { "setlayoutex",    setlayoutex },
 };
 #+END_SRC

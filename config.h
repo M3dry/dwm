@@ -205,8 +205,6 @@ static const Layout layouts[] = {
     { NULL,       NULL },
 };
 
-static const char *layoutmenu_cmd = "layoutmenu.sh";
-
 #include <X11/XF86keysym.h>
 
 #define M Mod4Mask
@@ -243,6 +241,7 @@ static Key keys[] = {
     { A,            -1,     XK_p,          spawn,                  SHCMD("pcmanfm") },
     { C,            -1,     XK_m,          spawn,                  SHCMD("multimc") },
     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
+    { A,            -1,     XK_s,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
 
     { A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
@@ -313,7 +312,7 @@ static Key keys[] = {
     { M,            -1,     XK_k,          pushup,                 {0} },
     { A,            -1,     XK_space,      togglefloating,         {0} },
     { A|S,          -1,     XK_space,      unfloatvisible,         {0} },
-    { M,            -1,     XK_s,          togglesticky,           {0} },
+    { A|S,          -1,     XK_s,          togglesticky,           {0} },
     { A,            -1,     XK_f,          togglefullscr,          {0} },
     { A|C,          -1,     XK_f,          togglefakefullscreen,   {0} },
     { A,            -1,     XK_u,          togglescratch,          {.ui = 0 } },
@@ -359,7 +358,7 @@ static Key keys[] = {
 
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
-    { ClkLtSymbol,          0,              Button1,        layoutmenu,     {0} },
+    { ClkLtSymbol,          0,              Button1,        spawn,          SHCMD("xmenu.sh -p 0x0") },
     { ClkClientWin,         A,              Button1,        movemouse,      {0} },
     { ClkClientWin,         A,              Button2,        togglefloating, {0} },
     { ClkClientWin,         A,              Button3,        resizemouse,    {0} },
@@ -370,21 +369,17 @@ static Button buttons[] = {
     { ClkTabBar,            0,              Button1,        focuswin,       {0} },
 };
 
-/* signal definitions */
-/* signum must be greater than 0 */
-/* trigger signals using `xsetroot -name "fsignal:<signame> [<type> <value>]"` */
 #include "dwmc.c"
 static Signal signals[] = {
-	/* signum           function */
+    /* signum           function */
     { "togglebar",      togglebar },
-	{ "togglevacant",   togglevacant },
-	{ "focusmon",       focusmon },
-	{ "tagmon",         tagmon },
-	{ "quit",           quit },
-	{ "layoutmenu",     layoutmenu },
-	{ "viewex",         viewex },
-	{ "toggleviewex",   toggleviewex },
-	{ "tagex",          tagex },
-	{ "toggletagex",    toggletagex },
-	{ "setlayoutex",    setlayoutex },
+    { "togglevacant",   togglevacant },
+    { "focusmon",       focusmon },
+    { "tagmon",         tagmon },
+    { "quit",           quit },
+    { "viewex",         viewex },
+    { "toggleviewex",   toggleviewex },
+    { "tagex",          tagex },
+    { "toggletagex",    toggletagex },
+    { "setlayoutex",    setlayoutex },
 };
