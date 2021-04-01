@@ -152,38 +152,35 @@ static const Rule rules[] = {
      *  WM_NAME(STRING) = title
      *  _NET_WM_WINDOW_TYPE(ATOM) = wintype
      */
-    /* class      instance    title          wintype    tags mask     switchtotag     isfloating   ispermanent   isterminal    noswallow   monitor  xkb layout*/
+    /* class      instance    title          wintype    tags mask     switchtotag     isfloating   ispermanent   isterminal    noswallow   monitor */
     /* Scratchpads */
-    { "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           0,            0,            0,          -1,      0 }, /* St */
-    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              1,           0,            0,            0,          -1,      0 }, /* cmus */
-    { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           0,            0,            0,          -1,      0 }, /* qalculate-gtk */
+    { "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           0,            0,            0,          -1 }, /* St */
+    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              1,           0,            0,            0,          -1 }, /* cmus */
+    { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           0,            0,            0,          -1 }, /* qalculate-gtk */
     /* Terminals */
-    { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1,      0 },
-    { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1,      0 },
-    { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1,      0 },
+    { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1 },
+    { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1 },
+    { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1 },
     /* Noswallow */
-    { NULL,       "Navigator",NULL,          NULL,      1,            1,              0,           1,            0,            1,          -1,      0 }, /* firefox */
-    { NULL,       "chromium", NULL,          NULL,      1 << 3,       1,              0,           1,            0,            1,          -1,      1 }, /* chromium */
-    { NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,            0,            1,          -1,      0 }, /* xev */
-    { "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           0,            0,            1,          -1,      0 }, /* xephyr */
-    { "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           0,            0,            1,          -1,      0 }, /* gimp */
-    { NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           0,            0,            1,          -1,      0 },
+    { NULL,       "Navigator",NULL,          NULL,      1,            0,              0,           1,            0,            1,          -1 }, /* firefox */
+    { NULL,       "chromium", NULL,          NULL,      1 << 3,       0,              0,           1,            0,            1,          -1 }, /* chromium */
+    { NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,            0,            1,          -1 }, /* xev */
+    { "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           0,            0,            1,          -1 }, /* xephyr */
+    { "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           0,            0,            1,          -1 }, /* gimp */
+    { NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           0,            0,            1,          -1 },
+    /* General windows */
+    { NULL,       "discord",  NULL,          NULL,      1 << 2,       0,              0,           0,            0,            0,          -1 }, /* chromium */
     /* Wintype */
-    { NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           0,            0,            0,          -1,      0 },
-    { NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           0,            0,            0,          -1,      0 },
-    { NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           0,            0,            0,          -1,      0 },
-    { NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           0,            0,            0,          -1,      0 },
+    { NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           0,            0,            0,          -1 },
 };
 
 static const MonitorRule monrules[] = {
    /* monitor  tag  layout  mfact  nmaster  showbar  topbar */
    {  1,       -1,  5,      -1,    -1,      -1,      -1     }, // use a different layout for the second monitor
    {  -1,      -1,  0,      -1,    -1,      -1,      -1     }, // default
-};
-
-static const char *xkb_layouts [] = {
-    "en",
-    "cz",
 };
 
 static const float mfact     = 0.5;
@@ -383,6 +380,7 @@ static Signal signals[] = {
     { "viewex",         viewex },
     { "toggleviewex",   toggleviewex },
     { "tagex",          tagex },
+    { "tagwithex",      tagwithex },
     { "toggletagex",    toggletagex },
     { "setlayoutex",    setlayoutex },
 };

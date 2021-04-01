@@ -17,6 +17,12 @@ tagex(const Arg *arg)
 }
 
 void
+tagwithex(const Arg *arg)
+{
+	tagwith(&((Arg) { .ui = 1 << arg->ui }));
+}
+
+void
 toggletagex(const Arg *arg)
 {
 	toggletag(&((Arg) { .ui = 1 << arg->ui }));
