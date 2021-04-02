@@ -131,7 +131,7 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 	unsigned int switchtag;
-	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, needresize, issticky, isterminal, noswallow, issteam, ispermanent;
+	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, needresize, issticky, isterminal, noswallow, issteam, ispermanent, iscentered;
 	int fakefullscreen;
 	pid_t pid;
 	Client *next;
@@ -204,6 +204,7 @@ typedef struct {
 	unsigned int tags;
 	int switchtag;
 	int isfloating;
+	int iscentered;
 	int ispermanent;
 	int isterminal;
 	int noswallow;
@@ -498,6 +499,7 @@ applyrules(Client *c)
 	XClassHint ch = { NULL, NULL };
 
 	/* rule matching */
+	c->iscentered = 0;
 	c->isfloating = 0;
 	c->tags = 0;
 	XGetClassHint(dpy, c->win, &ch);
@@ -518,6 +520,7 @@ applyrules(Client *c)
 			c->isterminal = r->isterminal;
 			c->noswallow  = r->noswallow;
 			c->isfloating = r->isfloating;
+			c->iscentered = r->iscentered;
 			c->ispermanent = r->ispermanent;
 			c->tags |= r->tags;
 			if ((r->tags & SPTAGMASK) && r->isfloating) {
@@ -1016,10 +1019,6 @@ configurerequest(XEvent *e)
 				c->oldh = c->h;
 				c->h = ev->height;
 			}
-			if ((c->x + c->w) > m->mx + m->mw && c->isfloating)
-				c->x = m->mx + (m->mw / 2 - WIDTH(c) / 2); /* center in x direction */
-			if ((c->y + c->h) > m->my + m->mh && c->isfloating)
-				c->y = m->my + (m->mh / 2 - HEIGHT(c) / 2); /* center in y direction */
 			if ((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
 				configure(c);
 			if (ISVISIBLE(c))
@@ -2085,8 +2084,10 @@ manage(Window w, XWindowAttributes *wa)
 		setfullscreen(c, 1);
 	updatesizehints(c);
 	updatewmhints(c);
-	c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
-	c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+	if (c->iscentered) {
+		c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;
+		c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
+	}
 	updatemotifhints(c);
 	c->sfx = c->x;
 	c->sfy = c->y;

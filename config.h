@@ -152,29 +152,29 @@ static const Rule rules[] = {
      *  WM_NAME(STRING) = title
      *  _NET_WM_WINDOW_TYPE(ATOM) = wintype
      */
-    /* class      instance    title          wintype    tags mask     switchtotag     isfloating   ispermanent   isterminal    noswallow   monitor */
+    /* class      instance    title          wintype    tags mask     switchtotag     isfloating   iscentered   ispermanent   isterminal    noswallow   monitor */
     /* Scratchpads */
-    { "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           0,            0,            0,          -1 }, /* St */
-    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              1,           0,            0,            0,          -1 }, /* cmus */
-    { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           0,            0,            0,          -1 }, /* qalculate-gtk */
+    { "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           1,           0,            0,            0,          -1 }, /* St */
+    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              1,           1,           0,            0,            0,          -1 }, /* cmus */
+    { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
     /* Terminals */
-    { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1 },
-    { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1 },
-    { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,            1,            0,          -1 },
+    { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+    { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+    { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     /* Noswallow */
-    { NULL,       "Navigator",NULL,          NULL,      1,            0,              0,           1,            0,            1,          -1 }, /* firefox */
-    { NULL,       "chromium", NULL,          NULL,      1 << 3,       0,              0,           1,            0,            1,          -1 }, /* chromium */
-    { NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,            0,            1,          -1 }, /* xev */
-    { "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           0,            0,            1,          -1 }, /* xephyr */
-    { "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           0,            0,            1,          -1 }, /* gimp */
-    { NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           0,            0,            1,          -1 },
+    { NULL,       "Navigator",NULL,          NULL,      1,            0,              0,           0,           1,            0,            1,          -1 }, /* firefox */
+    { NULL,       "chromium", NULL,          NULL,      1 << 3,       0,              0,           0,           1,            0,            1,          -1 }, /* chromium */
+    { NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            0,            1,          -1 }, /* xev */
+    { "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            0,            1,          -1 }, /* xephyr */
+    { "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          -1 }, /* gimp */
+    { NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           0,           0,            0,            1,          -1 },
     /* General windows */
-    { NULL,       "discord",  NULL,          NULL,      1 << 2,       0,              0,           0,            0,            0,          -1 }, /* chromium */
+    { NULL,       "discord",  NULL,          NULL,      1 << 2,       0,              0,           0,           0,            0,            0,          -1 }, /* chromium */
     /* Wintype */
-    { NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           0,            0,            0,          -1 },
-    { NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           0,            0,            0,          -1 },
-    { NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           0,            0,            0,          -1 },
-    { NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          -1 },
 };
 
 static const MonitorRule monrules[] = {
