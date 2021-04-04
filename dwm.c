@@ -763,10 +763,10 @@ buttonpress(XEvent *e)
 		    	click = ClkLtSymbol;
 		    else
 		    	click = ClkStatusText;
-        } else  {
+        } else {
 		    do
- 			    x += TEXTW(tags[i]);
-		    while (ev->x >= x && ++i < LENGTH(tags));
+		    	x += tagw[i];
+	    	while (ev->x >= x && ++i < LENGTH(tags));
 		    if (i < LENGTH(tags)) {
 		    	click = ClkTagBar;
 		    	arg.ui = 1 << i;

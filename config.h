@@ -285,8 +285,8 @@ static Key keys[] = {
     { A,            -1,     XK_j,          focusdir,               {.i = 3 } }, // down
     { M|S,          -1,     XK_j,          focusstack,             {.i = +1 } },
     { M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
-    { M|A,          -1,     XK_j,          inplacerotate,          {.i = +2 } },
-    { M|A,          -1,     XK_k,          inplacerotate,          {.i = -2 } },
+    { M|A,          -1,     XK_h,          inplacerotate,          {.i = +2 } },
+    { M|A,          -1,     XK_l,          inplacerotate,          {.i = -2 } },
 
     { A,            -1,     XK_t,          setlayout,              {.v = &layouts[0]} },
     { A,            -1,     XK_v,          setlayout,              {.v = &layouts[1]} },
@@ -308,8 +308,8 @@ static Key keys[] = {
 
     { A,            -1,     XK_semicolon,  zoom,                   {0} },
     { A|S,          -1,     XK_v,          transfer,               {0} },
-    { M,            -1,     XK_j,          pushdown,               {0} },
-    { M,            -1,     XK_k,          pushup,                 {0} },
+    { M|A,          -1,     XK_j,          pushdown,               {0} },
+    { M|A,          -1,     XK_k,          pushup,                 {0} },
     { A,            -1,     XK_space,      togglefloating,         {0} },
     { A|S,          -1,     XK_space,      unfloatvisible,         {0} },
     { A|S,          -1,     XK_s,          togglesticky,           {0} },
