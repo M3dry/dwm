@@ -84,7 +84,7 @@ static const char selindfg[]              = "#ff5370";
 static const char normindfg[]             = "#7986E7";
 static const char incindfg[]              = "#7986E7";
 
-static const char systraybg[]             = "#110000";
+static const char systraybg[]             = "#1E1C31";
 
 static const char normtileborder[]        = "#1E1C31";
 static const char normfibonacciborder[]   = "#1E1C31";
