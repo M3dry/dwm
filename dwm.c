@@ -2538,6 +2538,7 @@ resizemouse(const Arg *arg)
 	ocy = c->y;
 	ocx2 = c->x + c->w;
 	ocy2 = c->y + c->h;
+
 	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 		None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess)
 		return;
@@ -3186,7 +3187,8 @@ swaptags(const Arg *arg)
 		if((c->tags & newtag) || (c->tags & curtag))
 			c->tags ^= curtag ^ newtag;
 
-		if(!c->tags) c->tags = newtag;
+		if (!c->tags)
+			c->tags = newtag;
 	}
 
 	selmon->tagset[selmon->seltags] = newtag;

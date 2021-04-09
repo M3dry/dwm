@@ -35,7 +35,7 @@ static const int swallowfloating           = 1;   /* 1 means swallow floating wi
 
 static const unsigned int borderpx         = 2;   /* border pixel of windows */
 
-static const unsigned int snap             = 0;   /* snap pixel */
+static const unsigned int snap             = 32;  /* snap pixel */
 
 static const int startontag                = 1;   /* 0 means no tag active on start */
 
@@ -154,7 +154,7 @@ static const Rule rules[] = {
      */
     /* class      instance    title          wintype    tags mask     switchtotag     isfloating   iscentered   ispermanent   isterminal    noswallow   monitor */
     /* Scratchpads */
-    { "spte rm",  NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           1,           0,            0,            0,          -1 }, /* St */
+    { "spterm",   NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           1,           0,            0,            0,          -1 }, /* St */
     { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              1,           1,           0,            0,            0,          -1 }, /* cmus */
     { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
     /* Terminals */
