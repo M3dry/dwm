@@ -32,6 +32,7 @@
     - [[#ltsymbol-colors][Ltsymbol colors]]
     - [[#tab-bar-colors][Tab bar colors]]
     - [[#client-indicator-colors][Client indicator colors]]
+    - [[#systray-1][Systray]]
     - [[#layout-border-colors][Layout border colors]]
   - [[#colors-array][Colors array]]
 - [[#scratchpads][Scratchpads]]
@@ -204,6 +205,10 @@ static const char selindfg[]              = "#ff5370";
 static const char normindfg[]             = "#7986E7";
 static const char incindfg[]              = "#7986E7";
 #+END_SRC
+*** Systray
+#+BEGIN_SRC C
+static const char systraybg[]             = "#110000";
+#+END_SRC
 *** Layout border colors
 #+BEGIN_SRC C
 static const char normtileborder[]        = "#1E1C31";
@@ -240,6 +245,7 @@ static const char *colors[][10]  = {
     [SchemeClientSel]   = { selindfg },
     [SchemeClientNorm]  = { normindfg },
     [SchemeClientInc]   = { incindfg },
+    [SchemeSystray]     = {             systraybg },
     [SchemeInvMon]      = { invmonfg,    invmonbg },
     /* Win borders          tile            fibonacci            float            deck            nrowgrid            bstack            centeredmaster       monocle            gaplessgrid */
     [SchemeNormLayout]  = { normtileborder, normfibonacciborder, normfloatborder, normdeckborder, normnrowgridborder, normbstackborder, normcenmasterborder, normmonocleborder, normgaplessgridborder },

@@ -84,6 +84,8 @@ static const char selindfg[]              = "#ff5370";
 static const char normindfg[]             = "#7986E7";
 static const char incindfg[]              = "#7986E7";
 
+static const char systraybg[]             = "#110000";
+
 static const char normtileborder[]        = "#1E1C31";
 static const char normfibonacciborder[]   = "#1E1C31";
 static const char normfloatborder[]       = "#1E1C31";
@@ -116,6 +118,7 @@ static const char *colors[][10]  = {
     [SchemeClientSel]   = { selindfg },
     [SchemeClientNorm]  = { normindfg },
     [SchemeClientInc]   = { incindfg },
+    [SchemeSystray]     = {             systraybg },
     [SchemeInvMon]      = { invmonfg,    invmonbg },
     /* Win borders          tile            fibonacci            float            deck            nrowgrid            bstack            centeredmaster       monocle            gaplessgrid */
     [SchemeNormLayout]  = { normtileborder, normfibonacciborder, normfloatborder, normdeckborder, normnrowgridborder, normbstackborder, normcenmasterborder, normmonocleborder, normgaplessgridborder },

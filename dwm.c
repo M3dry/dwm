@@ -93,7 +93,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeLtsymbol, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeClientInc, SchemeInvMon, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeLtsymbol, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeClientInc, SchemeInvMon, SchemeSystray, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
@@ -457,6 +457,8 @@ keyrelease(XEvent *e) {
 void
 combotag(const Arg *arg) {
 	if(selmon->sel && arg->ui & TAGMASK) {
+		if (selmon->sel->switchtag)
+			selmon->sel->switchtag = 0;
 		if (combo) {
 			selmon->sel->tags |= arg->ui & TAGMASK;
 		} else {
@@ -469,7 +471,10 @@ combotag(const Arg *arg) {
 }
 
 void
-comboview(const Arg *arg) {
+comboview(const Arg *arg)
+{
+	int i;
+	unsigned int tmptag;
 	unsigned newtags = arg->ui & TAGMASK;
 	if(arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
         view(&((Arg) { .ui = 0 }));
@@ -481,8 +486,30 @@ comboview(const Arg *arg) {
 	    setlasttag(arg->ui);
 		selmon->seltags ^= 1;	/*toggle tagset*/
 		combo = 1;
-		if (newtags)
-			selmon->tagset[selmon->seltags] = newtags;
+		if (newtags) {
+			if (arg->ui & TAGMASK) {
+				selmon->pertag->prevtag = selmon->pertag->curtag;
+				selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+				if (arg->ui == ~SPTAGMASK)
+					selmon->pertag->curtag = 0;
+				else {
+					for (i = 0; !(arg->ui & 1 << i); i++) ;
+					selmon->pertag->curtag = i + 1;
+				}
+			}
+			} else {
+				tmptag = selmon->pertag->prevtag;
+				selmon->pertag->prevtag = selmon->pertag->curtag;
+				selmon->pertag->curtag = tmptag;
+			}
+			selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+			selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+			selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+			selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+			selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+			if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
+				togglebar(NULL);
 	}
 	focus(NULL);
 	arrange(selmon);
@@ -3924,10 +3951,10 @@ updatesystray(void)
 		/* init systray */
 		if (!(systray = (Systray *)calloc(1, sizeof(Systray))))
 			die("fatal: could not malloc() %u bytes\n", sizeof(Systray));
-		systray->win = XCreateSimpleWindow(dpy, root, x, m->by, w, bh, 0, 0, scheme[SchemeSel][ColBg].pixel);
+		systray->win = XCreateSimpleWindow(dpy, root, x, m->by, w, bh, 0, 0, scheme[SchemeSystray][0].pixel);
 		wa.event_mask        = ButtonPressMask | ExposureMask;
 		wa.override_redirect = True;
-		wa.background_pixel  = scheme[SchemeNorm][ColBg].pixel;
+		wa.background_pixel  = scheme[SchemeSystray][0].pixel;
 		XSelectInput(dpy, systray->win, SubstructureNotifyMask);
 		XChangeProperty(dpy, systray->win, netatom[NetSystemTrayOrientation], XA_CARDINAL, 32,
 				PropModeReplace, (unsigned char *)&netatom[NetSystemTrayOrientationHorz], 1);
@@ -3947,7 +3974,7 @@ updatesystray(void)
 	}
 	for (w = 0, i = systray->icons; i; i = i->next) {
 		/* make sure the background color stays the same */
-		wa.background_pixel  = scheme[SchemeNorm][ColBg].pixel;
+		wa.background_pixel  = scheme[SchemeSystray][0].pixel;
 		XChangeWindowAttributes(dpy, i->win, CWBackPixel, &wa);
 		XMapRaised(dpy, i->win);
 		w += systrayspacing;
@@ -3966,7 +3993,7 @@ updatesystray(void)
 	XMapWindow(dpy, systray->win);
 	XMapSubwindows(dpy, systray->win);
 	/* redraw background */
-	XSetForeground(dpy, drw->gc, scheme[SchemeNorm][ColBg].pixel);
+	XSetForeground(dpy, drw->gc, scheme[SchemeSystray][0].pixel);
 	XFillRectangle(dpy, systray->win, drw->gc, 0, 0, w, bh);
 	XSync(dpy, False);
 }
