@@ -331,6 +331,7 @@ static void swaptags(const Arg *arg);
 static Monitor *systraytomon(Monitor *m);
 static void tabmode(const Arg *arg);
 static void tag(const Arg *arg);
+static void tagall(const Arg *arg);
 static void tagwith(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tagnextmon(const Arg *arg);
@@ -1216,7 +1217,7 @@ dirtomon(int dir)
 
 int
 drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
-	int ret, i, w, x, len;
+	int ret, i, w, x, len, tmpw;
 	short isCode = 0;
 	char *text;
 	char *p;
@@ -1312,7 +1313,7 @@ drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
 	}
 
 	if (!isCode) {
-		w = TEXTW(text) - lrpad;
+		w = TEXTW(text) - lrpad; /* 2px right padding */
 		drw_text(drw, x, 0, w, bh, 0, text, 0);
 	}
 
@@ -1332,6 +1333,9 @@ drawbar(Monitor *m)
 	Client *c;
 	char tagdisp[64];
 	char *masterclientontag[LENGTH(tags)];
+	char *mstext;
+	char *rstext;
+	int msx;
 
 	if(showsystray && m == systraytomon(m))
 		stw = getsystraywidth();
@@ -3245,6 +3249,31 @@ tag(const Arg *arg)
 		focus(NULL);
 		arrange(selmon);
 	}
+}
+
+void
+tagall(const Arg *arg) {
+	if (!selmon->clients)
+		return;
+	/* if parameter starts with F, just move floating windows */
+	int floating_only = (char *)arg->v && ((char *)arg->v)[0] == 'F' ? 1 : 0;
+	int tag = (char *)arg->v ? atoi(((char *)arg->v) + floating_only) : 0;
+	int j;
+	Client* c;
+	if(tag >= 0 && tag < LENGTH(tags))
+		for(c = selmon->clients; c; c = c->next)
+		{
+			if(!floating_only || c->isfloating)
+				for(j = 0; j < LENGTH(tags); j++)
+				{
+					if(c->tags & 1 << j && selmon->tagset[selmon->seltags] & 1 << j)
+					{
+						c->tags = c->tags ^ (1 << j & TAGMASK);
+						c->tags = c->tags | 1 << (1-tag);
+					}
+				}
+		}
+	arrange(selmon);
 }
 
 void

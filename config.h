@@ -150,11 +150,6 @@ static const char *defaulttagapps[] = { "firefox", "emacsclient -c", "discord", 
 
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
 static const Rule rules[] = {
-    /* xprop(1):
-     *  WM_CLASS(STRING) = instance, class
-     *  WM_NAME(STRING) = title
-     *  _NET_WM_WINDOW_TYPE(ATOM) = wintype
-     */
     /* class      instance    title          wintype    tags mask     switchtotag     isfloating   iscentered   ispermanent   isterminal    noswallow   monitor */
     /* Scratchpads */
     { "spterm",   NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           1,           0,            0,            0,          -1 }, /* St */
@@ -269,7 +264,7 @@ static Key keys[] = {
     { A,            -1,     XK_q,          killclient,             {0} },
     { A|C|S,        -1,     XK_x,          killpermanent,          {0} },
     { A|S,          -1,     XK_q,          killunsel,              {0} },
-    { M|S,          -1,     XK_v,          togglevacant,           {0} },
+    { M,            -1,     XK_v,          togglevacant,           {0} },
     { A,            -1,     XK_n,          togglebar,              {0} },
     { A,            -1,     XK_r,          reorganizetags,         {0} },
     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
@@ -354,6 +349,26 @@ static Key keys[] = {
     TAGKEYS(                XK_7,                                  6)
     TAGKEYS(                XK_8,                                  7)
     TAGKEYS(                XK_9,                                  8)
+
+{ A|S,              -1,     XK_F1,         tagall,                 {.v = "F1"} },
+{ A|S,              -1,     XK_F2,         tagall,                 {.v = "F2"} },
+{ A|S,              -1,     XK_F3,         tagall,                 {.v = "F3"} },
+{ A|S,              -1,     XK_F4,         tagall,                 {.v = "F4"} },
+{ A|S,              -1,     XK_F5,         tagall,                 {.v = "F5"} },
+{ A|S,              -1,     XK_F6,         tagall,                 {.v = "F6"} },
+{ A|S,              -1,     XK_F7,         tagall,                 {.v = "F7"} },
+{ A|S,              -1,     XK_F8,         tagall,                 {.v = "F8"} },
+{ A|S,              -1,     XK_F9,         tagall,                 {.v = "F9"} },
+
+{ A,                -1,     XK_F1,         tagall,                 {.v = "1"} },
+{ A,                -1,     XK_F2,         tagall,                 {.v = "2"} },
+{ A,                -1,     XK_F3,         tagall,                 {.v = "3"} },
+{ A,                -1,     XK_F4,         tagall,                 {.v = "4"} },
+{ A,                -1,     XK_F5,         tagall,                 {.v = "5"} },
+{ A,                -1,     XK_F6,         tagall,                 {.v = "6"} },
+{ A,                -1,     XK_F7,         tagall,                 {.v = "7"} },
+{ A,                -1,     XK_F8,         tagall,                 {.v = "8"} },
+{ A,                -1,     XK_F9,         tagall,                 {.v = "9"} },
 
     { M|S,          -1,     XK_Escape,     quit,                   {0} },
     { A|C|S,        -1,     XK_q,          quit,                   {1} },
