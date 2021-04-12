@@ -6,8 +6,11 @@ static const int showbar                   = 1;   /* 0 means no bar */
 
 static const int topbar                    = 1;   /* 0 means bottom bar */
 
-static const int horizpadbar               = 0;   /* horizontal padding for statusbar */
+static const int horizpadbar               = 5;   /* horizontal padding for statusbar */
 static const int vertpadbar                = 0;   /* vertical padding for statusbar */
+
+static const int vertpad                   = 0;       /* vertical padding of bar */
+static const int sidepad                   = 0;       /* horizontal padding of bar */
 
 static const int user_bh                   = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 
@@ -27,9 +30,9 @@ static const unsigned int underlinevacant  = 0;   /* 0 means no underline for va
 
 static const unsigned int gappih           = 5;   /* horiz inner gap between windows */
 static const unsigned int gappiv           = 5;   /* vert inner gap between windows */
-static const unsigned int gappoh           = 0;   /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov           = 0;   /* vert outer gap between windows and screen edge */
-static       int smartgaps                 = 1;   /* 1 means no outer gap when there is only one window */
+static const unsigned int gappoh           = vertpad ||  sidepad ? 5 : 0;   /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov           = vertpad ||  sidepad ? 5 : 0;   /* vert outer gap between windows and screen edge */
+static                int smartgaps        = vertpad ||  sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window */
 
 static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
 
