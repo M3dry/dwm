@@ -347,6 +347,7 @@ static void togglescratch(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void togglevacant();
+static void togglepadding();
 static void transfer(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
@@ -436,6 +437,9 @@ static int previouschosentag[8];
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+
+static int padding = vertpad || sidepad ? 1 : 0;
+
 unsigned int tagw[LENGTH(tags)];
 
 struct Pertag {
@@ -1272,7 +1276,7 @@ drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
 
 			text[i] = '\0';
             w = TEXTW(text) - lrpad;
-			drw_text(drw, x - stw - 2 * sp - 2, 0, w, bh, 0, text, 0);
+			drw_text(drw, x - stw - 2 * sp, 0, w, bh, 0, text, 0);
 
 			x += w;
 
@@ -3543,10 +3547,27 @@ toggleview(const Arg *arg)
 void
 togglevacant()
 {
-    vacanttags = vacanttags ? 0 : 1;
+    vacanttags = !vacanttags;
 	drawbars();
 }
 
+void
+togglepadding()
+{
+	if (padding) {
+		vp = 0;
+		sp = 0;
+		smartgaps = 1;
+		setgaps(gappoh, gappov, gappih, gappiv);
+	} else {
+		vp = vertpaddef;
+		sp = sidepaddef;
+		smartgaps = 0;
+		setgaps(sidepaddef, sidepaddef, vertpaddef, vertpaddef);
+	}
+	updatebarpos(selmon);
+	padding = !padding;
+}
 void
 unfocus(Client *c, int setfocus)
 {
@@ -3689,8 +3710,8 @@ updatebarpos(Monitor *m)
 	m->wy = m->my;
 	m->wh = m->mh;
 	if (m->showbar) {
-		m->wh = m->wh - vertpad - bh;
-		m->by = m->topbar ? m->wy : m->wy + m->wh + vertpad;
+		m->wh = m->wh - vp - bh;
+		m->by = m->topbar ? m->wy : m->wy + m->wh + vp;
 		m->wy = m->topbar ? m->wy + bh + vp : m->wy;
 	} else {
 		m->by = -bh - vp;
@@ -3976,7 +3997,7 @@ updatesystray(void)
 	XWindowChanges wc;
 	Client *i;
 	Monitor *m = systraytomon(NULL);
-	unsigned int x = m->mx + m->mw - 2 * sp;
+	unsigned int x = m->mx + m->mw - sp;
 	unsigned int w = 1;
 
 	if (!showsystray)

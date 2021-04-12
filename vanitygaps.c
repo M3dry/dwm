@@ -26,9 +26,7 @@ static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int
 static void setgaps(int oh, int ov, int ih, int iv);
 
 /* Settings */
-#if !PERTAG_PATCH
 static int enablegaps = 1;
-#endif // PERTAG_PATCH
 
 void
 setgaps(int oh, int ov, int ih, int iv)

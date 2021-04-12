@@ -11,6 +11,8 @@ static const int vertpadbar                = 0;   /* vertical padding for status
 
 static const int vertpad                   = 0;       /* vertical padding of bar */
 static const int sidepad                   = 0;       /* horizontal padding of bar */
+static const int vertpaddef                = 10;      /* vertical padding of bar */
+static const int sidepaddef                = 10;      /* horizontal padding of bar */
 
 static const int user_bh                   = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 
@@ -28,11 +30,11 @@ static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of
 static const unsigned int underlinetags    = 0;   /* 0 means no underline */
 static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
 
-static const unsigned int gappih           = 5;   /* horiz inner gap between windows */
-static const unsigned int gappiv           = 5;   /* vert inner gap between windows */
-static const unsigned int gappoh           = vertpad ||  sidepad ? 5 : 0;   /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov           = vertpad ||  sidepad ? 5 : 0;   /* vert outer gap between windows and screen edge */
-static                int smartgaps        = vertpad ||  sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window */
+static const unsigned int gappih           = vertpad || sidepad ? vertpad : 5;   /* horiz inner gap between windows */
+static const unsigned int gappiv           = vertpad || sidepad ? vertpad : 5;   /* vert inner gap between windows */
+static const unsigned int gappoh           = vertpad || sidepad ? sidepad : 0;   /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov           = vertpad || sidepad ? sidepad : 0;   /* vert outer gap between windows and screen edge */
+static                int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
 
 static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
 
@@ -268,6 +270,7 @@ static Key keys[] = {
     { A|C|S,        -1,     XK_x,          killpermanent,          {0} },
     { A|S,          -1,     XK_q,          killunsel,              {0} },
     { M,            -1,     XK_v,          togglevacant,           {0} },
+    { M|S,          -1,     XK_v,          togglepadding,          {0} },
     { A,            -1,     XK_n,          togglebar,              {0} },
     { A,            -1,     XK_r,          reorganizetags,         {0} },
     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
