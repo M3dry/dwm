@@ -442,16 +442,6 @@ static int padding = vertpad || sidepad ? 1 : 0;
 
 unsigned int tagw[LENGTH(tags)];
 
-struct Pertag {
-	unsigned int curtag, prevtag; /* current and previous tag */
-	int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
-	float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
-	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
-	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
-	Bool showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
-	Client *prevzooms[LENGTH(tags) + 1]; /* store zoom information */
-};
-
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
 static int combo = 0;
@@ -514,6 +504,16 @@ comboview(const Arg *arg)
 			selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 			selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 			selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+			vacanttags = selmon->pertag->vacant[selmon->pertag->curtag];
+
+			selmon->gappoh = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff) >> 0;
+			selmon->gappov = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff00) >> 8;
+			selmon->gappih = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff0000) >> 16;
+			selmon->gappiv = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff000000) >> 24;
+
+			vp = selmon->pertag->vertpd[selmon->pertag->curtag];
+			sp = selmon->pertag->sidepd[selmon->pertag->curtag];
 
 			if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 				togglebar(NULL);
@@ -1143,6 +1143,12 @@ createmon(void)
 				break;
 			}
 		}
+		m->pertag->vacant[i] = vacanttags;
+		m->pertag->enablegaps[i] = 1;
+		m->pertag->gaps[i] =
+			((gappoh & 0xFF) << 0) | ((gappov & 0xFF) << 8) | ((gappih & 0xFF) << 16) | ((gappiv & 0xFF) << 24);
+		m->pertag->vertpd[i] = vertpad;
+		m->pertag->sidepd[i] = sidepad;
 	}
 	return m;
 }
@@ -1223,7 +1229,7 @@ dirtomon(int dir)
 
 int
 drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
-	int ret, i, w, x, len, tmpw;
+	int ret, i, w, x, len;
 	short isCode = 0;
 	char *text;
 	char *p;
@@ -1334,14 +1340,10 @@ drawbar(Monitor *m)
 {
     int indn, cnum = 0;
 	int x, w, stw = 0;
-    int ww = 0;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 	char tagdisp[64];
 	char *masterclientontag[LENGTH(tags)];
-	char *mstext;
-	char *rstext;
-	int msx;
 
 	if(showsystray && m == systraytomon(m))
 		stw = getsystraywidth();
@@ -2042,16 +2044,15 @@ killunsel(const Arg *arg)
 		return;
 
 	for (i = selmon->clients; i; i = i->next) {
-		if (ISVISIBLE(i) && i != selmon->sel) {
-	if (!sendevent(i, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
-				XGrabServer(dpy);
-				XSetErrorHandler(xerrordummy);
-				XSetCloseDownMode(dpy, DestroyAll);
-				XKillClient(dpy, i->win);
-				XSync(dpy, False);
-				XSetErrorHandler(xerror);
-				XUngrabServer(dpy);
-			}
+		if (ISVISIBLE(i) && i != selmon->sel && !i->ispermanent &&
+			!sendevent(i, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
+			XGrabServer(dpy);
+			XSetErrorHandler(xerrordummy);
+			XSetCloseDownMode(dpy, DestroyAll);
+			XKillClient(dpy, i->win);
+			XSync(dpy, False);
+			XSetErrorHandler(xerror);
+			XUngrabServer(dpy);
 		}
 	}
 }
@@ -2393,7 +2394,7 @@ propertynotify(XEvent *e)
 		}
 		if (ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName])
 			updatetitle(c);
-			drawtab(c->mon);
+		drawtab(c->mon);
 		if (ev->atom == motifatom)
 			updatemotifhints(c);
 	}
@@ -2530,9 +2531,9 @@ resizeclientpad(Client *c, int x, int y, int w, int h, int tw, int th)
 	    || &monocle == c->mon->lt[c->mon->sellt]->arrange)
 	    && !c->isfullscreen && !c->isfloating
 	    && NULL != c->mon->lt[c->mon->sellt]->arrange) {
-		c->w = wc.width += c->bw * 2;
-		c->h = wc.height += c->bw * 2;
-		wc.border_width = 0;
+			c->w = wc.width += c->bw * 2;
+			c->h = wc.height += c->bw * 2;
+			wc.border_width = 0;
 	}
 	if (!c->isfloating) {
 		if (w != tw) {
@@ -3526,7 +3527,6 @@ void
 toggleview(const Arg *arg)
 {
 	unsigned int newtagset = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
-	int i;
 
 	// the first visible client should be the same after we add a new tag
 	// we also want to be sure not to mutate the focus
@@ -3547,7 +3547,7 @@ toggleview(const Arg *arg)
 void
 togglevacant()
 {
-    vacanttags = !vacanttags;
+    selmon->pertag->vacant[selmon->pertag->curtag] = vacanttags = !vacanttags;
 	drawbars();
 }
 
@@ -3555,15 +3555,15 @@ void
 togglepadding()
 {
 	if (padding) {
-		vp = 0;
-		sp = 0;
+		selmon->pertag->vertpd[selmon->pertag->curtag] = vp = 0;
+		selmon->pertag->sidepd[selmon->pertag->curtag] = sp = 0;
 		smartgaps = 1;
-		setgaps(gappoh, gappov, gappih, gappiv);
+		setgaps(gappohdef, gappovdef, gappihdef, gappivdef);
 	} else {
-		vp = vertpaddef;
-		sp = sidepaddef;
+		selmon->pertag->vertpd[selmon->pertag->curtag] = vp = vertpadtoggle;
+		selmon->pertag->sidepd[selmon->pertag->curtag] = sp = sidepadtoggle;
 		smartgaps = 0;
-		setgaps(sidepaddef, sidepaddef, vertpaddef, vertpaddef);
+		setgaps(sidepadtoggle, sidepadtoggle, vertpadtoggle, vertpadtoggle);
 	}
 	updatebarpos(selmon);
 	padding = !padding;
@@ -3745,10 +3745,12 @@ updateclientlist()
 				XA_WINDOW, 32, PropModeAppend,
 				(unsigned char *) &(c->win), 1);
 }
-void updatecurrentdesktop(void){
+void
+updatecurrentdesktop(void)
+{
 	long rawdata[] = { selmon->tagset[selmon->seltags] };
 	int i=0;
-	while(*rawdata >> i+1){
+	while(*rawdata >> (i+1)) {
 		i++;
 	}
 	long data[] = { i };
@@ -4113,6 +4115,17 @@ view(const Arg *arg)
 	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+
+	vacanttags = selmon->pertag->vacant[selmon->pertag->curtag];
+
+	selmon->gappoh = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff) >> 0;
+	selmon->gappov = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff00) >> 8;
+	selmon->gappih = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff0000) >> 16;
+	selmon->gappiv = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff000000) >> 24;
+
+	vp = selmon->pertag->vertpd[selmon->pertag->curtag];
+	sp = selmon->pertag->sidepd[selmon->pertag->curtag];
+
 	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 		togglebar(NULL);
 	focus(NULL);

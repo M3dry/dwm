@@ -25,8 +25,20 @@ static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int
 static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
 static void setgaps(int oh, int ov, int ih, int iv);
 
-/* Settings */
-static int enablegaps = 1;
+struct Pertag {
+	unsigned int curtag, prevtag; /* current and previous tag */
+	int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
+	float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
+	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
+	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
+	Bool showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
+	Client *prevzooms[LENGTH(tags) + 1]; /* store zoom information */
+	unsigned int vacant[NUMTAGS + 1];
+	int enablegaps[NUMTAGS + 1];
+	unsigned int gaps[NUMTAGS + 1];
+	unsigned int vertpd[NUMTAGS + 1];
+	unsigned int sidepd[NUMTAGS + 1];
+};
 
 void
 setgaps(int oh, int ov, int ih, int iv)
@@ -40,17 +52,17 @@ setgaps(int oh, int ov, int ih, int iv)
 	selmon->gappov = ov;
 	selmon->gappih = ih;
 	selmon->gappiv = iv;
+
+	selmon->pertag->gaps[selmon->pertag->curtag] =
+		((oh & 0xFF) << 0) | ((ov & 0xFF) << 8) | ((ih & 0xFF) << 16) | ((iv & 0xFF) << 24);
+
 	arrange(selmon);
 }
 
 void
 togglegaps(const Arg *arg)
 {
-	#if PERTAG_PATCH
 	selmon->pertag->enablegaps[selmon->pertag->curtag] = !selmon->pertag->enablegaps[selmon->pertag->curtag];
-	#else
-	enablegaps = !enablegaps;
-	#endif // PERTAG_PATCH
 	arrange(NULL);
 }
 
@@ -141,11 +153,7 @@ void
 getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 {
 	unsigned int n, oe, ie;
-	#if PERTAG_PATCH
 	oe = ie = selmon->pertag->enablegaps[selmon->pertag->curtag];
-	#else
-	oe = ie = enablegaps;
-	#endif // PERTAG_PATCH
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);

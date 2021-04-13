@@ -1,6 +1,6 @@
 enum showtab_modes { showtab_never, showtab_auto, showtab_nmodes, showtab_always};
 static const int showtab                   = showtab_auto; /* Default tab bar show mode */
-static const int toptab                    = 0;   /* False means bottom tab bar */
+static const int toptab                    = 0;            /* False means bottom tab bar */
 
 static const int showbar                   = 1;   /* 0 means no bar */
 
@@ -9,10 +9,10 @@ static const int topbar                    = 1;   /* 0 means bottom bar */
 static const int horizpadbar               = 5;   /* horizontal padding for statusbar */
 static const int vertpadbar                = 0;   /* vertical padding for statusbar */
 
-static const int vertpad                   = 0;       /* vertical padding of bar */
-static const int sidepad                   = 0;       /* horizontal padding of bar */
-static const int vertpaddef                = 10;      /* vertical padding of bar */
-static const int sidepaddef                = 10;      /* horizontal padding of bar */
+static const int vertpad                   = 0;                           /* vertical padding of bar */
+static const int sidepad                   = 0;                           /* horizontal padding of bar */
+static const int vertpadtoggle             = vertpad ? vertpad : 10;      /* vertical padding of bar that's toggleable */
+static const int sidepadtoggle             = sidepad ? sidepad : 10;      /* horizontal padding of bar that's toggleable */
 
 static const int user_bh                   = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 
@@ -30,11 +30,16 @@ static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of
 static const unsigned int underlinetags    = 0;   /* 0 means no underline */
 static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
 
-static const unsigned int gappih           = vertpad || sidepad ? vertpad : 5;   /* horiz inner gap between windows */
-static const unsigned int gappiv           = vertpad || sidepad ? vertpad : 5;   /* vert inner gap between windows */
-static const unsigned int gappoh           = vertpad || sidepad ? sidepad : 0;   /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov           = vertpad || sidepad ? sidepad : 0;   /* vert outer gap between windows and screen edge */
-static                int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
+static const unsigned int gappihdef        = 5;                            /* horiz inner gap between windows */
+static const unsigned int gappivdef        = 5;                            /* vert inner gap between windows */
+static const unsigned int gappohdef        = 0;                            /* horiz outer gap between windows and screen edge */
+static const unsigned int gappovdef        = 0;                            /* vert outer gap between windows and screen edge */
+static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
+
+static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : gappihdef;
+static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : gappivdef;
+static const unsigned int gappoh           = vertpad            ? sidepadtoggle : gappohdef;
+static const unsigned int gappov           = sidepad            ? sidepadtoggle : gappovdef;
 
 static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
 
@@ -398,6 +403,7 @@ static Signal signals[] = {
     /* signum           function */
     { "togglebar",      togglebar },
     { "togglevacant",   togglevacant },
+    { "togglepadding",  togglepadding },
     { "focusmon",       focusmon },
     { "tagmon",         tagmon },
     { "quit",           quit },
