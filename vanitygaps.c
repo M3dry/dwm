@@ -56,6 +56,11 @@ setgaps(int oh, int ov, int ih, int iv)
 	selmon->pertag->gaps[selmon->pertag->curtag] =
 		((oh & 0xFF) << 0) | ((ov & 0xFF) << 8) | ((ih & 0xFF) << 16) | ((iv & 0xFF) << 24);
 
+	if (padding) {
+		selmon->pertag->vertpd[selmon->pertag->curtag] = selmon->vp = oh;
+		selmon->pertag->sidepd[selmon->pertag->curtag] = selmon->sp = ov;
+	}
+
 	arrange(selmon);
 }
 

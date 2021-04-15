@@ -103,14 +103,14 @@ static const int user_bh                   = 24;  /* 0 means that dwm will calcu
 #+END_SRC
 *** Systray
 #+BEGIN_SRC C
-static const unsigned int systraypinning   = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
+static const unsigned int systraypinning   = 1;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing   = 2;   /* systray spacing */
 static const int systraypinningfailfirst   = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray               = 1;   /* 0 means no systray */
 #+END_SRC
 *** Vacant tags
 #+BEGIN_SRC C
-static       unsigned int vacanttags       = 1;   /* 0 means no vacant tags */
+static       unsigned int vacantonstart    = 1;   /* 0 means no vacant tags */
 #+END_SRC
 *** Underline
 **** Underline size
@@ -131,6 +131,7 @@ static const unsigned int gappivdef        = 5;                            /* ve
 static const unsigned int gappohdef        = 0;                            /* horiz outer gap between windows and screen edge */
 static const unsigned int gappovdef        = 0;                            /* vert outer gap between windows and screen edge */
 static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
+static       unsigned int padding          = vertpad || sidepad ? 1 : 0;
 #+END_SRC
 *** No need to modify
 #+BEGIN_SRC C
@@ -429,7 +430,7 @@ static Key keys[] = {
     { A,            XK_e,   XK_d,          spawn,                  SHCMD("emacsclient -c -e '(dired nil)'") },
     { A,            XK_e,   XK_f,          spawn,                  SHCMD("emacsclient -c -e '(elfeed)'") },
     { A,            -1,     XK_w,          spawn,                  SHCMD("xdo activate -N FireFox || firefox") },
-    { A,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
+    { M,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
     { A|C,          -1,     XK_KP_Down,    spawn,                  SHCMD("xkill") },
     { C|A,          -1,     XK_d,          spawn,                  SHCMD("discord") },
     { A|S,          -1,     XK_u,          spawn,                  SHCMD("import my-stuff/Pictures/snips/$(date +'%H:%M:%S').png") },
@@ -438,7 +439,7 @@ static Key keys[] = {
     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
     { A,            -1,     XK_s,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
-    { A|S,          -1,     XK_r,          spawndefault,           {0} },
+    { A|C,          -1,     XK_g,          spawndefault,           {0} },
 #+END_SRC
 *** Launch dmenu scripts
 #+BEGIN_SRC C
@@ -477,7 +478,7 @@ static Key keys[] = {
     { A|C,          -1,     XK_u,          setmfact,               {.f = mfact + 1} },
     { A|S,          -1,     XK_j,          setcfact,               {.f = +0.25} },
     { A|S,          -1,     XK_k,          setcfact,               {.f = -0.25} },
-    { M|C,          -1,     XK_u,          setcfact,               {0} },
+    { A|M,          -1,     XK_u,          setcfact,               {0} },
     { A,            -1,     XK_bracketleft,incnmaster,             {.i = +1 } },
     { A,            -1,     XK_bracketright,incnmaster,            {.i = -1 } },
     { M,            -1,     XK_space,      focusmaster,            {0} },
