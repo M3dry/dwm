@@ -93,7 +93,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeLtsymbol, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeClientInc, SchemeInvMon, SchemeSystray, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeOccupied, SchemeOccupiedInv, SchemeStatus, SchemeLtsymbol, SchemeTabNorm, SchemeTabSel, SchemeClientSel, SchemeClientNorm, SchemeClientInc, SchemeInvMon, SchemeInvMonSel, SchemeSystray, SchemeNormLayout, SchemeSelLayout }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
@@ -1276,7 +1276,7 @@ drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
 
 	drw_setscheme(drw, scheme[LENGTH(colors)]);
 	drw->scheme[ColFg] = scheme[SchemeStatus][ColFg];
-	drw->scheme[ColBg] = scheme[SchemeStatus][ColBg];
+	drw->scheme[ColBg] = scheme[SchemeStatus][m == selmon ? 1 : 2];
 	drw_rect(drw, x, 0, w, bh, 1, 1);
 	x++;
 
@@ -1303,11 +1303,11 @@ drawstatusbar(Monitor *m, int bh, char* stext, int stw) {
 					char buf[8];
 					memcpy(buf, (char*)text+i+1, 7);
 					buf[7] = '\0';
-					drw_clr_create(drw, &drw->scheme[ColBg], buf);
+					drw_clr_create(drw, &drw->scheme[m == selmon ? 1 : 2], buf);
 					i += 7;
 				} else if (text[i] == 'd') {
 					drw->scheme[ColFg] = scheme[SchemeStatus][ColFg];
-					drw->scheme[ColBg] = scheme[SchemeStatus][ColBg];
+					drw->scheme[ColBg] = scheme[SchemeStatus][m == selmon ? 1 : 2];
 				} else if (text[i] == 'r') {
 					int rx = atoi(text + ++i);
 					while (text[++i] != ',');
@@ -1391,12 +1391,12 @@ drawbar(Monitor *m)
 		tagw[i] = w = TEXTW(masterclientontag[i]);
         if (m->vactag) {
             if (occ & 1 << i)
-		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : m == selmon ? SchemeNorm : SchemeInvMon]);
+		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? m == selmon ? SchemeSel : SchemeInvMonSel : m == selmon ? SchemeNorm : SchemeInvMon]);
             else
-		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeInvMon]);
+		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? m == selmon ? SchemeSel : SchemeInvMonSel : SchemeInvMon]);
         } else {
             if (occ & 1 << i)
-		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : m == selmon ? SchemeOccupied : SchemeOccupiedInv]);
+		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? m == selmon ? SchemeSel : SchemeInvMonSel : m == selmon ? SchemeOccupied : SchemeOccupiedInv]);
             else
 		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : m == selmon ? SchemeNorm : SchemeInvMon]);
         }
@@ -1424,16 +1424,10 @@ drawbar(Monitor *m)
 		x += w;
 	}
 	w = blw = TEXTW(m->ltsymbol);
-    if (m == selmon)
-	    drw_setscheme(drw, scheme[SchemeLtsymbol]);
-    else
-	    drw_setscheme(drw, scheme[SchemeInvMon]);
+	drw_setscheme(drw, scheme[m == selmon ? SchemeLtsymbol : SchemeInvMon]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-    if (m == selmon)
-	    drw_setscheme(drw, scheme[SchemeStatus]);
-    else
-	    drw_setscheme(drw, scheme[SchemeInvMon]);
+	drw_setscheme(drw, scheme[m == selmon ? SchemeLtsymbol : SchemeInvMon]);
 	drw_rect(drw, x, 0, m->ww - x, bh, 1, 1);
 
 	if (m == selmon || 1) { /* status is only drawn on selected monitor */

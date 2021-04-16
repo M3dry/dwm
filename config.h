@@ -61,8 +61,10 @@ static const char selfg[]                 = "#ff5370";
 static const char normbg[]                = "#1E1C31";
 static const char selbg[]                 = "#1E1C31";
 
-static const char invmonbg[]              = "#3071db";
-static const char invmonfg[]              = "#ffffff";
+static const char invnormbg[]             = "#f0f0f0";
+static const char invnormfg[]             = "#000000";
+static const char invselfg[]              = "#ff5370";
+static const char invselbg[]              = "#f0f0f0";
 
 static const char normfloatwinborder[]    = "#000000";
 static const char selfloatwinborder[]     = "#ffffff";
@@ -77,11 +79,14 @@ static const char selfakefullscrfloat[]   = "#9b1be5";
 
 static const char occupiedfg[]            = "#7986E7";
 static const char occupiedbg[]            = "#1E1C31";
-static const char ocinvfg[]               = "#000000";
+
+static const char ocinvfg[]               = "#7986E7";
 static const char ocinvbg[]               = "#f0f0f0";
 
 static const char statusfg[]              = "#7986E7";
 static const char statusbg[]              = "#1E1C31";
+
+static const char invstatusbg[]           = "#f0f0f0";
 
 static const char ltsymbolfg[]            = "#ff5370";
 static const char ltsymbolbg[]            = "#1E1C31";
@@ -122,15 +127,16 @@ static const char *colors[][10]  = {
     [SchemeSel]         = { selfg,      selbg,  selfloatwinborder,  selstickyborder,  selstickyfloatborder,  selfakefullscr,  selfakefullscrfloat },
     [SchemeOccupied]    = { occupiedfg, occupiedbg },
     [SchemeOccupiedInv] = { ocinvfg,    ocinvbg },
-    [SchemeStatus]      = { statusfg,   statusbg },
+    [SchemeStatus]      = { statusfg,   statusbg, invstatusbg },
     [SchemeLtsymbol]    = { ltsymbolfg, ltsymbolbg },
     [SchemeTabNorm]     = { normtabfg,  normtabbg },
     [SchemeTabSel]      = { seltabfg,   seltabbg},
     [SchemeClientSel]   = { selindfg },
     [SchemeClientNorm]  = { normindfg },
     [SchemeClientInc]   = { incindfg },
-    [SchemeSystray]     = {             systraybg },
-    [SchemeInvMon]      = { invmonfg,    invmonbg },
+    [SchemeSystray]     = {              systraybg },
+    [SchemeInvMon]      = { invnormfg,   invnormbg },
+    [SchemeInvMonSel]   = { invselfg,    invselbg },
     /* Win borders          tile            fibonacci            float            deck            nrowgrid            bstack            centeredmaster       monocle            gaplessgrid */
     [SchemeNormLayout]  = { normtileborder, normfibonacciborder, normfloatborder, normdeckborder, normnrowgridborder, normbstackborder, normcenmasterborder, normmonocleborder, normgaplessgridborder },
     [SchemeSelLayout]   = { seltileborder,  selfibonacciborder,  selfloatborder,  seldeckborder,  selnrowgridborder,  selbstackborder,  selcenmasterborder,  selmonocleborder,  selgaplessgridborder },
@@ -318,8 +324,8 @@ static Key keys[] = {
 
     { A,            -1,     XK_semicolon,  zoom,                   {0} },
     { A|S,          -1,     XK_v,          transfer,               {0} },
-    { M|A,          -1,     XK_j,          pushdown,               {0} },
-    { M|A,          -1,     XK_k,          pushup,                 {0} },
+    { A|C,          -1,     XK_j,          pushdown,               {0} },
+    { A|C,          -1,     XK_k,          pushup,                 {0} },
     { A,            -1,     XK_space,      togglefloating,         {0} },
     { A|S,          -1,     XK_space,      unfloatvisible,         {0} },
     { A|S,          -1,     XK_s,          togglesticky,           {0} },
@@ -334,14 +340,14 @@ static Key keys[] = {
     { A|S,          -1,     XK_comma,      tagmon,                 {.i = -1 } },
     { A|S,          -1,     XK_period,     tagmon,                 {.i = +1 } },
 
-    { A|C,          -1,     XK_j,          moveresize,             {.v = "0x 25y 0w 0h" } },
-    { A|C,          -1,     XK_k,          moveresize,             {.v = "0x -25y 0w 0h" } },
-    { A|C,          -1,     XK_l,          moveresize,             {.v = "25x 0y 0w 0h" } },
-    { A|C,          -1,     XK_h,          moveresize,             {.v = "-25x 0y 0w 0h" } },
-    { M|C,          -1,     XK_j,          moveresize,             {.v = "0x 0y 0w 25h" } },
-    { M|C,          -1,     XK_k,          moveresize,             {.v = "0x 0y 0w -25h" } },
-    { M|C,          -1,     XK_l,          moveresize,             {.v = "0x 0y 25w 0h" } },
-    { M|C,          -1,     XK_h,          moveresize,             {.v = "0x 0y -25w 0h" } },
+    { M|C,          -1,     XK_j,          moveresize,             {.v = "0x 25y 0w 0h" } },
+    { M|C,          -1,     XK_k,          moveresize,             {.v = "0x -25y 0w 0h" } },
+    { M|C,          -1,     XK_l,          moveresize,             {.v = "25x 0y 0w 0h" } },
+    { M|C,          -1,     XK_h,          moveresize,             {.v = "-25x 0y 0w 0h" } },
+    { M|A,          -1,     XK_j,          moveresize,             {.v = "0x 0y 0w 25h" } },
+    { M|A,          -1,     XK_k,          moveresize,             {.v = "0x 0y 0w -25h" } },
+    { M|A,          -1,     XK_l,          moveresize,             {.v = "0x 0y 25w 0h" } },
+    { M|A,          -1,     XK_h,          moveresize,             {.v = "0x 0y -25w 0h" } },
 
     { A|S,          -1,     XK_equal,      incrgaps,               {.i = +1 } },
     { A|S,          -1,     XK_minus,      incrgaps,               {.i = -1 } },
