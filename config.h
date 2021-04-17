@@ -257,7 +257,7 @@ static Key keys[] = {
     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
     { A,            -1,     XK_s,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
-    { A|C,          -1,     XK_g,          spawndefault,           {0} },
+    { A,            -1,     XK_r,          spawndefault,           {0} },
 
     { A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
     { A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },
@@ -284,7 +284,6 @@ static Key keys[] = {
     { M,            -1,     XK_v,          togglevacant,           {0} },
     { M|S,          -1,     XK_v,          togglepadding,          {0} },
     { A,            -1,     XK_n,          togglebar,              {0} },
-    { A,            -1,     XK_r,          reorganizetags,         {0} },
     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
     { A|S,          -1,     XK_l,          setmfact,               {.f = +0.05} },
     { A|C,          -1,     XK_u,          setmfact,               {.f = mfact + 1} },
