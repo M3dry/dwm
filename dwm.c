@@ -2383,8 +2383,6 @@ propertynotify(XEvent *e)
 			break;
 		case XA_WM_NORMAL_HINTS:
 			updatesizehints(c);
-			arrangemon(c->mon);
-			break;
 		case XA_WM_HINTS:
 			updatewmhints(c);
 			drawbars();
@@ -3969,7 +3967,7 @@ updatesystray(void)
 	XWindowChanges wc;
 	Client *i;
 	Monitor *m = systraytomon(NULL);
-	unsigned int x = m->mx + m->mw - selmon->sp;
+	unsigned int x = m->mx + m->mw - m->sp;
 	unsigned int w = 1;
 
 	if (!showsystray)
@@ -3978,7 +3976,7 @@ updatesystray(void)
 		/* init systray */
 		if (!(systray = (Systray *)calloc(1, sizeof(Systray))))
 			die("fatal: could not malloc() %u bytes\n", sizeof(Systray));
-		systray->win = XCreateSimpleWindow(dpy, root, x, m->by + selmon->vp, w, bh, 0, 0, scheme[SchemeSystray][0].pixel);
+		systray->win = XCreateSimpleWindow(dpy, root, x, m->by + m->vp, w, bh, 0, 0, scheme[SchemeSystray][0].pixel);
 		wa.event_mask        = ButtonPressMask | ExposureMask;
 		wa.override_redirect = True;
 		wa.background_pixel  = scheme[SchemeSystray][0].pixel;
@@ -4013,8 +4011,8 @@ updatesystray(void)
 	}
 	w = w ? w + systrayspacing : 1;
 	x -= w;
-	XMoveResizeWindow(dpy, systray->win, x, m->by + selmon->vp, w, bh);
-	wc.x = x; wc.y = m->by + selmon->vp; wc.width = w; wc.height = bh;
+	XMoveResizeWindow(dpy, systray->win, x, m->by + m->vp, w, bh);
+	wc.x = x; wc.y = m->by + m->vp; wc.width = w; wc.height = bh;
 	wc.stack_mode = Above; wc.sibling = m->barwin;
 	XConfigureWindow(dpy, systray->win, CWX|CWY|CWWidth|CWHeight|CWSibling|CWStackMode, &wc);
 	XMapWindow(dpy, systray->win);
