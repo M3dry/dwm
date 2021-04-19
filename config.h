@@ -16,7 +16,7 @@ static const int sidepadtoggle             = sidepad ? sidepad : 10;      /* hor
 
 static const int user_bh                   = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 
-static const unsigned int systraypinning         = 1;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
+static const unsigned int systraypinning   = 1;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing   = 2;   /* systray spacing */
 static const int systraypinningfailfirst   = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray               = 1;   /* 0 means no systray */
@@ -163,14 +163,14 @@ static const char ptagf[] = "[%s:%s]"; /* format of a tag label */
 static const char etagf[] = "%s";    /* format of an empty tag */
 static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 
-static const char *defaulttagapps[] = { "firefox", "emacsclient -c", "discord", "chromium", NULL, NULL, NULL, NULL, "gimp" };
+static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL, NULL, NULL, "discord", "gimp" };
 
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
 static const Rule rules[] = {
     /* class      instance    title          wintype    tags mask     switchtotag     isfloating   iscentered   ispermanent   isterminal    noswallow   monitor */
     /* Scratchpads */
-    { "spterm",   NULL,       NULL,          NULL,      SPTAG(0),     0,              1,           1,           0,            0,            0,          -1 }, /* St */
-    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              1,           1,           0,            0,            0,          -1 }, /* cmus */
+    { "spterm",   NULL,       NULL,          NULL,      SPTAG(0),     0,              0,           1,           0,            0,            0,          -1 }, /* St */
+    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              0,           1,           0,            0,            0,          -1 }, /* cmus */
     { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
     /* Terminals */
     { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
@@ -184,7 +184,7 @@ static const Rule rules[] = {
     { "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          -1 }, /* gimp */
     { NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           0,           0,            0,            1,          -1 },
     /* General windows */
-    { NULL,       "discord",  NULL,          NULL,      1 << 2,       0,              0,           0,           0,            0,            0,          -1 }, /* chromium */
+    { NULL,       "discord",  NULL,          NULL,      1 << 7,       0,              0,           0,           0,            0,            0,          -1 }, /* chromium */
     /* Wintype */
     { NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          -1 },
     { NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          -1 },
