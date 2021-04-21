@@ -1376,11 +1376,9 @@ drawbar(Monitor *m)
 	for (i = 0; i < LENGTH(tags); i++) {
 		indn = 0;
 		cnum = 0;
-        if (m->vactag) {
-		    /* do not draw vacant tags */
+        if (m->vactag)
 		    if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
-		    continue;
-		}
+				continue;
 
 		if (masterclientontag[i])
 			snprintf(tagdisp, 64, ptagf, tags[i], masterclientontag[i]);
@@ -1388,28 +1386,26 @@ drawbar(Monitor *m)
 			snprintf(tagdisp, 64, etagf, tags[i]);
 		masterclientontag[i] = tagdisp;
 		tagw[i] = w = TEXTW(masterclientontag[i]);
-        if (m->vactag) {
+        if (m->vactag)
             if (occ & 1 << i)
 		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? m == selmon ? SchemeSel : SchemeInvMonSel : m == selmon ? SchemeNorm : SchemeInvMon]);
             else
 		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? m == selmon ? SchemeSel : SchemeInvMonSel : SchemeInvMon]);
-        } else {
+        else
             if (occ & 1 << i)
 		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? m == selmon ? SchemeSel : SchemeInvMonSel : m == selmon ? SchemeOccupied : SchemeOccupiedInv]);
             else
 		        drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : m == selmon ? SchemeNorm : SchemeInvMon]);
-        }
 		drw_text(drw, x, 0, w + 2 * m->sp, bh, lrpad / 2, masterclientontag[i], urg & 1 << i);
 
 		if (underlinetags && ((underlinevacant) ? m->vactag : !m->vactag && (occ & 1 << i || m->tagset[m->seltags] & 1 << i)))
 			drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
 
-		for (c = m->clients; c; c = c->next) {
+		for (c = m->clients; c; c = c->next)
 			if (c->tags & (1 << i))
 				cnum++;
-		}
 
-		for (c = m->clients; c && cnum > 1; c = c->next) {
+		for (c = m->clients; c && cnum > 1; c = c->next)
 			if (c->tags & (1 << i)) {
 				drw_setscheme(drw, scheme[selmon->sel == c ? SchemeClientSel : m->tagset[m->seltags] & 1 << i ? SchemeClientInc : SchemeClientNorm]);
 				if (selmon->sel == c)
@@ -1418,10 +1414,10 @@ drawbar(Monitor *m)
 					drw_rect(drw, x, 1 + (indn * 2), 4, 1, 3, urg & 1 << i);
 				indn++;
 			}
-		}
 
 		x += w;
 	}
+
 	w = blw = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[m == selmon ? SchemeLtsymbol : SchemeInvMon]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);

@@ -247,6 +247,7 @@ static Key keys[] = {
     { A,            XK_e,   XK_c,          spawn,                  SHCMD("emacsclient -c -e '(ibuffer)'") },
     { A,            XK_e,   XK_d,          spawn,                  SHCMD("emacsclient -c -e '(dired nil)'") },
     { A,            XK_e,   XK_f,          spawn,                  SHCMD("emacsclient -c -e '(elfeed)'") },
+    { A,            -1,     XK_s,          spawn,                  SHCMD("emacsclient    -e '(emacs-everywhere)'") },
     { A,            -1,     XK_w,          spawn,                  SHCMD("xdo activate -N FireFox || firefox") },
     { M,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
     { A|C,          -1,     XK_KP_Down,    spawn,                  SHCMD("xkill") },
@@ -255,7 +256,7 @@ static Key keys[] = {
     { A,            -1,     XK_p,          spawn,                  SHCMD("pcmanfm") },
     { C,            -1,     XK_m,          spawn,                  SHCMD("multimc") },
     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
-    { A,            -1,     XK_s,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
+    { M,            -1,     XK_g,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
     { A,            -1,     XK_r,          spawndefault,           {0} },
 
