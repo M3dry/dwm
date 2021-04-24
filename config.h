@@ -30,17 +30,12 @@ static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of
 static const unsigned int underlinetags    = 0;   /* 0 means no underline */
 static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
 
-static const unsigned int gappihdef        = 5;                            /* horiz inner gap between windows */
-static const unsigned int gappivdef        = 5;                            /* vert inner gap between windows */
-static const unsigned int gappohdef        = 0;                            /* horiz outer gap between windows and screen edge */
-static const unsigned int gappovdef        = 0;                            /* vert outer gap between windows and screen edge */
+static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : 5;  /* horiz inner gap between windows */
+static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 5;  /* vert inner gap between windows */
+static const unsigned int gappoh           = vertpad            ? sidepadtoggle : 0;  /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov           = sidepad            ? sidepadtoggle : 0;  /* vert outer gap between windows and screen edge */
 static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
 static       unsigned int padding          = vertpad || sidepad ? 1 : 0;
-
-static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : gappihdef;
-static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : gappivdef;
-static const unsigned int gappoh           = vertpad            ? sidepadtoggle : gappohdef;
-static const unsigned int gappov           = sidepad            ? sidepadtoggle : gappovdef;
 
 static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
 
@@ -172,10 +167,11 @@ static const Rule rules[] = {
     { "spterm",   NULL,       NULL,          NULL,      SPTAG(0),     0,              0,           1,           0,            0,            0,          -1 }, /* St */
     { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              0,           1,           0,            0,            0,          -1 }, /* cmus */
     { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
-    /* Terminals */
+    /* Swallow */
     { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+    { "Emacs",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     /* Noswallow */
     { NULL,       "Navigator",NULL,          NULL,      1,            0,              0,           0,           1,            0,            1,          -1 }, /* firefox */
     { NULL,       "chromium", NULL,          NULL,      1 << 3,       0,              0,           0,           1,            0,            1,          -1 }, /* chromium */

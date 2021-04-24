@@ -3093,7 +3093,16 @@ showhide(Client *c)
 	if (!c)
 		return;
 	if (ISVISIBLE(c)) {
-		if ((c->tags & SPTAGMASK) && c->isfloating) {
+        if (
+			(c->tags & SPTAGMASK) &&
+			c->isfloating &&
+			(
+				c->x < c->mon->mx ||
+				c->x > c->mon->mx + c->mon->mw ||
+				c->y < c->mon->my ||
+				c->y > c->mon->my + c->mon->mh
+			)
+		) {
 			c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
 			c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
 		}
@@ -3511,7 +3520,7 @@ toggleview(const Arg *arg)
 void
 togglevacant()
 {
-    selmon->vactag = selmon->vactag == 0 ? 1 : 0;
+    selmon->vactag = selmon->vactag? 0 : 1;
 	drawbar(selmon);
 }
 
@@ -3522,12 +3531,12 @@ togglepadding()
 		selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag] = 0;
 		selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag] = 0;
 		smartgaps = 1;
-		setgaps(gappohdef, gappovdef, gappihdef, gappivdef);
+		setgaps(gappoh, gappov, gappih, gappiv);
 	} else {
 		selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag] = vertpadtoggle;
 		selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag] = sidepadtoggle;
 		smartgaps = 0;
-		setgaps(sidepadtoggle, sidepadtoggle, vertpadtoggle, vertpadtoggle);
+		setgaps(sidepadtoggle, sidepadtoggle, gappih, gappiv);
 	}
 	updatebarpos(selmon);
 	padding = !padding;

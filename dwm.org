@@ -1,4 +1,5 @@
 #+TITLE: Dwm
+#+author: M3dry
 #+PROPERTY: header-args :C :tangle config.h :main no
 
 * Table of contents :toc_4:
@@ -16,7 +17,6 @@
       - [[#underline-size][Underline size]]
       - [[#enable-underline][Enable underline]]
   - [[#gaps][Gaps]]
-    - [[#no-need-to-modify][No need to modify]]
   - [[#swallow-floating][Swallow floating]]
   - [[#window-border][Window border]]
   - [[#snap][Snap]]
@@ -73,121 +73,114 @@
 
 * Variables
 ** Tab bar
-#+BEGIN_SRC C
+#+begin_src C
 enum showtab_modes { showtab_never, showtab_auto, showtab_nmodes, showtab_always};
 static const int showtab                   = showtab_auto; /* Default tab bar show mode */
 static const int toptab                    = 0;            /* False means bottom tab bar */
-#+END_SRC
+#+end_src
 ** Bar
 *** Showbar
-#+BEGIN_SRC C
+#+begin_src C
 static const int showbar                   = 1;   /* 0 means no bar */
-#+END_SRC
+#+end_src
 *** Bar position
-#+BEGIN_SRC C
+#+begin_src C
 static const int topbar                    = 1;   /* 0 means bottom bar */
-#+END_SRC
+#+end_src
 *** Status padding
-#+BEGIN_SRC C
+#+begin_src C
 static const int horizpadbar               = 5;   /* horizontal padding for statusbar */
 static const int vertpadbar                = 0;   /* vertical padding for statusbar */
-#+END_SRC
+#+end_src
 *** Bar padding
-#+BEGIN_SRC C
+#+begin_src C
 static const int vertpad                   = 0;                           /* vertical padding of bar */
 static const int sidepad                   = 0;                           /* horizontal padding of bar */
 static const int vertpadtoggle             = vertpad ? vertpad : 10;      /* vertical padding of bar that's toggleable */
 static const int sidepadtoggle             = sidepad ? sidepad : 10;      /* horizontal padding of bar that's toggleable */
-#+END_SRC
+#+end_src
 *** Bar height
-#+BEGIN_SRC C
+#+begin_src C
 static const int user_bh                   = 24;  /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
-#+END_SRC
+#+end_src
 *** Systray
-#+BEGIN_SRC C
+#+begin_src C
 static const unsigned int systraypinning   = 1;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing   = 2;   /* systray spacing */
 static const int systraypinningfailfirst   = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray               = 1;   /* 0 means no systray */
-#+END_SRC
+#+end_src
 *** Vacant tags
-#+BEGIN_SRC C
+#+begin_src C
 static       unsigned int vacantonstart    = 1;   /* 0 means no vacant tags */
-#+END_SRC
+#+end_src
 *** Underline
 **** Underline size
-#+BEGIN_SRC C
+#+begin_src C
 static const unsigned int ulinepad         = 2;   /* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke      = 2;   /* thickness / height of the underline */
 static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of the bar the line should appear */
-#+END_SRC
+#+end_src
 **** Enable underline
-#+BEGIN_SRC C
+#+begin_src C
 static const unsigned int underlinetags    = 0;   /* 0 means no underline */
 static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
-#+END_SRC
+#+end_src
 ** Gaps
 #+begin_src C
-static const unsigned int gappihdef        = 5;                            /* horiz inner gap between windows */
-static const unsigned int gappivdef        = 5;                            /* vert inner gap between windows */
-static const unsigned int gappohdef        = 0;                            /* horiz outer gap between windows and screen edge */
-static const unsigned int gappovdef        = 0;                            /* vert outer gap between windows and screen edge */
+static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : 5;  /* horiz inner gap between windows */
+static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 5;  /* vert inner gap between windows */
+static const unsigned int gappoh           = vertpad            ? sidepadtoggle : 0;  /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov           = sidepad            ? sidepadtoggle : 0;  /* vert outer gap between windows and screen edge */
 static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
 static       unsigned int padding          = vertpad || sidepad ? 1 : 0;
-#+END_SRC
-*** No need to modify
-#+BEGIN_SRC C
-static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : gappihdef;
-static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : gappivdef;
-static const unsigned int gappoh           = vertpad            ? sidepadtoggle : gappohdef;
-static const unsigned int gappov           = sidepad            ? sidepadtoggle : gappovdef;
 #+end_src
 ** Swallow floating
-#+BEGIN_SRC C
+#+begin_src C
 static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
-#+END_SRC
+#+end_src
 ** Window border
-#+BEGIN_SRC C
+#+begin_src C
 static const unsigned int borderpx         = 2;   /* border pixel of windows */
-#+END_SRC
+#+end_src
 ** Snap
-#+BEGIN_SRC C
+#+begin_src C
 static const unsigned int snap             = 32;  /* snap pixel */
-#+END_SRC
+#+end_src
 ** Start on tag
-#+BEGIN_SRC C
+#+begin_src C
 static const int startontag                = 1;   /* 0 means no tag active on start */
-#+END_SRC
+#+end_src
 ** Decoration hints
-#+BEGIN_SRC C
+#+begin_src C
 static const int decorhints                = 1;   /* 1 means respect decoration hints */
-#+END_SRC
+#+end_src
 ** Focus on wheel
-#+BEGIN_SRC C
+#+begin_src C
 static const int focusonwheel              = 0;
-#+END_SRC
+#+end_src
 ** Fonts
-#+BEGIN_SRC C
+#+begin_src C
 static const char *fonts[]                 = { "mononoki Nerd Font Mono:size=12:antialias=true:autohint=true" };
-#+END_SRC
+#+end_src
 * Colors
 ** Color variables
 *** Monitor colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char normfg[]                = "#4E5579";
 static const char selfg[]                 = "#ff5370";
 static const char normbg[]                = "#1E1C31";
 static const char selbg[]                 = "#1E1C31";
-#+END_SRC
+#+end_src
 **** Inverted
-#+BEGIN_SRC C
+#+begin_src C
 static const char invnormbg[]             = "#f0f0f0";
 static const char invnormfg[]             = "#000000";
 static const char invselfg[]              = "#ff5370";
 static const char invselbg[]              = "#f0f0f0";
-#+END_SRC
+#+end_src
 *** Special window border colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char normfloatwinborder[]    = "#000000";
 static const char selfloatwinborder[]     = "#ffffff";
 static const char normstickyborder[]      = "#000000";
@@ -198,50 +191,50 @@ static const char normfakefullscr[]       = "#408ab2";
 static const char selfakefullscr[]        = "#b869e5";
 static const char normfakefullscrfloat[]  = "#289fe0";
 static const char selfakefullscrfloat[]   = "#9b1be5";
-#+END_SRC
+#+end_src
 *** Occupied tag colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char occupiedfg[]            = "#7986E7";
 static const char occupiedbg[]            = "#1E1C31";
-#+END_SRC
+#+end_src
 **** Inverted
-#+BEGIN_SRC C
+#+begin_src C
 static const char ocinvfg[]               = "#7986E7";
 static const char ocinvbg[]               = "#f0f0f0";
-#+END_SRC
+#+end_src
 *** Status colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char statusfg[]              = "#7986E7";
 static const char statusbg[]              = "#1E1C31";
-#+END_SRC
+#+end_src
 **** Inverted
-#+BEGIN_SRC C
+#+begin_src C
 static const char invstatusbg[]           = "#f0f0f0";
-#+END_SRC
+#+end_src
 *** Ltsymbol colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char ltsymbolfg[]            = "#ff5370";
 static const char ltsymbolbg[]            = "#1E1C31";
-#+END_SRC
+#+end_src
 *** Tab bar colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char normtabfg[]             = "#4E5579";
 static const char seltabfg[]              = "#7986E7";
 static const char normtabbg[]             = "#1E1C31";
 static const char seltabbg[]              = "#1E1C31";
-#+END_SRC
+#+end_src
 *** Client indicator colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char selindfg[]              = "#ff5370";
 static const char normindfg[]             = "#7986E7";
 static const char incindfg[]              = "#7986E7";
-#+END_SRC
+#+end_src
 *** Systray
-#+BEGIN_SRC C
+#+begin_src C
 static const char systraybg[]             = "#1E1C31";
-#+END_SRC
+#+end_src
 *** Layout border colors
-#+BEGIN_SRC C
+#+begin_src C
 static const char normtileborder[]        = "#1E1C31";
 static const char normfibonacciborder[]   = "#1E1C31";
 static const char normfloatborder[]       = "#1E1C31";
@@ -260,9 +253,9 @@ static const char selbstackborder[]       = "#ff5370";
 static const char selcenmasterborder[]    = "#ff5370";
 static const char selmonocleborder[]      = "#ff5370";
 static const char selgaplessgridborder[]  = "#ff5370";
-#+END_SRC
+#+end_src
 ** Colors array
-#+BEGIN_SRC C
+#+begin_src C
 static const char *colors[][10]  = {
     /* Tags/borders       fg            bg      float               sticky            sticky + float         fakefullscreen   fakefullscreen + float */
     [SchemeNorm]        = { normfg,     normbg, normfloatwinborder, normstickyborder, normstickyfloatborder, normfakefullscr, normfakefullscrfloat },
@@ -283,9 +276,9 @@ static const char *colors[][10]  = {
     [SchemeNormLayout]  = { normtileborder, normfibonacciborder, normfloatborder, normdeckborder, normnrowgridborder, normbstackborder, normcenmasterborder, normmonocleborder, normgaplessgridborder },
     [SchemeSelLayout]   = { seltileborder,  selfibonacciborder,  selfloatborder,  seldeckborder,  selnrowgridborder,  selbstackborder,  selcenmasterborder,  selmonocleborder,  selgaplessgridborder },
 };
-#+END_SRC
+#+end_src
 * Scratchpads
-#+BEGIN_SRC C
+#+begin_src C
 typedef struct {
     const char *name;
     const void *cmd;
@@ -300,22 +293,22 @@ static Sp scratchpads[] = {
    {"spmus",       spcmd2},
    {"spcal",       spcmd3},
 };
-#+END_SRC
+#+end_src
 * Tag
 ** Number of tags
-#+BEGIN_SRC C
+#+begin_src C
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-#+END_SRC
+#+end_src
 ** Master window name
-#+BEGIN_SRC C
+#+begin_src C
 static const char ptagf[] = "[%s:%s]"; /* format of a tag label */
 static const char etagf[] = "%s";    /* format of an empty tag */
 static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
-#+END_SRC
+#+end_src
 ** Default applications
-#+BEGIN_SRC C
+#+begin_src C
 static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL, NULL, NULL, "discord", "gimp" };
-#+END_SRC
+#+end_src
 
 * Rules
 ** Client rules
@@ -323,7 +316,7 @@ static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL,
      WM_CLASS(STRING) = instance, class
      WM_NAME(STRING) = title
      _NET_WM_WINDOW_TYPE(ATOM) = wintype
-#+BEGIN_SRC C
+#+begin_src C
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
 static const Rule rules[] = {
     /* class      instance    title          wintype    tags mask     switchtotag     isfloating   iscentered   ispermanent   isterminal    noswallow   monitor */
@@ -331,10 +324,11 @@ static const Rule rules[] = {
     { "spterm",   NULL,       NULL,          NULL,      SPTAG(0),     0,              0,           1,           0,            0,            0,          -1 }, /* St */
     { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              0,           1,           0,            0,            0,          -1 }, /* cmus */
     { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
-    /* Terminals */
+    /* Swallow */
     { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+    { "Emacs",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
     /* Noswallow */
     { NULL,       "Navigator",NULL,          NULL,      1,            0,              0,           0,           1,            0,            1,          -1 }, /* firefox */
     { NULL,       "chromium", NULL,          NULL,      1 << 3,       0,              0,           0,           1,            0,            1,          -1 }, /* chromium */
@@ -350,15 +344,15 @@ static const Rule rules[] = {
     { NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          -1 },
     { NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          -1 },
 };
-#+END_SRC
+#+end_src
 ** Monitor rules
-#+BEGIN_SRC C
+#+begin_src C
 static const MonitorRule monrules[] = {
    /* monitor  tag  layout  mfact  nmaster  showbar  topbar */
    {  1,       -1,  5,      -1,    -1,      -1,      -1     }, // use a different layout for the second monitor
    {  -1,      -1,  0,      -1,    -1,      -1,      -1     }, // default
 };
-#+END_SRC
+#+end_src
 * Layouts
 ** Layout modifiers
 + mfact defines how wide master stack is
@@ -366,14 +360,14 @@ static const MonitorRule monrules[] = {
 + nmaster defines how many windows are in master stack
 + attachbelow defines if windows should attach bellow selected window
 + force_vsplit forces two clients to always slpit vertically
-#+BEGIN_SRC C
+#+begin_src C
 static const float mfact     = 0.5;
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int nmaster     = 1;
 static const int attachbelow = 1;
 #define FORCE_VSPLIT 1
 #include "vanitygaps.c"
-#+END_SRC
+#+end_src
 ** Layout definitions
 + avaible layouts:
   - bstack
@@ -387,7 +381,7 @@ static const int attachbelow = 1;
   - nrowgrid
   - spiral
   - tile
-#+BEGIN_SRC C
+#+begin_src C
 static const Layout layouts[] = {
     /* symbol     arrange function */
     { "[]=",      tile },    /* first entry is default */
@@ -401,23 +395,23 @@ static const Layout layouts[] = {
     { "HHH",      gaplessgrid },
     { NULL,       NULL },
 };
-#+END_SRC
+#+end_src
 * Key bindings
 ** Special keys
 + Mod4Mask = Modkey
 + Mod1Mask = Alt
 + ShiftMask = Shift
 + ControlMask = Control
-#+BEGIN_SRC C
+#+begin_src C
 #include <X11/XF86keysym.h>
 
 #define M Mod4Mask
 #define A Mod1Mask
 #define S ShiftMask
 #define C ControlMask
-#+END_SRC
+#+end_src
 ** Tag functions
-#+BEGIN_SRC C
+#+begin_src C
 #define TAGKEYS(KEY,TAG) \
     { A,       -1,   KEY,   comboview,    {.ui = 1 << TAG} }, \
     { C,       -1,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
@@ -427,9 +421,9 @@ static const Layout layouts[] = {
     { M|S,     -1,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
     { A|M,     XK_l, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
     { A|M,     XK_h, KEY,   tagprevmon,   {.ui = 1 << TAG} },
-#+END_SRC
+#+end_src
 ** Launch applications
-#+BEGIN_SRC C
+#+begin_src C
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 static Key keys[] = {
@@ -453,9 +447,9 @@ static Key keys[] = {
     { M,            -1,     XK_g,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
     { C|A,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
     { A,            -1,     XK_r,          spawndefault,           {0} },
-#+END_SRC
+#+end_src
 *** Launch dmenu scripts
-#+BEGIN_SRC C
+#+begin_src C
     { A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
     { A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },
     { A|C,          -1,     XK_Return,     spawn,                  SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'") },
@@ -468,17 +462,17 @@ static Key keys[] = {
     { A|S,          XK_d,   XK_v,          spawn,                  SHCMD("manview") },
     { A|S,          XK_d,   XK_a,          spawn,                  SHCMD("allmenu") },
     { A|S,          XK_d,   XK_q,          spawn,                  SHCMD("shut") },
-#+END_SRC
+#+end_src
 ** Multimedia keys
-#+BEGIN_SRC C
+#+begin_src C
     { 0,-1, XF86XK_AudioPrev,              spawn,                  SHCMD("playerctl --player cmus previous") },
     { 0,-1, XF86XK_AudioNext,              spawn,                  SHCMD("playerctl --player cmus next") },
     { 0,-1, XF86XK_AudioPlay,              spawn,                  SHCMD("playerctl --player cmus play-pause") },
     { 0,-1, XF86XK_AudioLowerVolume,       spawn,                  SHCMD("pamixer --allow-boost -d 1 ; killall dwmStatus && dwmStatus &") },
     { 0,-1, XF86XK_AudioRaiseVolume,       spawn,                  SHCMD("pamixer --allow-boost -i 1 ; killall dwmStatus && dwmStatus &") },
-#+END_SRC
+#+end_src
 ** Generic manipulation
-#+BEGIN_SRC C
+#+begin_src C
     { A,            -1,     XK_q,          killclient,             {0} },
     { A|C|S,        -1,     XK_x,          killpermanent,          {0} },
     { A|S,          -1,     XK_q,          killunsel,              {0} },
@@ -503,9 +497,9 @@ static Key keys[] = {
     { M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
     { M|A,          -1,     XK_h,          inplacerotate,          {.i = +2 } },
     { M|A,          -1,     XK_l,          inplacerotate,          {.i = -2 } },
-#+END_SRC
+#+end_src
 ** Changing layouts and manipulating them
-#+BEGIN_SRC C
+#+begin_src C
     { A,            -1,     XK_t,          setlayout,              {.v = &layouts[0]} },
     { A,            -1,     XK_v,          setlayout,              {.v = &layouts[1]} },
     { A|S,          -1,     XK_f,          setlayout,              {.v = &layouts[2]} },
@@ -523,9 +517,9 @@ static Key keys[] = {
     { A|S,          -1,     XK_n,          shiftviewclients,       { .i = +1 } },
     { A|S,          -1,     XK_p,          shiftviewclients,       { .i = -1 } },
     { A|S,          -1,     XK_a,          winview,                {0} },
-#+END_SRC
+#+end_src
 ** Manipulating windows
-#+BEGIN_SRC C
+#+begin_src C
     { A,            -1,     XK_semicolon,  zoom,                   {0} },
     { A|S,          -1,     XK_v,          transfer,               {0} },
     { A|C,          -1,     XK_j,          pushdown,               {0} },
@@ -538,16 +532,16 @@ static Key keys[] = {
     { A,            -1,     XK_u,          togglescratch,          {.ui = 0 } },
     { A,            -1,     XK_i,          togglescratch,          {.ui = 1 } },
     { A,            -1,     XK_y,          togglescratch,          {.ui = 2 } },
-#+END_SRC
+#+end_src
 ** Monitors
-#+BEGIN_SRC C
+#+begin_src C
     { A,            -1,     XK_comma,      focusmon,               {.i = -1 } },
     { A,            -1,     XK_period,     focusmon,               {.i = +1 } },
     { A|S,          -1,     XK_comma,      tagmon,                 {.i = -1 } },
     { A|S,          -1,     XK_period,     tagmon,                 {.i = +1 } },
-#+END_SRC
+#+end_src
 ** Moveresize
-#+BEGIN_SRC C
+#+begin_src C
     { M|C,          -1,     XK_j,          moveresize,             {.v = "0x 25y 0w 0h" } },
     { M|C,          -1,     XK_k,          moveresize,             {.v = "0x -25y 0w 0h" } },
     { M|C,          -1,     XK_l,          moveresize,             {.v = "25x 0y 0w 0h" } },
@@ -556,22 +550,22 @@ static Key keys[] = {
     { M|A,          -1,     XK_k,          moveresize,             {.v = "0x 0y 0w -25h" } },
     { M|A,          -1,     XK_l,          moveresize,             {.v = "0x 0y 25w 0h" } },
     { M|A,          -1,     XK_h,          moveresize,             {.v = "0x 0y -25w 0h" } },
-#+END_SRC
+#+end_src
 ** Gaps
-#+BEGIN_SRC C
+#+begin_src C
     { A|S,          -1,     XK_equal,      incrgaps,               {.i = +1 } },
     { A|S,          -1,     XK_minus,      incrgaps,               {.i = -1 } },
     { A|S,          -1,     XK_0,          defaultgaps,            {0} },
     { A|C,          -1,     XK_0,          togglegaps,             {0} },
-#+END_SRC
+#+end_src
 ** Window border
-#+BEGIN_SRC C
+#+begin_src C
     { A|C,          -1,     XK_equal,      setborderpx,            {.i = +1 } },
     { A|C,          -1,     XK_minus,      setborderpx,            {.i = -1 } },
     { M,            -1,     XK_0,          setborderpx,            {.i = 0 } },
-#+END_SRC
+#+end_src
 ** Tagkeys
-#+BEGIN_SRC C
+#+begin_src C
     TAGKEYS(                XK_1,                                  0)
     TAGKEYS(                XK_2,                                  1)
     TAGKEYS(                XK_3,                                  2)
@@ -581,10 +575,10 @@ static Key keys[] = {
     TAGKEYS(                XK_7,                                  6)
     TAGKEYS(                XK_8,                                  7)
     TAGKEYS(                XK_9,                                  8)
-#+END_SRC
+#+end_src
 *** Tag all
 **** Floating windows only
-#+BEGIN_SRC C
+#+begin_src C
 { A|S,              -1,     XK_F1,         tagall,                 {.v = "F1"} },
 { A|S,              -1,     XK_F2,         tagall,                 {.v = "F2"} },
 { A|S,              -1,     XK_F3,         tagall,                 {.v = "F3"} },
@@ -594,9 +588,9 @@ static Key keys[] = {
 { A|S,              -1,     XK_F7,         tagall,                 {.v = "F7"} },
 { A|S,              -1,     XK_F8,         tagall,                 {.v = "F8"} },
 { A|S,              -1,     XK_F9,         tagall,                 {.v = "F9"} },
-#+END_SRC
+#+end_src
 **** All windows
-#+BEGIN_SRC C
+#+begin_src C
 { A,                -1,     XK_F1,         tagall,                 {.v = "1"} },
 { A,                -1,     XK_F2,         tagall,                 {.v = "2"} },
 { A,                -1,     XK_F3,         tagall,                 {.v = "3"} },
@@ -606,13 +600,13 @@ static Key keys[] = {
 { A,                -1,     XK_F7,         tagall,                 {.v = "7"} },
 { A,                -1,     XK_F8,         tagall,                 {.v = "8"} },
 { A,                -1,     XK_F9,         tagall,                 {.v = "9"} },
-#+END_SRC
+#+end_src
 ** Quit and restart
-#+BEGIN_SRC C
+#+begin_src C
     { M|S,          -1,     XK_Escape,     quit,                   {0} },
     { A|C|S,        -1,     XK_q,          quit,                   {1} },
 };
-#+END_SRC
+#+end_src
 * Mouse actions
 + click can be
   - ClkTagBar
@@ -621,7 +615,7 @@ static Key keys[] = {
   - ClkWinTitle
   - ClkClientWin
   - ClkRootWin
-#+BEGIN_SRC C
+#+begin_src C
 static Button buttons[] = {
     /* click                event mask      button          function        argument */
     { ClkLtSymbol,          0,              Button1,        spawn,          SHCMD("xmenu.sh -p 0x0") },
@@ -634,9 +628,9 @@ static Button buttons[] = {
     { ClkTagBar,            A,              Button3,        toggletag,      {0} },
     { ClkTabBar,            0,              Button1,        focuswin,       {0} },
 };
-#+END_SRC
+#+end_src
 * dwmc
-#+BEGIN_SRC C
+#+begin_src C
 #include "dwmc.c"
 static Signal signals[] = {
     /* signum           function */
@@ -653,4 +647,4 @@ static Signal signals[] = {
     { "toggletagex",    toggletagex },
     { "setlayoutex",    setlayoutex },
 };
-#+END_SRC
+#+end_src
