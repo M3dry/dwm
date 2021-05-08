@@ -37,7 +37,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xutil.h>
-#include <X11/XKBlib.h>
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
@@ -125,7 +124,6 @@ struct Client {
 	float mina, maxa;
 	float cfact;
 	int x, y, w, h;
-	int sfx, sfy, sfw, sfh; /* stored float geometry, used on mode revert */
 	int oldx, oldy, oldw, oldh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
@@ -139,7 +137,6 @@ struct Client {
 	Client *swallowing;
 	Monitor *mon;
 	Window win;
-	unsigned char kbdgrp;
 };
 
 typedef struct {
@@ -264,10 +261,10 @@ static void focus(Client *c);
 static void focusdir(const Arg *arg);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
+static void focusmoni(const int dir);
 static void focusstack(const Arg *arg);
 static void focuswin(const Arg* arg);
 static Atom getatomprop(Client *c, Atom prop);
-static Client *getclientundermouse(void);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
 static unsigned int getsystraywidth();
@@ -285,7 +282,6 @@ static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
-static void moveresize(const Arg *arg);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void pop(Client *);
@@ -299,7 +295,6 @@ static void removesystrayicon(Client *i);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
 static void resizebarwin(Monitor *m);
 static void resizeclient(Client *c, int x, int y, int w, int h);
-static void resizeclientpad(Client *c, int x, int y, int w, int h, int xpad, int ypad);
 static void resizemouse(const Arg *arg);
 static void resizerequest(XEvent *e);
 static void restack(Monitor *m);
@@ -336,6 +331,9 @@ static void tag(const Arg *arg);
 static void tagall(const Arg *arg);
 static void tagwith(const Arg *arg);
 static void tagmon(const Arg *arg);
+static void focusnextmon(const Arg *arg);
+static void focusprevmon(const Arg *arg);
+static void focusothermon(const Arg *arg, int dir);
 static void tagnextmon(const Arg *arg);
 static void tagprevmon(const Arg *arg);
 static void tagothermon(const Arg *arg, int dir);
@@ -1191,7 +1189,6 @@ destroynotify(XEvent *e)
 	}
 	else if ((c = swallowingclient(ev->window)))
 		unmanage(c->swallowing, 1);
-	focus(getclientundermouse());
 }
 
 void
@@ -1344,10 +1341,11 @@ drawbar(Monitor *m)
 {
     int indn, cnum = 0;
 	int x, w, stw = 0;
-	unsigned int i, occ = 0, urg = 0;
+	unsigned int i, occ = 0, urg = 0, n = 0;
 	Client *c;
 	char tagdisp[64];
 	char *masterclientontag[LENGTH(tags)];
+	char ntext[16];
 
 	if(showsystray && m == systraytomon(m))
 		stw = getsystraywidth();
@@ -1363,6 +1361,8 @@ drawbar(Monitor *m)
 		    occ |= c->tags;
 		if (c->isurgent)
 			urg |= c->tags;
+		if (ISVISIBLE(c))
+			n++;
 		for (i = 0; i < LENGTH(tags); i++)
 			if (!masterclientontag[i] && c->tags & (1<<i)) {
 				XClassHint ch = { NULL, NULL };
@@ -1406,7 +1406,7 @@ drawbar(Monitor *m)
 				cnum++;
 
 		for (c = m->clients; c && cnum > 1; c = c->next)
-			if (c->tags & (1 << i)) {
+			if (c->tags & (1 << i) && !(m->tagset[m->seltags] & 1 << i)) {
 				drw_setscheme(drw, scheme[selmon->sel == c ? SchemeClientSel : m->tagset[m->seltags] & 1 << i ? SchemeClientInc : SchemeClientNorm]);
 				if (selmon->sel == c)
 					drw_rect(drw, x, 1 + (indn * 2), 8, 2, 4, urg & 1 << i);
@@ -1421,6 +1421,12 @@ drawbar(Monitor *m)
 	w = blw = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[m == selmon ? SchemeLtsymbol : SchemeInvMon]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+	/* Drawing client number indicator (same color as layout symbol) */
+	if (n > 1) {
+		snprintf(ntext, sizeof ntext, "%u", n);
+		w = TEXTW(ntext);
+		x = drw_text(drw, x, 0, w, bh, lrpad / 2, ntext, 0);
+	}
 
 	drw_setscheme(drw, scheme[m == selmon ? SchemeLtsymbol : SchemeInvMon]);
 	drw_rect(drw, x, 0, m->ww - x, bh, 1, 1);
@@ -1579,7 +1585,6 @@ focus(Client *c)
 		}
 		if (c->isurgent)
 			seturgent(c, 0);
-		XkbLockGroup(dpy, XkbUseCoreKbd, c->kbdgrp);
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, 1);
@@ -1703,6 +1708,21 @@ focusmon(const Arg *arg)
 }
 
 void
+focusmoni(const int dir)
+{
+	Monitor *m;
+
+	if (!mons->next)
+		return;
+	if ((m = dirtomon(dir)) == selmon)
+		return;
+	unfocus(selmon->sel, 0);
+	prevmon = selmon;
+	selmon = m;
+	focus(NULL);
+}
+
+void
 focusstack(const Arg *arg)
 {
 	Client *c = NULL, *i;
@@ -1762,20 +1782,6 @@ getatomprop(Client *c, Atom prop)
 		XFree(p);
 	}
 	return atom;
-}
-
-Client *
-getclientundermouse(void)
-{
-	int ret, di;
-	unsigned int dui;
-	Window child, dummy;
-
-	ret = XQueryPointer(dpy, root, &dummy, &child, &di, &di, &di, &di, &dui);
-	if (!ret)
-		return NULL;
-
-	return wintoclient(child);
 }
 
 int
@@ -2058,7 +2064,6 @@ manage(Window w, XWindowAttributes *wa)
 	Client *c, *t = NULL, *term = NULL;
 	Window trans = None;
 	XWindowChanges wc;
-	XkbStateRec kbd_state;
 
 	c = ecalloc(1, sizeof(Client));
 	c->win = w;
@@ -2122,10 +2127,6 @@ manage(Window w, XWindowAttributes *wa)
 		c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2;
 	}
 	updatemotifhints(c);
-	c->sfx = c->x;
-	c->sfy = c->y;
-	c->sfw = c->w;
-	c->sfh = c->h;
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, 0);
 	if (!c->isfloating)
@@ -2146,8 +2147,6 @@ manage(Window w, XWindowAttributes *wa)
 	if (c->mon == selmon)
 		unfocus(selmon->sel, 0);
 	c->mon->sel = c;
-	XkbGetState(dpy, XkbUseCoreKbd, &kbd_state);
-	c->kbdgrp = kbd_state.group;
 	arrange(c->mon);
 	XMapWindow(dpy, c->win);
 	if (term)
@@ -2252,71 +2251,6 @@ movemouse(const Arg *arg)
 		prevmon = selmon;
 		selmon = m;
 		focus(NULL);
-	}
-}
-
-void
-moveresize(const Arg *arg) {
-	/* only floating windows can be moved */
-	Client *c;
-	c = selmon->sel;
-	int x, y, w, h, nx, ny, nw, nh, ox, oy, ow, oh;
-	char xAbs, yAbs, wAbs, hAbs;
-	int msx, msy, dx, dy, nmx, nmy;
-	unsigned int dui;
-	Window dummy;
-
-	if (!c || !arg)
-		return;
-	if (selmon->lt[selmon->sellt]->arrange && !c->isfloating)
-		return;
-	if (sscanf((char *)arg->v, "%d%c %d%c %d%c %d%c", &x, &xAbs, &y, &yAbs, &w, &wAbs, &h, &hAbs) != 8)
-		return;
-
-	/* compute new window position; prevent window from be positioned outside the current monitor */
-	nw = c->w + w;
-	if (wAbs == 'W')
-		nw = w < selmon->mw - 2 * c->bw ? w : selmon->mw - 2 * c->bw;
-
-	nh = c->h + h;
-	if (hAbs == 'H')
-		nh = h < selmon->mh - 2 * c->bw ? h : selmon->mh - 2 * c->bw;
-
-	nx = c->x + x;
-	if (xAbs == 'X') {
-		if (x < selmon->mx)
-			nx = selmon->mx;
-		else if (x > selmon->mx + selmon->mw)
-			nx = selmon->mx + selmon->mw - nw - 2 * c->bw;
-		else
-			nx = x;
-	}
-
-	ny = c->y + y;
-	if (yAbs == 'Y') {
-		if (y < selmon->my)
-			ny = selmon->my;
-		else if (y > selmon->my + selmon->mh)
-			ny = selmon->my + selmon->mh - nh - 2 * c->bw;
-		else
-			ny = y;
-	}
-
-	ox = c->x;
-	oy = c->y;
-	ow = c->w;
-	oh = c->h;
-
-	XRaiseWindow(dpy, c->win);
-	Bool xqp = XQueryPointer(dpy, root, &dummy, &dummy, &msx, &msy, &dx, &dy, &dui);
-	resize(c, nx, ny, nw, nh, True);
-
-	/* move cursor along with the window to avoid problems caused by the sloppy focus */
-	if (xqp && ox <= msx && (ox + ow) >= msx && oy <= msy && (oy + oh) >= msy)
-	{
-		nmx = c->x - ox + c->w - ow;
-		nmy = c->y - oy + c->h - oh;
-		XWarpPointer(dpy, None, None, 0, 0, 0, 0, nmx, nmy);
 	}
 }
 
@@ -2461,11 +2395,10 @@ removesystrayicon(Client *i)
 
 
 void
-resize(Client *c, int tx, int ty, int tw, int th, int interact)
+resize(Client *c, int x, int y, int w, int h, int interact)
 {
-	int wh = tw, hh = th;
-	if (applysizehints(c, &tx, &ty, &wh, &hh, interact))
-		resizeclientpad(c, tx, ty, wh, hh, tw, th);
+	if (applysizehints(c, &x, &y, &w, &h, interact))
+		resizeclient(c, x, y, w, h);
 }
 
 void
@@ -2478,14 +2411,6 @@ resizebarwin(Monitor *m) {
 
 void
 resizeclient(Client *c, int x, int y, int w, int h)
-{
-	resizeclientpad(c, x, y, w, h, w, h);
-}
-
-/* This is essentially the resizeclient function renamed with two
- * additional parameters, tw and th (for tile width and height). */
-void
-resizeclientpad(Client *c, int x, int y, int w, int h, int tw, int th)
 {
 	XWindowChanges wc;
 	c->oldx = c->x; c->x = wc.x = x;
@@ -2501,16 +2426,7 @@ resizeclientpad(Client *c, int x, int y, int w, int h, int tw, int th)
 			c->h = wc.height += c->bw * 2;
 			wc.border_width = 0;
 	}
-	if (!c->isfloating) {
-		if (w != tw) {
-			wc.x += (tw - w) / 2;
-			c->w = tw;
-		}
-		if (h != th) {
-			wc.y += (th - h) / 2;
-			c->h = th;
-		}
-	}
+
 	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 	configure(c);
 	if (c->fakefullscreen == 1)
@@ -2677,6 +2593,27 @@ scan(void)
 		if (wins)
 			XFree(wins);
 	}
+}
+
+void
+focusnextmon(const Arg *arg)
+{
+	focusothermon(arg, 1);
+}
+
+void
+focusprevmon(const Arg *arg)
+{
+	focusothermon(arg, -1);
+}
+
+void
+focusothermon(const Arg *arg, int dir)
+{
+	if (!mons->next)
+		return;
+	focusmoni(dir);
+	view(arg);
 }
 
 void
@@ -3367,9 +3304,8 @@ togglefloating(const Arg *arg)
 		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFakeFullscrFloat].pixel);
         else
 		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFloat].pixel);
-		/* restore last known float dimensions */
-		resize(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
-		       selmon->sel->sfw, selmon->sel->sfh, False);
+		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
+			selmon->sel->w, selmon->sel->h, 0);
     } else {
         if (selmon->sel->issticky)
 		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColSticky].pixel);
@@ -3383,11 +3319,6 @@ togglefloating(const Arg *arg)
                 }
             }
         }
-		/* save last known float dimensions */
-		selmon->sel->sfx = selmon->sel->x;
-		selmon->sel->sfy = selmon->sel->y;
-		selmon->sel->sfw = selmon->sel->w;
-		selmon->sel->sfh = selmon->sel->h;
 	}
 	arrange(selmon);
 }
@@ -3544,7 +3475,6 @@ togglepadding()
 void
 unfocus(Client *c, int setfocus)
 {
-	XkbStateRec kbd_state;
 	if (!c)
 		return;
 	grabbuttons(c, 0);
@@ -3571,8 +3501,6 @@ unfocus(Client *c, int setfocus)
 		XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
 	}
 
-	XkbGetState(dpy, XkbUseCoreKbd, &kbd_state);
-	c->kbdgrp = kbd_state.group;
 	updatecurrentdesktop();
 }
 

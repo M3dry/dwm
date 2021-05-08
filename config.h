@@ -49,7 +49,7 @@ static const int decorhints                = 1;   /* 1 means respect decoration 
 
 static const int focusonwheel              = 0;
 
-static const char *fonts[]                 = { "Source Code Variable:size=12:antialias=true:autohint=true" };
+static const char *fonts[]                 = { "FiraMono Nerd Font Mono:size=12:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#4E5579";
 static const char selfg[]                 = "#ff5370";
@@ -229,8 +229,10 @@ static const Layout layouts[] = {
     { A|S,     -1,   KEY,   combotag,     {.ui = 1 << TAG} }, \
     { A|C,     -1,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
     { M|S,     -1,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
-    { A|M,     XK_l, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|M,     XK_h, KEY,   tagprevmon,   {.ui = 1 << TAG} },
+    { A|C,     XK_l, KEY,   focusnextmon, {.ui = 1 << TAG} }, \
+    { A|C,     XK_h, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
+    { A|C,     XK_j, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
+    { A|C,     XK_k, KEY,   tagprevmon,   {.ui = 1 << TAG} },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
@@ -243,17 +245,29 @@ static Key keys[] = {
     { A, XK_e, XK_c, spawn, SHCMD("emacsclient -c -e '(ibuffer)'") },
     { A, XK_e, XK_d, spawn, SHCMD("emacsclient -c -e '(dired nil)'") },
     { A, XK_e, XK_f, spawn, SHCMD("emacsclient -c -e '(elfeed)'") },
-    { A, -1, XK_s, spawn, SHCMD("emacsclient -e '(emacs-everywhere)'") },
+    { A, -1, XK_s, spawn, SHCMD("~/.emacs.d/bin/doom everywhere") },
     { A, -1, XK_w, spawn, SHCMD("xdo activate -N FireFox || firefox") },
     { M, -1, XK_w, spawn, SHCMD("xdo activate -N Chromium || chromium") },
     { A|C, -1, XK_KP_Down, spawn, SHCMD("xkill") },
     { A|C, -1, XK_d, spawn, SHCMD("discord") },
-    { A|S, -1, XK_u, spawn, SHCMD("import my-stuff|Pictures|snips|$(date +'%H:%M:%S').png") },
+    { A|S, -1, XK_u, spawn, SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png") },
     { A, -1, XK_p, spawn, SHCMD("pcmanfm") },
     { A|C, -1, XK_m, spawn, SHCMD("multimc") },
     { A|M|C, -1, XK_l, spawn, SHCMD("slock") },
     { M, -1, XK_g, spawn, SHCMD("xmenu.sh -p 0x0") },
     { A, -1, XK_r, spawndefault, {0} },
+    { A|S, -1, XK_Return, spawn, SHCMD("dmenu_run -l 5 -g 10 -p 'Run '") },
+    { A, -1, XK_c, spawn, SHCMD("volume-script") },
+    { A|C, -1, XK_Return, spawn, SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'") },
+    { A|S, -1, XK_w, spawn, SHCMD("Booky 'firefox' '_' 'Bconfig'") },
+    { A, -1, XK_z, spawn, SHCMD("music-changer cmus") },
+    { A|S, XK_d, XK_s, spawn, SHCMD("switch") },
+    { A|S, XK_d, XK_e, spawn, SHCMD("emoji-script") },
+    { A|S, XK_d, XK_c, spawn, SHCMD("calc") },
+    { A|S, XK_d, XK_p, spawn, SHCMD("passmenu2 -F -p 'Passwords '") },
+    { A|S, XK_d, XK_v, spawn, SHCMD("manview") },
+    { A|S, XK_d, XK_a, spawn, SHCMD("allmenu") },
+    { A|S, XK_d, XK_q, spawn, SHCMD("shut") },
     { 0, -1, XF86XK_AudioPrev, spawn, SHCMD("playerctl --player cmus previous") },
     { 0, -1, XF86XK_AudioNext, spawn, SHCMD("playerctl --player cmus next") },
     { 0, -1, XF86XK_AudioPlay, spawn, SHCMD("playerctl --player cmus play-pause") },
@@ -316,14 +330,6 @@ static Key keys[] = {
     { A, -1, XK_period, focusmon, {.i = +1 } },
     { A|S, -1, XK_comma, tagmon, {.i = -1 } },
     { A|S, -1, XK_period, tagmon, {.i = +1 } },
-    { M|C, -1, XK_j, moveresize, {.v = "0x 25y 0w 0h" } },
-    { M|C, -1, XK_k, moveresize, {.v = "0x -25y 0w 0h" } },
-    { M|C, -1, XK_l, moveresize, {.v = "25x 0y 0w 0h" } },
-    { M|C, -1, XK_h, moveresize, {.v = "-25x 0y 0w 0h" } },
-    { M|A, -1, XK_j, moveresize, {.v = "0x 0y 0w 25h" } },
-    { M|A, -1, XK_k, moveresize, {.v = "0x 0y 0w -25h" } },
-    { M|A, -1, XK_l, moveresize, {.v = "0x 0y 25w 0h" } },
-    { M|A, -1, XK_h, moveresize, {.v = "0x 0y -25w 0h" } },
     { A|S, -1, XK_equal, incrgaps, {.i = +1 } },
     { A|S, -1, XK_minus, incrgaps, {.i = -1 } },
     { A|S, -1, XK_0, defaultgaps, {0} },

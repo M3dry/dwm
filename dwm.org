@@ -1,6 +1,7 @@
 #+TITLE: Dwm
 #+author: M3dry
-#+PROPERTY: header-args :C :tangle config.h :main no
+#+property: header-args :C :tangle config.h :main no
+#+exclude_tags: toc_4
 
 * Table of contents :toc_4:
 - [[#variables][Variables]]
@@ -146,7 +147,7 @@ static const int focusonwheel              = 0;
 #+end_src
 ** Fonts
 #+begin_src C
-static const char *fonts[]                 = { "Source Code Variable:size=12:antialias=true:autohint=true" };
+static const char *fonts[]                 = { "FiraMono Nerd Font Mono:size=12:antialias=true:autohint=true" };
 #+end_src
 * Colors
 ** Color variables
@@ -403,115 +404,121 @@ static const Layout layouts[] = {
     { A|S,     -1,   KEY,   combotag,     {.ui = 1 << TAG} }, \
     { A|C,     -1,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
     { M|S,     -1,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
-    { A|M,     XK_l, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|M,     XK_h, KEY,   tagprevmon,   {.ui = 1 << TAG} },
+    { A|C,     XK_l, KEY,   focusnextmon, {.ui = 1 << TAG} }, \
+    { A|C,     XK_h, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
+    { A|C,     XK_j, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
+    { A|C,     XK_k, KEY,   tagprevmon,   {.ui = 1 << TAG} },
 #+end_src
 * Keybinds
 #+name: binds
 | mod   | key                     | multi key | function             | args                                                                  |
 |-------+-------------------------+-----------+----------------------+-----------------------------------------------------------------------|
 | A     | XK_Return               |        -1 | spawn                | SHCMD("$TERMINAL")                                                    |
-| A/S   | XK_c                    |        -1 | spawn                | SHCMD("$TERMINAL htop")                                               |
-| A/S   | XK_z                    |        -1 | spawn                | SHCMD("playerctl play-pause")                                         |
-| A/S   | XK_e                    |        -1 | spawn                | SHCMD("$TERMINAL nvim")                                               |
+| A:S   | XK_c                    |        -1 | spawn                | SHCMD("$TERMINAL htop")                                               |
+| A:S   | XK_z                    |        -1 | spawn                | SHCMD("playerctl play-pause")                                         |
+| A:S   | XK_e                    |        -1 | spawn                | SHCMD("$TERMINAL nvim")                                               |
 | A     | XK_e                    |      XK_e | spawn                | SHCMD("emacsclient -c")                                               |
 | A     | XK_c                    |      XK_e | spawn                | SHCMD("emacsclient -c -e '(ibuffer)'")                                |
 | A     | XK_d                    |      XK_e | spawn                | SHCMD("emacsclient -c -e '(dired nil)'")                              |
 | A     | XK_f                    |      XK_e | spawn                | SHCMD("emacsclient -c -e '(elfeed)'")                                 |
-| A     | XK_s                    |        -1 | spawn                | SHCMD("emacsclient    -e '(emacs-everywhere)'")                       |
-| A     | XK_w                    |        -1 | spawn                | SHCMD("xdo activate -N FireFox // firefox")                           |
-| M     | XK_w                    |        -1 | spawn                | SHCMD("xdo activate -N Chromium // chromium")                         |
-| A/C   | XK_KP_Down              |        -1 | spawn                | SHCMD("xkill")                                                        |
-| A/C   | XK_d                    |        -1 | spawn                | SHCMD("discord")                                                      |
-| A/S   | XK_u                    |        -1 | spawn                | SHCMD("import my-stuff/Pictures/snips/$(date +'%H:%M:%S').png")       |
+| A     | XK_s                    |        -1 | spawn                | SHCMD("~/.emacs.d/bin/doom everywhere")                               |
+| A     | XK_w                    |        -1 | spawn                | SHCMD("xdo activate -N FireFox :: firefox")                           |
+| M     | XK_w                    |        -1 | spawn                | SHCMD("xdo activate -N Chromium :: chromium")                         |
+| A:C   | XK_KP_Down              |        -1 | spawn                | SHCMD("xkill")                                                        |
+| A:C   | XK_d                    |        -1 | spawn                | SHCMD("discord")                                                      |
+| A:S   | XK_u                    |        -1 | spawn                | SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png")          |
 | A     | XK_p                    |        -1 | spawn                | SHCMD("pcmanfm")                                                      |
-| A/C   | XK_m                    |        -1 | spawn                | SHCMD("multimc")                                                      |
-| A/M/C | XK_l                    |        -1 | spawn                | SHCMD("slock")                                                        |
+| A:C   | XK_m                    |        -1 | spawn                | SHCMD("multimc")                                                      |
+| A:M:C | XK_l                    |        -1 | spawn                | SHCMD("slock")                                                        |
 | M     | XK_g                    |        -1 | spawn                | SHCMD("xmenu.sh -p 0x0")                                              |
 | A     | XK_r                    |        -1 | spawndefault         | {0}                                                                   |
+| A:S   | XK_Return               |        -1 | spawn                | SHCMD("dmenu_run -l 5 -g 10 -p 'Run'")                                |
+| A     | XK_c                    |        -1 | spawn                | SHCMD("volume-script")                                                |
+| A:C   | XK_Return               |        -1 | spawn                | SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'")               |
+| A:S   | XK_w                    |        -1 | spawn                | SHCMD("Booky 'firefox' '_' 'Bconfig'")                                |
+| A     | XK_z                    |        -1 | spawn                | SHCMD("music-changer cmus")                                           |
+| A:S   | XK_s                    |      XK_d | spawn                | SHCMD("switch")                                                       |
+| A:S   | XK_e                    |      XK_d | spawn                | SHCMD("emoji-script")                                                 |
+| A:S   | XK_c                    |      XK_d | spawn                | SHCMD("calc")                                                         |
+| A:S   | XK_p                    |      XK_d | spawn                | SHCMD("passmenu2 -F -p 'Passwords'")                                  |
+| A:S   | XK_v                    |      XK_d | spawn                | SHCMD("manview")                                                      |
+| A:S   | XK_a                    |      XK_d | spawn                | SHCMD("allmenu")                                                      |
+| A:S   | XK_q                    |      XK_d | spawn                | SHCMD("shut")                                                         |
 | 0     | XF86XK_AudioPrev        |        -1 | spawn                | SHCMD("playerctl --player cmus previous")                             |
 | 0     | XF86XK_AudioNext        |        -1 | spawn                | SHCMD("playerctl --player cmus next")                                 |
 | 0     | XF86XK_AudioPlay        |        -1 | spawn                | SHCMD("playerctl --player cmus play-pause")                           |
 | 0     | XF86XK_AudioLowerVolume |        -1 | spawn                | SHCMD("pamixer --allow-boost -d 1 ; killall dwmStatus ; dwmStatus &") |
 | 0     | XF86XK_AudioRaiseVolume |        -1 | spawn                | SHCMD("pamixer --allow-boost -i 1 ; killall dwmStatus ; dwmStatus &") |
 | A     | XK_q                    |        -1 | killclient           | {0}                                                                   |
-| A/C/S | XK_x                    |        -1 | killpermanent        | {0}                                                                   |
-| A/S   | XK_q                    |        -1 | killunsel            | {0}                                                                   |
+| A:C:S | XK_x                    |        -1 | killpermanent        | {0}                                                                   |
+| A:S   | XK_q                    |        -1 | killunsel            | {0}                                                                   |
 | M     | XK_v                    |        -1 | togglevacant         | {0}                                                                   |
-| M/S   | XK_v                    |        -1 | togglepadding        | {0}                                                                   |
+| M:S   | XK_v                    |        -1 | togglepadding        | {0}                                                                   |
 | A     | XK_n                    |        -1 | togglebar            | {0}                                                                   |
-| A/S   | XK_h                    |        -1 | setmfact             | {.f = -0.05}                                                          |
-| A/S   | XK_l                    |        -1 | setmfact             | {.f = +0.05}                                                          |
-| A/C   | XK_u                    |        -1 | setmfact             | {.f = mfact + 1}                                                      |
-| A/S   | XK_j                    |        -1 | setcfact             | {.f = +0.25}                                                          |
-| A/S   | XK_k                    |        -1 | setcfact             | {.f = -0.25}                                                          |
-| A/M   | XK_u                    |        -1 | setcfact             | {0}                                                                   |
+| A:S   | XK_h                    |        -1 | setmfact             | {.f = -0.05}                                                          |
+| A:S   | XK_l                    |        -1 | setmfact             | {.f = +0.05}                                                          |
+| A:C   | XK_u                    |        -1 | setmfact             | {.f = mfact + 1}                                                      |
+| A:S   | XK_j                    |        -1 | setcfact             | {.f = +0.25}                                                          |
+| A:S   | XK_k                    |        -1 | setcfact             | {.f = -0.25}                                                          |
+| A:M   | XK_u                    |        -1 | setcfact             | {0}                                                                   |
 | A     | XK_bracketleft          |        -1 | incnmaster           | {.i = +1 }                                                            |
 | A     | XK_bracketright         |        -1 | incnmaster           | {.i = -1 }                                                            |
 | M     | XK_space                |        -1 | focusmaster          | {0}                                                                   |
-| A/C   | XK_space                |        -1 | switchcol            | {0}                                                                   |
+| A:C   | XK_space                |        -1 | switchcol            | {0}                                                                   |
 | A     | XK_h                    |        -1 | focusdir             | {.i = 0 }                                                             |
 | A     | XK_l                    |        -1 | focusdir             | {.i = 1 }                                                             |
 | A     | XK_k                    |        -1 | focusdir             | {.i = 2 }                                                             |
 | A     | XK_j                    |        -1 | focusdir             | {.i = 3 }                                                             |
-| M/S   | XK_j                    |        -1 | focusstack           | {.i = +1 }                                                            |
-| M/S   | XK_k                    |        -1 | focusstack           | {.i = -1 }                                                            |
-| M/A   | XK_h                    |        -1 | inplacerotate        | {.i = +2 }                                                            |
-| M/A   | XK_l                    |        -1 | inplacerotate        | {.i = -2 }                                                            |
+| M:S   | XK_j                    |        -1 | focusstack           | {.i = +1 }                                                            |
+| M:S   | XK_k                    |        -1 | focusstack           | {.i = -1 }                                                            |
+| M:A   | XK_h                    |        -1 | inplacerotate        | {.i = +2 }                                                            |
+| M:A   | XK_l                    |        -1 | inplacerotate        | {.i = -2 }                                                            |
 | A     | XK_t                    |        -1 | setlayout            | {.v = &layouts[0]}                                                    |
 | A     | XK_v                    |        -1 | setlayout            | {.v = &layouts[1]}                                                    |
-| A/S   | XK_f                    |        -1 | setlayout            | {.v = &layouts[2]}                                                    |
+| A:S   | XK_f                    |        -1 | setlayout            | {.v = &layouts[2]}                                                    |
 | A     | XK_d                    |        -1 | setlayout            | {.v = &layouts[3]}                                                    |
 | A     | XK_g                    |        -1 | setlayout            | {.v = &layouts[4]}                                                    |
 | A     | XK_b                    |        -1 | setlayout            | {.v = &layouts[5]}                                                    |
-| A/S   | XK_m                    |        -1 | setlayout            | {.v = &layouts[6]}                                                    |
+| A:S   | XK_m                    |        -1 | setlayout            | {.v = &layouts[6]}                                                    |
 | A     | XK_m                    |        -1 | setlayout            | {.v = &layouts[7]}                                                    |
-| A/S   | XK_g                    |        -1 | setlayout            | {.v = &layouts[8]}                                                    |
-| A/S   | XK_t                    |        -1 | tabmode              | {-1}                                                                  |
-| A/C   | XK_i                    |        -1 | cyclelayout          | {.i = -1 }                                                            |
-| A/C   | XK_p                    |        -1 | cyclelayout          | {.i = +1 }                                                            |
+| A:S   | XK_g                    |        -1 | setlayout            | {.v = &layouts[8]}                                                    |
+| A:S   | XK_t                    |        -1 | tabmode              | {-1}                                                                  |
+| A:C   | XK_i                    |        -1 | cyclelayout          | {.i = -1 }                                                            |
+| A:C   | XK_p                    |        -1 | cyclelayout          | {.i = +1 }                                                            |
 | A     | XK_0                    |        -1 | view                 | {.ui = ~0 }                                                           |
 | A     | XK_Tab                  |        -1 | goback               | {0}                                                                   |
-| A/S   | XK_n                    |        -1 | shiftviewclients     | { .i = +1 }                                                           |
-| A/S   | XK_p                    |        -1 | shiftviewclients     | { .i = -1 }                                                           |
-| A/S   | XK_a                    |        -1 | winview              | {0}                                                                   |
+| A:S   | XK_n                    |        -1 | shiftviewclients     | { .i = +1 }                                                           |
+| A:S   | XK_p                    |        -1 | shiftviewclients     | { .i = -1 }                                                           |
+| A:S   | XK_a                    |        -1 | winview              | {0}                                                                   |
 | A     | XK_semicolon            |        -1 | zoom                 | {0}                                                                   |
-| A/S   | XK_v                    |        -1 | transfer             | {0}                                                                   |
-| A/C   | XK_j                    |        -1 | pushdown             | {0}                                                                   |
-| A/C   | XK_k                    |        -1 | pushup               | {0}                                                                   |
+| A:S   | XK_v                    |        -1 | transfer             | {0}                                                                   |
+| A:C   | XK_j                    |        -1 | pushdown             | {0}                                                                   |
+| A:C   | XK_k                    |        -1 | pushup               | {0}                                                                   |
 | A     | XK_space                |        -1 | togglefloating       | {0}                                                                   |
-| A/S   | XK_space                |        -1 | unfloatvisible       | {0}                                                                   |
-| A/S   | XK_s                    |        -1 | togglesticky         | {0}                                                                   |
+| A:S   | XK_space                |        -1 | unfloatvisible       | {0}                                                                   |
+| A:S   | XK_s                    |        -1 | togglesticky         | {0}                                                                   |
 | A     | XK_f                    |        -1 | togglefullscr        | {0}                                                                   |
-| A/C   | XK_f                    |        -1 | togglefakefullscreen | {0}                                                                   |
+| A:C   | XK_f                    |        -1 | togglefakefullscreen | {0}                                                                   |
 | A     | XK_u                    |        -1 | togglescratch        | {.ui = 0 }                                                            |
 | A     | XK_i                    |        -1 | togglescratch        | {.ui = 1 }                                                            |
 | A     | XK_y                    |        -1 | togglescratch        | {.ui = 2 }                                                            |
 | A     | XK_comma                |        -1 | focusmon             | {.i = -1 }                                                            |
 | A     | XK_period               |        -1 | focusmon             | {.i = +1 }                                                            |
-| A/S   | XK_comma                |        -1 | tagmon               | {.i = -1 }                                                            |
-| A/S   | XK_period               |        -1 | tagmon               | {.i = +1 }                                                            |
-| M/C   | XK_j                    |        -1 | moveresize           | {.v = "0x 25y 0w 0h" }                                                |
-| M/C   | XK_k                    |        -1 | moveresize           | {.v = "0x -25y 0w 0h" }                                               |
-| M/C   | XK_l                    |        -1 | moveresize           | {.v = "25x 0y 0w 0h" }                                                |
-| M/C   | XK_h                    |        -1 | moveresize           | {.v = "-25x 0y 0w 0h" }                                               |
-| M/A   | XK_j                    |        -1 | moveresize           | {.v = "0x 0y 0w 25h" }                                                |
-| M/A   | XK_k                    |        -1 | moveresize           | {.v = "0x 0y 0w -25h" }                                               |
-| M/A   | XK_l                    |        -1 | moveresize           | {.v = "0x 0y 25w 0h" }                                                |
-| M/A   | XK_h                    |        -1 | moveresize           | {.v = "0x 0y -25w 0h" }                                               |
-| A/S   | XK_equal                |        -1 | incrgaps             | {.i = +1 }                                                            |
-| A/S   | XK_minus                |        -1 | incrgaps             | {.i = -1 }                                                            |
-| A/S   | XK_0                    |        -1 | defaultgaps          | {0}                                                                   |
-| A/C   | XK_0                    |        -1 | togglegaps           | {0}                                                                   |
-| A/C   | XK_equal                |        -1 | setborderpx          | {.i = +1 }                                                            |
-| A/C   | XK_minus                |        -1 | setborderpx          | {.i = -1 }                                                            |
+| A:S   | XK_comma                |        -1 | tagmon               | {.i = -1 }                                                            |
+| A:S   | XK_period               |        -1 | tagmon               | {.i = +1 }                                                            |
+| A:S   | XK_equal                |        -1 | incrgaps             | {.i = +1 }                                                            |
+| A:S   | XK_minus                |        -1 | incrgaps             | {.i = -1 }                                                            |
+| A:S   | XK_0                    |        -1 | defaultgaps          | {0}                                                                   |
+| A:C   | XK_0                    |        -1 | togglegaps           | {0}                                                                   |
+| A:C   | XK_equal                |        -1 | setborderpx          | {.i = +1 }                                                            |
+| A:C   | XK_minus                |        -1 | setborderpx          | {.i = -1 }                                                            |
 | M     | XK_0                    |        -1 | setborderpx          | {.i = 0 }                                                             |
-| M/S   | XK_Escape               |        -1 | quit                 | {0}                                                                   |
-| A/C/S | XK_q                    |        -1 | quit                 | {1}                                                                   |
+| M:S   | XK_Escape               |        -1 | quit                 | {0}                                                                   |
+| A:C:S | XK_q                    |        -1 | quit                 | {1}                                                                   |
 
 #+begin_src sh :tangle no :var keys=binds :results output :wrap "src C"
 echo "#define SHCMD(cmd) { .v = (const char*[]){ \"/bin/sh\", \"-c\", cmd, NULL } }\n\nstatic Key keys[] = {"
-echo $keys | sed "s/)\ /)\n/g ; s/}\ /}\n/g ; s/\//|/g" | sed "s/\ /^/ ; s/\ /^/ ; s/\ /^/ ; s/\ /^/" | awk -F'^' '{print "    { " $1 ", " $3 ", " $2 ", " $4 ", " $5 " }," }'
+echo $keys | sed "s/)\ /)\n/g ; s/}\ /}\n/g ; s/:/|/g" | sed "s/\ /^/ ; s/\ /^/ ; s/\ /^/ ; s/\ /^/" | awk -F'^' '{print "    { " $1 ", " $3 ", " $2 ", " $4 ", " $5 " }," }'
 echo "
 TAGKEYS(                XK_1,                                  0)
 TAGKEYS(                XK_2,                                  1)
@@ -537,17 +544,29 @@ static Key keys[] = {
     { A, XK_e, XK_c, spawn, SHCMD("emacsclient -c -e '(ibuffer)'") },
     { A, XK_e, XK_d, spawn, SHCMD("emacsclient -c -e '(dired nil)'") },
     { A, XK_e, XK_f, spawn, SHCMD("emacsclient -c -e '(elfeed)'") },
-    { A, -1, XK_s, spawn, SHCMD("emacsclient -e '(emacs-everywhere)'") },
+    { A, -1, XK_s, spawn, SHCMD("~/.emacs.d/bin/doom everywhere") },
     { A, -1, XK_w, spawn, SHCMD("xdo activate -N FireFox || firefox") },
     { M, -1, XK_w, spawn, SHCMD("xdo activate -N Chromium || chromium") },
     { A|C, -1, XK_KP_Down, spawn, SHCMD("xkill") },
     { A|C, -1, XK_d, spawn, SHCMD("discord") },
-    { A|S, -1, XK_u, spawn, SHCMD("import my-stuff|Pictures|snips|$(date +'%H:%M:%S').png") },
+    { A|S, -1, XK_u, spawn, SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png") },
     { A, -1, XK_p, spawn, SHCMD("pcmanfm") },
     { A|C, -1, XK_m, spawn, SHCMD("multimc") },
     { A|M|C, -1, XK_l, spawn, SHCMD("slock") },
     { M, -1, XK_g, spawn, SHCMD("xmenu.sh -p 0x0") },
     { A, -1, XK_r, spawndefault, {0} },
+    { A|S, -1, XK_Return, spawn, SHCMD("dmenu_run -l 5 -g 10 -p 'Run '") },
+    { A, -1, XK_c, spawn, SHCMD("volume-script") },
+    { A|C, -1, XK_Return, spawn, SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'") },
+    { A|S, -1, XK_w, spawn, SHCMD("Booky 'firefox' '_' 'Bconfig'") },
+    { A, -1, XK_z, spawn, SHCMD("music-changer cmus") },
+    { A|S, XK_d, XK_s, spawn, SHCMD("switch") },
+    { A|S, XK_d, XK_e, spawn, SHCMD("emoji-script") },
+    { A|S, XK_d, XK_c, spawn, SHCMD("calc") },
+    { A|S, XK_d, XK_p, spawn, SHCMD("passmenu2 -F -p 'Passwords '") },
+    { A|S, XK_d, XK_v, spawn, SHCMD("manview") },
+    { A|S, XK_d, XK_a, spawn, SHCMD("allmenu") },
+    { A|S, XK_d, XK_q, spawn, SHCMD("shut") },
     { 0, -1, XF86XK_AudioPrev, spawn, SHCMD("playerctl --player cmus previous") },
     { 0, -1, XF86XK_AudioNext, spawn, SHCMD("playerctl --player cmus next") },
     { 0, -1, XF86XK_AudioPlay, spawn, SHCMD("playerctl --player cmus play-pause") },
@@ -610,14 +629,6 @@ static Key keys[] = {
     { A, -1, XK_period, focusmon, {.i = +1 } },
     { A|S, -1, XK_comma, tagmon, {.i = -1 } },
     { A|S, -1, XK_period, tagmon, {.i = +1 } },
-    { M|C, -1, XK_j, moveresize, {.v = "0x 25y 0w 0h" } },
-    { M|C, -1, XK_k, moveresize, {.v = "0x -25y 0w 0h" } },
-    { M|C, -1, XK_l, moveresize, {.v = "25x 0y 0w 0h" } },
-    { M|C, -1, XK_h, moveresize, {.v = "-25x 0y 0w 0h" } },
-    { M|A, -1, XK_j, moveresize, {.v = "0x 0y 0w 25h" } },
-    { M|A, -1, XK_k, moveresize, {.v = "0x 0y 0w -25h" } },
-    { M|A, -1, XK_l, moveresize, {.v = "0x 0y 25w 0h" } },
-    { M|A, -1, XK_h, moveresize, {.v = "0x 0y -25w 0h" } },
     { A|S, -1, XK_equal, incrgaps, {.i = +1 } },
     { A|S, -1, XK_minus, incrgaps, {.i = -1 } },
     { A|S, -1, XK_0, defaultgaps, {0} },
@@ -639,194 +650,6 @@ TAGKEYS(                XK_8,                                  7)
 TAGKEYS(                XK_9,                                  8)};
 #+end_src
 
-# * Key bindings
-# :PROPERTIES:
-# :header-args: tangle no
-# :END:
-# ** Launch applications
-# #+begin_src C
-# #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-
-# static Key keys[] = {
-#     { A,            -1,     XK_Return,     spawn,                  SHCMD("$TERMINAL") },
-#     { A|S,          -1,     XK_c,          spawn,                  SHCMD("$TERMINAL htop") },
-#     { A|S,          -1,     XK_z,          spawn,                  SHCMD("playerctl play-pause") },
-#     { A|S,          -1,     XK_e,          spawn,                  SHCMD("$TERMINAL $EDITOR") },
-#     { A,            XK_e,   XK_e,          spawn,                  SHCMD("emacsclient -c -a emacs") },
-#     { A,            XK_e,   XK_c,          spawn,                  SHCMD("emacsclient -c -e '(ibuffer)'") },
-#     { A,            XK_e,   XK_d,          spawn,                  SHCMD("emacsclient -c -e '(dired nil)'") },
-#     { A,            XK_e,   XK_f,          spawn,                  SHCMD("emacsclient -c -e '(elfeed)'") },
-#     { A,            -1,     XK_s,          spawn,                  SHCMD("emacsclient    -e '(emacs-everywhere)'") },
-#     { A,            -1,     XK_w,          spawn,                  SHCMD("xdo activate -N FireFox || firefox") },
-#     { M,            -1,     XK_o,          spawn,                  SHCMD("xdo activate -N Chromium || chromium") },
-#     { A|C,          -1,     XK_KP_Down,    spawn,                  SHCMD("xkill") },
-#     { C|A,          -1,     XK_d,          spawn,                  SHCMD("discord") },
-#     { A|S,          -1,     XK_u,          spawn,                  SHCMD("import my-stuff/Pictures/snips/$(date +'%H:%M:%S').png") },
-#     { A,            -1,     XK_p,          spawn,                  SHCMD("pcmanfm") },
-#     { C,            -1,     XK_m,          spawn,                  SHCMD("multimc") },
-#     { M|C|A,        -1,     XK_l,          spawn,                  SHCMD("slock") },
-#     { M,            -1,     XK_g,          spawn,                  SHCMD("xmenu.sh -p 0x0") },
-#     { A,            -1,     XK_r,          spawndefault,           {0} },
-# #+end_src
-# *** Launch dmenu scripts
-# #+begin_src C
-#     { A|S,          -1,     XK_Return,     spawn,                  SHCMD("dmenu_run -l 5 -g 10 -p 'Run:'") },
-#     { A,            -1,     XK_c,          spawn,                  SHCMD("volume-script") },
-#     { A|C,          -1,     XK_Return,     spawn,                  SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'") },
-#     { A|S,          -1,     XK_w,          spawn,                  SHCMD("Booky 'firefox' ':' 'Bconfig'") },
-#     { A,            -1,     XK_z,          spawn,                  SHCMD("music-changer cmus") },
-#     { A|S,          XK_d,   XK_s,          spawn,                  SHCMD("switch") },
-#     { A|S,          XK_d,   XK_e,          spawn,                  SHCMD("emoji-script") },
-#     { A|S,          XK_d,   XK_c,          spawn,                  SHCMD("calc") },
-#     { A|S,          XK_d,   XK_p,          spawn,                  SHCMD("passmenu2 -F -p 'Passwords:'") },
-#     { A|S,          XK_d,   XK_v,          spawn,                  SHCMD("manview") },
-#     { A|S,          XK_d,   XK_a,          spawn,                  SHCMD("allmenu") },
-#     { A|S,          XK_d,   XK_q,          spawn,                  SHCMD("shut") },
-# #+end_src
-# ** Multimedia keys
-# #+begin_src C
-#     { 0,-1, XF86XK_AudioPrev,              spawn,                  SHCMD("playerctl --player cmus previous") },
-#     { 0,-1, XF86XK_AudioNext,              spawn,                  SHCMD("playerctl --player cmus next") },
-#     { 0,-1, XF86XK_AudioPlay,              spawn,                  SHCMD("playerctl --player cmus play-pause") },
-#     { 0,-1, XF86XK_AudioLowerVolume,       spawn,                  SHCMD("pamixer --allow-boost -d 1 ; killall dwmStatus && dwmStatus &") },
-#     { 0,-1, XF86XK_AudioRaiseVolume,       spawn,                  SHCMD("pamixer --allow-boost -i 1 ; killall dwmStatus && dwmStatus &") },
-# #+end_src
-# ** Generic manipulation
-# #+begin_src C
-#     { A,            -1,     XK_q,          killclient,             {0} },
-#     { A|C|S,        -1,     XK_x,          killpermanent,          {0} },
-#     { A|S,          -1,     XK_q,          killunsel,              {0} },
-#     { M,            -1,     XK_v,          togglevacant,           {0} },
-#     { M|S,          -1,     XK_v,          togglepadding,          {0} },
-#     { A,            -1,     XK_n,          togglebar,              {0} },
-#     { A|S,          -1,     XK_h,          setmfact,               {.f = -0.05} },
-#     { A|S,          -1,     XK_l,          setmfact,               {.f = +0.05} },
-#     { A|C,          -1,     XK_u,          setmfact,               {.f = mfact + 1} },
-#     { A|S,          -1,     XK_j,          setcfact,               {.f = +0.25} },
-#     { A|S,          -1,     XK_k,          setcfact,               {.f = -0.25} },
-#     { A|M,          -1,     XK_u,          setcfact,               {0} },
-#     { A,            -1,     XK_bracketleft,incnmaster,             {.i = +1 } },
-#     { A,            -1,     XK_bracketright,incnmaster,            {.i = -1 } },
-#     { M,            -1,     XK_space,      focusmaster,            {0} },
-#     { A|C,          -1,     XK_space,      switchcol,              {0} },
-#     { A,            -1,     XK_h,          focusdir,               {.i = 0 } }, // left
-#     { A,            -1,     XK_l,          focusdir,               {.i = 1 } }, // right
-#     { A,            -1,     XK_k,          focusdir,               {.i = 2 } }, // up
-#     { A,            -1,     XK_j,          focusdir,               {.i = 3 } }, // down
-#     { M|S,          -1,     XK_j,          focusstack,             {.i = +1 } },
-#     { M|S,          -1,     XK_k,          focusstack,             {.i = -1 } },
-#     { M|A,          -1,     XK_h,          inplacerotate,          {.i = +2 } },
-#     { M|A,          -1,     XK_l,          inplacerotate,          {.i = -2 } },
-# #+end_src
-# ** Changing layouts and manipulating them
-# #+begin_src C
-#     { A,            -1,     XK_t,          setlayout,              {.v = &layouts[0]} },
-#     { A,            -1,     XK_v,          setlayout,              {.v = &layouts[1]} },
-#     { A|S,          -1,     XK_f,          setlayout,              {.v = &layouts[2]} },
-#     { A,            -1,     XK_d,          setlayout,              {.v = &layouts[3]} },
-#     { A,            -1,     XK_g,          setlayout,              {.v = &layouts[4]} },
-#     { A,            -1,     XK_b,          setlayout,              {.v = &layouts[5]} },
-#     { A|S,          -1,     XK_m,          setlayout,              {.v = &layouts[6]} },
-#     { A,            -1,     XK_m,          setlayout,              {.v = &layouts[7]} },
-#     { A|S,          -1,     XK_g,          setlayout,              {.v = &layouts[8]} },
-#     { A|S,          -1,     XK_t,          tabmode,                {-1} },
-#     { A|C,          -1,     XK_i,          cyclelayout,            {.i = -1 } },
-#     { A|C,          -1,     XK_p,          cyclelayout,            {.i = +1 } },
-#     { A,            -1,     XK_0,          view,                   {.ui = ~0 } },
-#     { A,            -1,     XK_Tab,        goback,                 {0} },
-#     { A|S,          -1,     XK_n,          shiftviewclients,       { .i = +1 } },
-#     { A|S,          -1,     XK_p,          shiftviewclients,       { .i = -1 } },
-#     { A|S,          -1,     XK_a,          winview,                {0} },
-# #+end_src
-# ** Manipulating windows
-# #+begin_src C
-#     { A,            -1,     XK_semicolon,  zoom,                   {0} },
-#     { A|S,          -1,     XK_v,          transfer,               {0} },
-#     { A|C,          -1,     XK_j,          pushdown,               {0} },
-#     { A|C,          -1,     XK_k,          pushup,                 {0} },
-#     { A,            -1,     XK_space,      togglefloating,         {0} },
-#     { A|S,          -1,     XK_space,      unfloatvisible,         {0} },
-#     { A|S,          -1,     XK_s,          togglesticky,           {0} },
-#     { A,            -1,     XK_f,          togglefullscr,          {0} },
-#     { A|C,          -1,     XK_f,          togglefakefullscreen,   {0} },
-#     { A,            -1,     XK_u,          togglescratch,          {.ui = 0 } },
-#     { A,            -1,     XK_i,          togglescratch,          {.ui = 1 } },
-#     { A,            -1,     XK_y,          togglescratch,          {.ui = 2 } },
-# #+end_src
-# ** Monitors
-# #+begin_src C
-#     { A,            -1,     XK_comma,      focusmon,               {.i = -1 } },
-#     { A,            -1,     XK_period,     focusmon,               {.i = +1 } },
-#     { A|S,          -1,     XK_comma,      tagmon,                 {.i = -1 } },
-#     { A|S,          -1,     XK_period,     tagmon,                 {.i = +1 } },
-# #+end_src
-# ** Moveresize
-# #+begin_src C
-#     { M|C,          -1,     XK_j,          moveresize,             {.v = "0x 25y 0w 0h" } },
-#     { M|C,          -1,     XK_k,          moveresize,             {.v = "0x -25y 0w 0h" } },
-#     { M|C,          -1,     XK_l,          moveresize,             {.v = "25x 0y 0w 0h" } },
-#     { M|C,          -1,     XK_h,          moveresize,             {.v = "-25x 0y 0w 0h" } },
-#     { M|A,          -1,     XK_j,          moveresize,             {.v = "0x 0y 0w 25h" } },
-#     { M|A,          -1,     XK_k,          moveresize,             {.v = "0x 0y 0w -25h" } },
-#     { M|A,          -1,     XK_l,          moveresize,             {.v = "0x 0y 25w 0h" } },
-#     { M|A,          -1,     XK_h,          moveresize,             {.v = "0x 0y -25w 0h" } },
-# #+end_src
-# ** Gaps
-# #+begin_src C
-#     { A|S,          -1,     XK_equal,      incrgaps,               {.i = +1 } },
-#     { A|S,          -1,     XK_minus,      incrgaps,               {.i = -1 } },
-#     { A|S,          -1,     XK_0,          defaultgaps,            {0} },
-#     { A|C,          -1,     XK_0,          togglegaps,             {0} },
-# #+end_src
-# ** Window border
-# #+begin_src C
-#     { A|C,          -1,     XK_equal,      setborderpx,            {.i = +1 } },
-#     { A|C,          -1,     XK_minus,      setborderpx,            {.i = -1 } },
-#     { M,            -1,     XK_0,          setborderpx,            {.i = 0 } },
-# #+end_src
-# ** Tagkeys
-# #+begin_src C
-#     TAGKEYS(                XK_1,                                  0)
-#     TAGKEYS(                XK_2,                                  1)
-#     TAGKEYS(                XK_3,                                  2)
-#     TAGKEYS(                XK_4,                                  3)
-#     TAGKEYS(                XK_5,                                  4)
-#     TAGKEYS(                XK_6,                                  5)
-#     TAGKEYS(                XK_7,                                  6)
-#     TAGKEYS(                XK_8,                                  7)
-#     TAGKEYS(                XK_9,                                  8)
-# #+end_src
-# *** Tag all
-# **** Floating windows only
-# #+begin_src C
-# { A|S,              -1,     XK_F1,         tagall,                 {.v = "F1"} },
-# { A|S,              -1,     XK_F2,         tagall,                 {.v = "F2"} },
-# { A|S,              -1,     XK_F3,         tagall,                 {.v = "F3"} },
-# { A|S,              -1,     XK_F4,         tagall,                 {.v = "F4"} },
-# { A|S,              -1,     XK_F5,         tagall,                 {.v = "F5"} },
-# { A|S,              -1,     XK_F6,         tagall,                 {.v = "F6"} },
-# { A|S,              -1,     XK_F7,         tagall,                 {.v = "F7"} },
-# { A|S,              -1,     XK_F8,         tagall,                 {.v = "F8"} },
-# { A|S,              -1,     XK_F9,         tagall,                 {.v = "F9"} },
-# #+end_src
-# **** All windows
-# #+begin_src C
-# { A,                -1,     XK_F1,         tagall,                 {.v = "1"} },
-# { A,                -1,     XK_F2,         tagall,                 {.v = "2"} },
-# { A,                -1,     XK_F3,         tagall,                 {.v = "3"} },
-# { A,                -1,     XK_F4,         tagall,                 {.v = "4"} },
-# { A,                -1,     XK_F5,         tagall,                 {.v = "5"} },
-# { A,                -1,     XK_F6,         tagall,                 {.v = "6"} },
-# { A,                -1,     XK_F7,         tagall,                 {.v = "7"} },
-# { A,                -1,     XK_F8,         tagall,                 {.v = "8"} },
-# { A,                -1,     XK_F9,         tagall,                 {.v = "9"} },
-# #+end_src
-# ** Quit and restart
-# #+begin_src C
-#     { M|S,          -1,     XK_Escape,     quit,                   {0} },
-#     { A|C|S,        -1,     XK_q,          quit,                   {1} },
-# };
-# #+end_src
 * Mouse actions
 + click can be
   - ClkTagBar
