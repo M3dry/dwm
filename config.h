@@ -235,7 +235,8 @@ static const Layout layouts[] = {
     { A|C,     XK_l, KEY,   focusnextmon, {.ui = 1 << TAG} }, \
     { A|C,     XK_h, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
     { A|C,     XK_j, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|C,     XK_k, KEY,   tagprevmon,   {.ui = 1 << TAG} },
+    { A|C,     XK_k, KEY,   tagprevmon,   {.ui = 1 << TAG} }, \
+    { A|C,     XK_q, KEY,   killontag,    {.ui = 1 << TAG} },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 

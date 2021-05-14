@@ -331,6 +331,7 @@ static void tag(const Arg *arg);
 static void tagall(const Arg *arg);
 static void tagwith(const Arg *arg);
 static void tagmon(const Arg *arg);
+static void killontag(const Arg *arg);
 static void focusnextmon(const Arg *arg);
 static void focusprevmon(const Arg *arg);
 static void focusothermon(const Arg *arg, int dir);
@@ -2613,6 +2614,32 @@ scan(void)
 }
 
 void
+killontag(const Arg *arg)
+{
+    Client *c = NULL;
+
+    view(arg);
+
+    if (!selmon->sel)
+        return view(arg);
+
+    for (c = selmon->clients; c; c = c->next) {
+        if (ISVISIBLE(c) && !c->ispermanent &&
+            !sendevent(c, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
+            XGrabServer(dpy);
+            XSetErrorHandler(xerrordummy);
+            XSetCloseDownMode(dpy, DestroyAll);
+            XKillClient(dpy, c->win);
+            XSync(dpy, False);
+            XSetErrorHandler(xerror);
+            XUngrabServer(dpy);
+        }
+    }
+
+    view(arg);
+}
+
+void
 focusnextmon(const Arg *arg)
 {
     focusothermon(arg, 1);
@@ -4011,6 +4038,7 @@ view(const Arg *arg)
         view(&((Arg) { .ui = 0 }));
         return;
     }
+
     prevmon = NULL;
     setlasttag(arg->ui);
     selmon->seltags ^= 1; /* toggle sel tagset */
