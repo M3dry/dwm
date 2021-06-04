@@ -38,6 +38,7 @@ struct Pertag {
     unsigned int gaps[NUMTAGS + 1];
     unsigned int vertpd[NUMTAGS + 1];
     unsigned int sidepd[NUMTAGS + 1];
+    unsigned int topbar[NUMTAGS + 1];
 };
 
 void

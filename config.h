@@ -49,7 +49,7 @@ static const int decorhints                = 1;   /* 1 means respect decoration 
 
 static const int focusonwheel              = 0;
 
-static const char *fonts[]                 = { "FiraMono Nerd Font Mono:size=12:antialias=true:autohint=true" };
+static const char *fonts[]                 = { "Operator Mono SSm Lig:size=12:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#4E5579";
 static const char selfg[]                 = "#5fafff";
@@ -281,6 +281,7 @@ static Key keys[] = {
 {A|C|S,-1,XK_x,killpermanent,{0}},
 {A|S,-1,XK_q,killunsel,{0}},
 {M,-1,XK_v,togglevacant,{0}},
+{A|C,-1,XK_v,toggletopbar,{0}},
 {M|S,-1,XK_v,togglepadding,{0}},
 {A,-1,XK_n,togglebar,{0}},
 {A|S,-1,XK_h,setmfact,{ .f = -0.05 }},
@@ -322,7 +323,7 @@ static Key keys[] = {
 {A|S,-1,XK_v,transfer,{0}},
 {A|C,-1,XK_j,pushdown,{0}},
 {A|C,-1,XK_k,pushup,{0}},
-{A,-1,XK_space,togglefloating,{0}},
+{A|C,-1,XK_u,togglefloating,{0}},
 {A|S,-1,XK_space,unfloatvisible,{0}},
 {A|S,-1,XK_s,togglesticky,{0}},
 {A,-1,XK_f,togglefullscr,{0}},
