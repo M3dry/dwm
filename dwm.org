@@ -41,11 +41,11 @@
     - [[#systray-1][Systray]]
     - [[#layout-border-colors][Layout border colors]]
   - [[#colors-array][Colors array]]
-- [[#scratchpads][Scratchpads]]
 - [[#tag][Tag]]
   - [[#number-of-tags][Number of tags]]
   - [[#master-window-name][Master window name]]
   - [[#default-applications][Default applications]]
+- [[#scratchpads][Scratchpads]]
 - [[#rules][Rules]]
   - [[#client-rules][Client rules]]
   - [[#monitor-rules][Monitor rules]]
@@ -148,7 +148,8 @@ static const int focusonwheel              = 0;
 #+end_src
 ** Fonts
 #+begin_src C
-static const char *fonts[]                 = { "Operator Mono SSm Lig:size=12:antialias=true:autohint=true" };
+static const char *fonts[] = { "Operator Mono SSm Lig:size=12:antialias=true:autohint=true"
+                               "mononoki Nerd Font:size=12:antialias=true:autohint=true" };
 #+end_src
 * Colors
 ** Color variables
@@ -268,23 +269,6 @@ static const char *colors[][10]  = {
     [SchemeSelLayout]   = { seltileborder,  selfibonacciborder,  selfloatborder,  seldeckborder,  selnrowgridborder,  selbstackborder,  selcenmasterborder,  selmonocleborder,  selgaplessgridborder },
 };
 #+end_src
-* Scratchpads
-#+begin_src C
-typedef struct {
-    const char *name;
-    const void *cmd;
-} Sp;
-
-const char *spcmd1[] = {"st", "-c", "spterm", "-t", "stSCP", "-g", "144x41", NULL };
-const char *spcmd2[] = {"st", "-c", "spmus", "-t", "cmusSCP", "-g", "144x41", "-e", "cmus", NULL };
-const char *spcmd3[] = {"qalculate-gtk", "--title", "spcal", NULL };
-static Sp scratchpads[] = {
-   /* name          cmd  */
-   {"spterm",      spcmd1},
-   {"spmus",       spcmd2},
-   {"spcal",       spcmd3},
-};
-#+end_src
 * Tag
 ** Number of tags
 #+begin_src C
@@ -300,6 +284,12 @@ static const int lcaselbl = 0;         /* 1 means make tag label lowercase */
 #+begin_src C
 static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL, NULL, NULL, "discord", "gimp" };
 #+end_src
+* Scratchpads
+#+begin_src C
+static const char *scpclean[] = {"u", NULL};
+static const char *scpcmus[]  = {"i", "st", "-c", "scpcmus",  "-t", "cmusSCP", "-e", "cmus", NULL};
+static const char *scpcal[]   = {"y", "qalculate-gtk", "--title", "calSCP", NULL};
+#+end_src
 * Rules
 ** Client rules
     xprop(1):
@@ -309,30 +299,31 @@ static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL,
 #+begin_src C
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
 static const Rule rules[] = {
-    /* class      instance    title          wintype    tags mask     switchtotag     isfloating   iscentered   ispermanent   isterminal    noswallow   monitor */
+    /* class      instance    title          wintype tags mask switchtotag isfloating iscentered ispermanent isterminal noswallow monitor scratch key */
     /* Scratchpads */
-    { "spterm",   NULL,       NULL,          NULL,      SPTAG(0),     0,              0,           1,           0,            0,            0,          -1 }, /* St */
-    { "spmus",    NULL,       NULL,          NULL,      SPTAG(1),     0,              0,           1,           0,            0,            0,          -1 }, /* cmus */
-    { NULL,       NULL,       "spcal",       NULL,      SPTAG(2),     0,              1,           1,           0,            0,            0,          -1 }, /* qalculate-gtk */
+    { "scpclean", NULL,       NULL,          NULL,   0,        0,          0,         0,         0,          0,         0,        -1, 'u' },
+    { "scpcmus",  NULL,       NULL,          NULL,   0,        0,          0,         0,         1,          0,         0,        -1, 'i' },
+    { NULL,       NULL,       "calSCP",      NULL,   0,        0,          1,         1,         0,          0,         0,        -1, 'y' },
     /* Swallow */
-    { "St",       NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
-    { "Alacritty",NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
-    { "XTerm",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
-    { "Emacs",    NULL,       NULL,          NULL,      0,            0,              0,           0,           0,            1,            0,          -1 },
+    { "St",       NULL,       NULL,          NULL,   0,        0,          0,         0,         0,          1,         0,        -1, 0 },
+    { "Alacritty",NULL,       NULL,          NULL,   0,        0,          0,         0,         0,          1,         0,        -1, 0 },
+    { "XTerm",    NULL,       NULL,          NULL,   0,        0,          0,         0,         0,          1,         0,        -1, 0 },
+    { "Emacs",    NULL,       NULL,          NULL,   0,        0,          0,         0,         0,          1,         0,        -1, 0 },
     /* Noswallow */
-    { NULL,       "Navigator",NULL,          NULL,      1,            0,              0,           0,           1,            0,            1,          -1 }, /* firefox */
-    { NULL,       "chromium", NULL,          NULL,      1 << 3,       0,              0,           0,           1,            0,            1,          -1 }, /* chromium */
-    { NULL,       NULL,       "Event Tester",NULL,      0,            0,              0,           0,           0,            0,            1,          -1 }, /* xev */
-    { "Xephyr",   NULL,       NULL,          NULL,      0,            0,              1,           1,           0,            0,            1,          -1 }, /* xephyr */
-    { "Gimp",     NULL,       NULL,          NULL,      1 << 8,       3,              1,           1,           0,            0,            1,          -1 }, /* gimp */
-    { NULL,       NULL,       "glxgears",    NULL,      0,            0,              1,           0,           0,            0,            1,          -1 },
+    { NULL,       NULL,       "Event Tester",NULL,   0,        0,          0,         0,         0,          0,         1,        -1, 0 },
+    { "Xephyr",   NULL,       NULL,          NULL,   0,        0,          1,         1,         0,          0,         1,        -1, 0 },
+    { "Gimp",     NULL,       NULL,          NULL,   1 << 8,   3,          1,         1,         0,          0,         1,        -1, 0 },
+    { NULL,       NULL,       "glxgears",    NULL,   0,        0,          1,         0,         0,          0,         1,        -1, 0 },
     /* General windows */
-    { NULL,       "discord",  NULL,          NULL,      1 << 7,       0,              0,           0,           0,            0,            0,          -1 }, /* chromium */
+    { NULL,       "discord",  NULL,          NULL,   1 << 7,   0,          0,         0,         0,          0,         0,        -1, 0 },
+    { NULL,       "Navigator",NULL,          NULL,   1,        0,          0,         0,         1,          0,         1,        -1, 0 },
+    { NULL,       "nyxt",     NULL,          NULL,   1,        0,          0,         0,         1,          0,         1,        -1, 0 },
+    { NULL,       "chromium", NULL,          NULL,   1 << 3,   0,          0,         0,         1,          0,         1,        -1, 0 },
     /* Wintype */
-    { NULL,       NULL,       NULL, WTYPE "DIALOG",     0,            0,              1,           1,           0,            0,            0,          -1 },
-    { NULL,       NULL,       NULL, WTYPE "UTILITY",    0,            0,              1,           1,           0,            0,            0,          -1 },
-    { NULL,       NULL,       NULL, WTYPE "TOOLBAR",    0,            0,              1,           1,           0,            0,            0,          -1 },
-    { NULL,       NULL,       NULL, WTYPE "SPLASH",     0,            0,              1,           1,           0,            0,            0,          -1 },
+    { NULL,       NULL,       NULL, WTYPE "DIALOG",  0,        0,          1,         1,         0,          0,         0,        -1, 0 },
+    { NULL,       NULL,       NULL, WTYPE "UTILITY", 0,        0,          1,         1,         0,          0,         0,        -1, 0 },
+    { NULL,       NULL,       NULL, WTYPE "TOOLBAR", 0,        0,          1,         1,         0,          0,         0,        -1, 0 },
+    { NULL,       NULL,       NULL, WTYPE "SPLASH",  0,        0,          1,         1,         0,          0,         0,        -1, 0 },
 };
 #+end_src
 ** Monitor rules
@@ -432,13 +423,13 @@ static const Layout layouts[] = {
 | M     | XK_w                    |        -1 | spawn                | SHCMD("xdo activate -N Chromium :: chromium")                         |
 | A:C   | XK_KP_Down              |        -1 | spawn                | SHCMD("xkill")                                                        |
 | A:C   | XK_d                    |        -1 | spawn                | SHCMD("discord")                                                      |
-| A:S   | XK_u                    |        -1 | spawn                | SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png")          |
+| A:C   | XK_u                    |        -1 | spawn                | SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png")          |
 | A     | XK_p                    |        -1 | spawn                | SHCMD("pcmanfm")                                                      |
 | A:C   | XK_m                    |        -1 | spawn                | SHCMD("multimc")                                                      |
 | A:M:C | XK_l                    |        -1 | spawn                | SHCMD("slock")                                                        |
 | M     | XK_g                    |        -1 | spawn                | SHCMD("xmenu.sh -p 0x0")                                              |
 | A     | XK_r                    |        -1 | spawndefault         | {0}                                                                   |
-| A:S   | XK_Return               |        -1 | spawn                | SHCMD("dmenu_run -l 5 -g 10 -p 'Run'")                                |
+| A:S   | XK_Return               |        -1 | spawn                | SHCMD("dmenu_run_history -l 5 -g 10 -p 'Run'")                        |
 | A     | XK_c                    |        -1 | spawn                | SHCMD("volume-script")                                                |
 | A:C   | XK_Return               |        -1 | spawn                | SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'")               |
 | A:S   | XK_w                    |        -1 | spawn                | SHCMD("Booky 'firefox' '_' 'Bconfig'")                                |
@@ -464,10 +455,10 @@ static const Layout layouts[] = {
 | A     | XK_n                    |        -1 | togglebar            | {0}                                                                   |
 | A:S   | XK_h                    |        -1 | setmfact             | { .f = -0.05 }                                                        |
 | A:S   | XK_l                    |        -1 | setmfact             | { .f = +0.05 }                                                        |
-| A:C   | XK_u                    |        -1 | setmfact             | { .f = mfact + 1 }                                                    |
+| M:C   | XK_u                    |        -1 | setmfact             | { .f = mfact + 1 }                                                    |
 | A:S   | XK_j                    |        -1 | setcfact             | { .f = +0.25 }                                                        |
 | A:S   | XK_k                    |        -1 | setcfact             | { .f = -0.25 }                                                        |
-| A:M   | XK_u                    |        -1 | setcfact             | {0}                                                                   |
+| A:C:S | XK_u                    |        -1 | setcfact             | {0}                                                                   |
 | A     | XK_bracketleft          |        -1 | incnmaster           | { .i = +1 }                                                           |
 | A     | XK_bracketright         |        -1 | incnmaster           | { .i = -1 }                                                           |
 | M     | XK_space                |        -1 | focusmaster          | {0}                                                                   |
@@ -501,14 +492,20 @@ static const Layout layouts[] = {
 | A:S   | XK_v                    |        -1 | transfer             | {0}                                                                   |
 | A:C   | XK_j                    |        -1 | pushdown             | {0}                                                                   |
 | A:C   | XK_k                    |        -1 | pushup               | {0}                                                                   |
-| A:C   | XK_u                    |        -1 | togglefloating       | {0}                                                                   |
+| A:C   | XK_r                    |        -1 | togglefloating       | {0}                                                                   |
 | A:S   | XK_space                |        -1 | unfloatvisible       | {0}                                                                   |
 | A:S   | XK_s                    |        -1 | togglesticky         | {0}                                                                   |
 | A     | XK_f                    |        -1 | togglefullscr        | {0}                                                                   |
 | A:C   | XK_f                    |        -1 | togglefakefullscreen | {0}                                                                   |
-| A     | XK_u                    |        -1 | togglescratch        | { .ui = 0 }                                                           |
-| A     | XK_i                    |        -1 | togglescratch        | { .ui = 1 }                                                           |
-| A     | XK_y                    |        -1 | togglescratch        | { .ui = 2 }                                                           |
+| A     | XK_u                    |        -1 | togglescratch        | { .v = scpclean }                                                     |
+| A     | XK_i                    |        -1 | togglescratch        | { .v = scpcmus }                                                      |
+| A     | XK_y                    |        -1 | togglescratch        | { .v = scpcal }                                                       |
+| A:M   | XK_u                    |        -1 | removescratch        | { .v = scpclean }                                                     |
+| A:M   | XK_i                    |        -1 | removescratch        | { .v = scpcmus }                                                      |
+| A:M   | XK_y                    |        -1 | removescratch        | { .v = scpcal }                                                       |
+| A:S   | XK_u                    |        -1 | setscratch           | { .v = scpclean }                                                     |
+| A:S   | XK_i                    |        -1 | setscratch           | { .v = scpcmus }                                                      |
+| A:S   | XK_y                    |        -1 | setscratch           | { .v = scpcal }                                                       |
 | A     | XK_comma                |        -1 | focusmon             | { .i = -1 }                                                           |
 | A     | XK_period               |        -1 | focusmon             | { .i = +1 }                                                           |
 | A:S   | XK_comma                |        -1 | tagmon               | { .i = -1 }                                                           |
@@ -557,13 +554,13 @@ static Key keys[] = {
 {M,-1,XK_w,spawn,SHCMD("xdo activate -N Chromium || chromium")},
 {A|C,-1,XK_KP_Down,spawn,SHCMD("xkill")},
 {A|C,-1,XK_d,spawn,SHCMD("discord")},
-{A|S,-1,XK_u,spawn,SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png")},
+{A|C,-1,XK_u,spawn,SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png")},
 {A,-1,XK_p,spawn,SHCMD("pcmanfm")},
 {A|C,-1,XK_m,spawn,SHCMD("multimc")},
 {A|M|C,-1,XK_l,spawn,SHCMD("slock")},
 {M,-1,XK_g,spawn,SHCMD("xmenu.sh -p 0x0")},
 {A,-1,XK_r,spawndefault,{0}},
-{A|S,-1,XK_Return,spawn,SHCMD("dmenu_run -l 5 -g 10 -p 'Run'")},
+{A|S,-1,XK_Return,spawn,SHCMD("dmenu_run_history -l 5 -g 10 -p 'Run'")},
 {A,-1,XK_c,spawn,SHCMD("volume-script")},
 {A|C,-1,XK_Return,spawn,SHCMD("Booky 'emacsclient -c -a emacs' '><' 'Cconfig'")},
 {A|S,-1,XK_w,spawn,SHCMD("Booky 'firefox' '_' 'Bconfig'")},
@@ -589,10 +586,10 @@ static Key keys[] = {
 {A,-1,XK_n,togglebar,{0}},
 {A|S,-1,XK_h,setmfact,{ .f = -0.05 }},
 {A|S,-1,XK_l,setmfact,{ .f = +0.05 }},
-{A|C,-1,XK_u,setmfact,{ .f = mfact + 1 }},
+{M|C,-1,XK_u,setmfact,{ .f = mfact + 1 }},
 {A|S,-1,XK_j,setcfact,{ .f = +0.25 }},
 {A|S,-1,XK_k,setcfact,{ .f = -0.25 }},
-{A|M,-1,XK_u,setcfact,{0}},
+{A|C|S,-1,XK_u,setcfact,{0}},
 {A,-1,XK_bracketleft,incnmaster,{ .i = +1 }},
 {A,-1,XK_bracketright,incnmaster,{ .i = -1 }},
 {M,-1,XK_space,focusmaster,{0}},
@@ -626,14 +623,20 @@ static Key keys[] = {
 {A|S,-1,XK_v,transfer,{0}},
 {A|C,-1,XK_j,pushdown,{0}},
 {A|C,-1,XK_k,pushup,{0}},
-{A|C,-1,XK_u,togglefloating,{0}},
+{A|C,-1,XK_r,togglefloating,{0}},
 {A|S,-1,XK_space,unfloatvisible,{0}},
 {A|S,-1,XK_s,togglesticky,{0}},
 {A,-1,XK_f,togglefullscr,{0}},
 {A|C,-1,XK_f,togglefakefullscreen,{0}},
-{A,-1,XK_u,togglescratch,{ .ui = 0 }},
-{A,-1,XK_i,togglescratch,{ .ui = 1 }},
-{A,-1,XK_y,togglescratch,{ .ui = 2 }},
+{A,-1,XK_u,togglescratch,{ .v = scpclean }},
+{A,-1,XK_i,togglescratch,{ .v = scpcmus }},
+{A,-1,XK_y,togglescratch,{ .v = scpcal }},
+{A|M,-1,XK_u,removescratch,{ .v = scpclean }},
+{A|M,-1,XK_i,removescratch,{ .v = scpcmus }},
+{A|M,-1,XK_y,removescratch,{ .v = scpcal }},
+{A|S,-1,XK_u,setscratch,{ .v = scpclean }},
+{A|S,-1,XK_i,setscratch,{ .v = scpcmus }},
+{A|S,-1,XK_y,setscratch,{ .v = scpcal }},
 {A,-1,XK_comma,focusmon,{ .i = -1 }},
 {A,-1,XK_period,focusmon,{ .i = +1 }},
 {A|S,-1,XK_comma,tagmon,{ .i = -1 }},

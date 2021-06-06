@@ -33,12 +33,12 @@ struct Pertag {
     const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
     Bool showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
     Client *prevzooms[LENGTH(tags) + 1]; /* store zoom information */
-    unsigned int vacant[NUMTAGS + 1];
-    int enablegaps[NUMTAGS + 1];
-    unsigned int gaps[NUMTAGS + 1];
-    unsigned int vertpd[NUMTAGS + 1];
-    unsigned int sidepd[NUMTAGS + 1];
-    unsigned int topbar[NUMTAGS + 1];
+    unsigned int vacant[LENGTH(tags) + 1];
+    int enablegaps[LENGTH(tags) + 1];
+    unsigned int gaps[LENGTH(tags) + 1];
+    unsigned int vertpd[LENGTH(tags) + 1];
+    unsigned int sidepd[LENGTH(tags) + 1];
+    unsigned int topbar[LENGTH(tags) + 1];
 };
 
 void
