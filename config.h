@@ -23,15 +23,15 @@ static const int showsystray               = 1;   /* 0 means no systray */
 
 static       unsigned int vacantonstart    = 1;   /* 0 means no vacant tags */
 
-static const unsigned int ulinepad         = 2;   /* horizontal padding between the underline and tag */
+static const unsigned int ulinepad         = 6;   /* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke      = 2;   /* thickness / height of the underline */
 static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of the bar the line should appear */
 
-static const unsigned int underlinetags    = 0;   /* 0 means no underline */
-static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
+static const unsigned int underlinetags    = 1;   /* 0 means no underline */
+static const unsigned int underlinevacant  = 1;   /* 0 means no underline for vacant tags */
 
-static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : 5;  /* horiz inner gap between windows */
-static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 5;  /* vert inner gap between windows */
+static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : 0;  /* horiz inner gap between windows */
+static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 0;  /* vert inner gap between windows */
 static const unsigned int gappoh           = vertpad            ? sidepadtoggle : 0;  /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = sidepad            ? sidepadtoggle : 0;  /* vert outer gap between windows and screen edge */
 static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
@@ -39,7 +39,7 @@ static       unsigned int padding          = vertpad || sidepad ? 1 : 0;
 
 static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
 
-static const unsigned int borderpx         = 2;   /* border pixel of windows */
+static const unsigned int borderpx         = 1;   /* border pixel of windows */
 
 static const unsigned int snap             = 0;  /* snap pixel */
 
@@ -217,17 +217,17 @@ static const Layout layouts[] = {
 #define C ControlMask
 
 #define TAGKEYS(KEY,TAG) \
-    { A,       -1,   KEY,   comboview,    {.ui = 1 << TAG} }, \
-    { C,       -1,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
-    { M,       -1,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
-    { A|S,     -1,   KEY,   combotag,     {.ui = 1 << TAG} }, \
-    { A|C,     -1,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
-    { M|S,     -1,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
-    { A|C,     XK_l, KEY,   focusnextmon, {.ui = 1 << TAG} }, \
-    { A|C,     XK_h, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
-    { A|C,     XK_j, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|C,     XK_k, KEY,   tagprevmon,   {.ui = 1 << TAG} }, \
-    { A|C,     XK_q, KEY,   killontag,    {.ui = 1 << TAG} },
+    { A,       -1,        KEY,   comboview,    {.ui = 1 << TAG} }, \
+    { C,       -1,        KEY,   toggleview,   {.ui = 1 << TAG} }, \
+    { M,       -1,        KEY,   toggletag,    {.ui = 1 << TAG} }, \
+    { A|S,     -1,        KEY,   combotag,     {.ui = 1 << TAG} }, \
+    { A|C,     -1,        KEY,   tagwith,      {.ui = 1 << TAG} }, \
+    { M|S,     -1,        KEY,   swaptags,     {.ui = 1 << TAG} }, \
+    { A|C,     XK_comma,  KEY,   focusnextmon, {.ui = 1 << TAG} }, \
+    { A|C,     XK_period, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
+    { A|C|S,   XK_comma,  KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
+    { A|C|S,   XK_period, KEY,   tagprevmon,   {.ui = 1 << TAG} }, \
+    { A|C,     XK_q,      KEY,   killontag,    {.ui = 1 << TAG} },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
@@ -312,8 +312,8 @@ static Key keys[] = {
 {A|S,-1,XK_a,winview,{0}},
 {A,-1,XK_semicolon,zoom,{0}},
 {A|S,-1,XK_v,transfer,{0}},
-{A|C,-1,XK_j,pushdown,{0}},
-{A|C,-1,XK_k,pushup,{0}},
+{M|C,-1,XK_j,pushdown,{0}},
+{M|C,-1,XK_k,pushup,{0}},
 {A|C,-1,XK_r,togglefloating,{0}},
 {A|S,-1,XK_space,unfloatvisible,{0}},
 {A|S,-1,XK_s,togglesticky,{0}},

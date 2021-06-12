@@ -104,19 +104,19 @@ static       unsigned int vacantonstart    = 1;   /* 0 means no vacant tags */
 *** Underline
 **** Underline size
 #+begin_src C
-static const unsigned int ulinepad         = 2;   /* horizontal padding between the underline and tag */
+static const unsigned int ulinepad         = 6;   /* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke      = 2;   /* thickness / height of the underline */
 static const unsigned int ulinevoffset     = 0;   /* how far above the bottom of the bar the line should appear */
 #+end_src
 **** Enable underline
 #+begin_src C
-static const unsigned int underlinetags    = 0;   /* 0 means no underline */
-static const unsigned int underlinevacant  = 0;   /* 0 means no underline for vacant tags */
+static const unsigned int underlinetags    = 1;   /* 0 means no underline */
+static const unsigned int underlinevacant  = 1;   /* 0 means no underline for vacant tags */
 #+end_src
 ** Gaps
 #+begin_src C
-static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : 5;  /* horiz inner gap between windows */
-static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 5;  /* vert inner gap between windows */
+static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle : 0;  /* horiz inner gap between windows */
+static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 0;  /* vert inner gap between windows */
 static const unsigned int gappoh           = vertpad            ? sidepadtoggle : 0;  /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = sidepad            ? sidepadtoggle : 0;  /* vert outer gap between windows and screen edge */
 static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
@@ -128,7 +128,7 @@ static const int swallowfloating           = 1;   /* 1 means swallow floating wi
 #+end_src
 ** Window border
 #+begin_src C
-static const unsigned int borderpx         = 2;   /* border pixel of windows */
+static const unsigned int borderpx         = 1;   /* border pixel of windows */
 #+end_src
 ** Snap
 #+begin_src C
@@ -334,6 +334,7 @@ static const MonitorRule monrules[] = {
    {  -1,      -1,  0,      -1,    -1,      -1,      -1     }, // default
 };
 #+end_src
+
 * Layouts
 ** Layout modifiers
 + mfact defines how wide master stack is
@@ -394,17 +395,17 @@ static const Layout layouts[] = {
 * Tag functions
 #+begin_src C
 #define TAGKEYS(KEY,TAG) \
-    { A,       -1,   KEY,   comboview,    {.ui = 1 << TAG} }, \
-    { C,       -1,   KEY,   toggleview,   {.ui = 1 << TAG} }, \
-    { M,       -1,   KEY,   toggletag,    {.ui = 1 << TAG} }, \
-    { A|S,     -1,   KEY,   combotag,     {.ui = 1 << TAG} }, \
-    { A|C,     -1,   KEY,   tagwith,      {.ui = 1 << TAG} }, \
-    { M|S,     -1,   KEY,   swaptags,     {.ui = 1 << TAG} }, \
-    { A|C,     XK_l, KEY,   focusnextmon, {.ui = 1 << TAG} }, \
-    { A|C,     XK_h, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
-    { A|C,     XK_j, KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|C,     XK_k, KEY,   tagprevmon,   {.ui = 1 << TAG} }, \
-    { A|C,     XK_q, KEY,   killontag,    {.ui = 1 << TAG} },
+    { A,       -1,        KEY,   comboview,    {.ui = 1 << TAG} }, \
+    { C,       -1,        KEY,   toggleview,   {.ui = 1 << TAG} }, \
+    { M,       -1,        KEY,   toggletag,    {.ui = 1 << TAG} }, \
+    { A|S,     -1,        KEY,   combotag,     {.ui = 1 << TAG} }, \
+    { A|C,     -1,        KEY,   tagwith,      {.ui = 1 << TAG} }, \
+    { M|S,     -1,        KEY,   swaptags,     {.ui = 1 << TAG} }, \
+    { A|C,     XK_comma,  KEY,   focusnextmon, {.ui = 1 << TAG} }, \
+    { A|C,     XK_period, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
+    { A|C|S,   XK_comma,  KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
+    { A|C|S,   XK_period, KEY,   tagprevmon,   {.ui = 1 << TAG} }, \
+    { A|C,     XK_q,      KEY,   killontag,    {.ui = 1 << TAG} },
 #+end_src
 * Keybinds
 #+name: binds
@@ -490,8 +491,8 @@ static const Layout layouts[] = {
 | A:S   | XK_a                    |        -1 | winview              | {0}                                                                   |
 | A     | XK_semicolon            |        -1 | zoom                 | {0}                                                                   |
 | A:S   | XK_v                    |        -1 | transfer             | {0}                                                                   |
-| A:C   | XK_j                    |        -1 | pushdown             | {0}                                                                   |
-| A:C   | XK_k                    |        -1 | pushup               | {0}                                                                   |
+| M:C   | XK_j                    |        -1 | pushdown             | {0}                                                                   |
+| M:C   | XK_k                    |        -1 | pushup               | {0}                                                                   |
 | A:C   | XK_r                    |        -1 | togglefloating       | {0}                                                                   |
 | A:S   | XK_space                |        -1 | unfloatvisible       | {0}                                                                   |
 | A:S   | XK_s                    |        -1 | togglesticky         | {0}                                                                   |
@@ -621,8 +622,8 @@ static Key keys[] = {
 {A|S,-1,XK_a,winview,{0}},
 {A,-1,XK_semicolon,zoom,{0}},
 {A|S,-1,XK_v,transfer,{0}},
-{A|C,-1,XK_j,pushdown,{0}},
-{A|C,-1,XK_k,pushup,{0}},
+{M|C,-1,XK_j,pushdown,{0}},
+{M|C,-1,XK_k,pushup,{0}},
 {A|C,-1,XK_r,togglefloating,{0}},
 {A|S,-1,XK_space,unfloatvisible,{0}},
 {A|S,-1,XK_s,togglesticky,{0}},

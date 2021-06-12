@@ -1420,7 +1420,7 @@ drawbar(Monitor *m)
 
         drw_text(drw, x, 0, w + 2 * m->sp, bh, lrpad / 2, masterclientontag[i], urg & 1 << i);
 
-        if (underlinetags && ((underlinevacant) ? m->vactag : !m->vactag && (occ & 1 << i || m->tagset[m->seltags] & 1 << i)))
+        if (underlinetags && ((underlinevacant) ? (m->vactag && m->tagset[m->seltags] & 1 << i) : (!m->vactag && (occ & 1 << i || m->tagset[m->seltags] & 1 << i))))
             drw_rect(drw, x + ulinepad, bh - ulinestroke - ulinevoffset, w - (ulinepad * 2), ulinestroke, 1, 0);
 
         for (c = m->clients; c; c = c->next)
