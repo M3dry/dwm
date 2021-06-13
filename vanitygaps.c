@@ -25,7 +25,7 @@ static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int
 static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
 static void setgaps(int oh, int ov, int ih, int iv);
 
-struct Pertag {
+struct vactags {
     unsigned int curtag, prevtag; /* current and previous tag */
     int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
     float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
@@ -39,6 +39,9 @@ struct Pertag {
     unsigned int vertpd[LENGTH(tags) + 1];
     unsigned int sidepd[LENGTH(tags) + 1];
     unsigned int topbar[LENGTH(tags) + 1];
+    unsigned int smartgaps[LENGTH(tags) + 1];
+    unsigned int vactags[LENGTH(tags) + 1];
+    unsigned int borderpx[LENGTH(tags) + 1];
 };
 
 void
@@ -163,7 +166,7 @@ getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
     Client *c;
 
     for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-    if (smartgaps && n == 1) {
+    if (m->smartgaps && n == 1) {
         oe = 0; // outer gaps disabled when only one client
     }
 

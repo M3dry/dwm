@@ -127,7 +127,7 @@ struct Client {
     unsigned int tags;
     unsigned int switchtag;
     int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, needresize, issticky, isterminal, noswallow, issteam, ispermanent, iscentered;
-	char scratchkey;
+    char scratchkey;
     int fakefullscreen;
     pid_t pid;
     Client *next;
@@ -157,7 +157,7 @@ typedef struct {
 
 #define MAXTABS 50
 
-typedef struct Pertag Pertag;
+typedef struct vactags Pertag;
 struct Monitor {
     char ltsymbol[16];
     float mfact;
@@ -171,9 +171,10 @@ struct Monitor {
     int gappiv;           /* vertical gap between windows */
     int gappoh;           /* horizontal outer gaps */
     int gappov;           /* vertical outer gaps */
+    int smartgaps;
     int vp;           /* vertical outer gaps */
     int sp;           /* vertical outer gaps */
-    unsigned int vactag;
+    int vactag;
     unsigned int borderpx;
     unsigned int seltags;
     unsigned int sellt;
@@ -207,18 +208,25 @@ typedef struct {
     int isterminal;
     int noswallow;
     int monitor;
-	const char scratchkey;
+    const char scratchkey;
 } Rule;
 
 typedef struct {
-    int monitor;
-    int tag;
-    int layout;
-    float mfact;
-    int nmaster;
     int showbar;
     int topbar;
-} MonitorRule;
+    int vacant;
+    int layout;
+    int gapih;
+    int gapiv;
+    int gapoh;
+    int gapov;
+    int smartgaps;
+    int vpad;
+    int spad;
+    int borderpx;
+    int nmaster;
+    float mfact;
+} TagRule;
 
 typedef struct Systray   Systray;
 struct Systray {
@@ -509,6 +517,9 @@ comboview(const Arg *arg)
             selmon->gappov = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff00) >> 8;
             selmon->gappih = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff0000) >> 16;
             selmon->gappiv = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff000000) >> 24;
+            selmon->smartgaps = selmon->pertag->smartgaps[selmon->pertag->curtag];
+            selmon->vactag = selmon->pertag->vactags[selmon->pertag->curtag];
+            selmon->borderpx = selmon->pertag->borderpx[selmon->pertag->curtag];
 
             selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag];
             selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag];
@@ -535,7 +546,7 @@ applyrules(Client *c)
     c->iscentered = 0;
     c->isfloating = 0;
     c->tags = 0;
-	c->scratchkey = 0;
+    c->scratchkey = 0;
     XGetClassHint(dpy, c->win, &ch);
     class    = ch.res_class ? ch.res_class : broken;
     instance = ch.res_name  ? ch.res_name  : broken;
@@ -557,7 +568,7 @@ applyrules(Client *c)
             c->iscentered = r->iscentered;
             c->ispermanent = r->ispermanent;
             c->tags |= r->tags;
-			c->scratchkey = r->scratchkey;
+            c->scratchkey = r->scratchkey;
 
             for (m = mons; m && m->num != r->monitor; m = m->next);
             if (m)
@@ -588,9 +599,9 @@ applyrules(Client *c)
     if (ch.res_name)
         XFree(ch.res_name);
 
-	if (c->tags & TAGMASK)                    c->tags = c->tags & TAGMASK;
-	else if (c->mon->tagset[c->mon->seltags]) c->tags = c->mon->tagset[c->mon->seltags];
-	else                                      c->tags = 1;
+     if (c->tags & TAGMASK)                    c->tags = c->tags & TAGMASK;
+     else if (c->mon->tagset[c->mon->seltags]) c->tags = c->mon->tagset[c->mon->seltags];
+     else                                      c->tags = 1;
 }
 
 int
@@ -1094,81 +1105,59 @@ configurerequest(XEvent *e)
 Monitor *
 createmon(void)
 {
-    Monitor *m, *mon;
-    int i, mi, j, layout;
-    const MonitorRule *mr;
+    Monitor *m;
+    const TagRule *tr;
+    int i;
 
     m = ecalloc(1, sizeof(Monitor));
     m->tagset[0] = m->tagset[1] = startontag ? 1 : 0;
-    m->mfact = mfact;
-    m->nmaster = nmaster;
-    m->showbar = showbar;
+    m->mfact = tagrules[0].mfact;
+    m->nmaster = tagrules[0].nmaster;
+    m->showbar = tagrules[0].showbar;
     m->showtab = showtab;
-    m->topbar = topbar;
+    m->topbar = tagrules[0].topbar;
     m->toptab = toptab;
-    m->borderpx = borderpx;
+    m->borderpx = tagrules[0].borderpx;
     m->ntabs = 0;
-    m->gappih = gappih;
-    m->gappiv = gappiv;
-    m->gappoh = gappoh;
-    m->gappov = gappov;
-    m->vactag = vacantonstart;
-    m->vp = vertpad;
-    m->sp = sidepad;
-
-    for (mi = 0, mon = mons; mon; mon = mon->next, mi++);
-    for (j = 0; j < LENGTH(monrules); j++) {
-        mr = &monrules[j];
-        if ((mr->monitor == -1 || mr->monitor == mi)
-                && (mr->tag <= 0 || (m->tagset[0] & (1 << (mr->tag - 1))))
-        ) {
-            layout = MAX(mr->layout, 0);
-            layout = MIN(layout, LENGTH(layouts) - 1);
-            m->lt[0] = &layouts[layout];
-            m->lt[1] = &layouts[1 % LENGTH(layouts)];
-            strncpy(m->ltsymbol, layouts[layout].symbol, sizeof m->ltsymbol);
-
-            if (mr->mfact > -1)
-                m->mfact = mr->mfact;
-            if (mr->nmaster > -1)
-                m->nmaster = mr->nmaster;
-            if (mr->showbar > -1)
-                m->showbar = mr->showbar;
-            if (mr->topbar > -1)
-                m->topbar = mr->topbar;
-            break;
-        }
-    }
+    m->gappih = tagrules[0].gapih;
+    m->gappiv = tagrules[0].gapiv;
+    m->gappoh = tagrules[0].gapoh;
+    m->gappov = tagrules[0].gapov;
+    m->smartgaps = tagrules[0].smartgaps;
+    m->vactag = tagrules[0].vacant;
+    m->vp = tagrules[0].vpad;
+    m->sp = tagrules[0].spad;
+    m->lt[0] = &layouts[0];
+    m->lt[1] = &layouts[1 % LENGTH(layouts)];
+    strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
 
     if (!(m->pertag = (Pertag *)calloc(1, sizeof(Pertag))))
         die("fatal: could not malloc() %u bytes\n", sizeof(Pertag));
     m->pertag->curtag = m->pertag->prevtag = 1;
-    for (i = 0; i <= LENGTH(tags); i++) {
 
-        /* init layouts */
-        m->pertag->sellts[i] = m->sellt;
+     for (i = 0; i <= LENGTH(tags); i++) {
+         /* init nmaster */
+         m->pertag->nmasters[i] = tagrules[i - 1].nmaster;
 
-        /* init showbar */
-        m->pertag->showbars[i] = m->showbar;
-        for (j = 0; j < LENGTH(monrules); j++) {
-            mr = &monrules[j];
-            if ((mr->monitor == -1 || mr->monitor == mi) && (mr->tag == -1 || mr->tag == i)) {
-                layout = MAX(mr->layout, 0);
-                layout = MIN(layout, LENGTH(layouts) - 1);
-                m->pertag->ltidxs[i][0] = &layouts[layout];
-                m->pertag->ltidxs[i][1] = m->lt[0];
-                m->pertag->nmasters[i] = (mr->nmaster > -1 ? mr->nmaster : m->nmaster);
-                m->pertag->mfacts[i] = (mr->mfact > -1 ? mr->mfact : m->mfact);
-                m->pertag->showbars[i] = (mr->showbar > -1 ? mr->showbar : m->showbar);
-                break;
-            }
-        }
-        m->pertag->enablegaps[i] = 1;
-        m->pertag->gaps[i] =
-            ((gappoh & 0xFF) << 0) | ((gappov & 0xFF) << 8) | ((gappih & 0xFF) << 16) | ((gappiv & 0xFF) << 24);
-        m->pertag->vertpd[i] = vertpad;
-        m->pertag->sidepd[i] = sidepad;
-        m->pertag->topbar[i] = topbar;
+         /* init mfacts */
+         m->pertag->mfacts[i] = tagrules[i - 1].mfact;
+
+         /* init layouts */
+         m->pertag->ltidxs[i][0] = m->lt[0];
+         m->pertag->ltidxs[i][1] = m->lt[1];
+         m->pertag->sellts[i] = tagrules[i - 1].layout;
+
+         /* init showbar */
+         m->pertag->showbars[i] = tagrules[i - 1].showbar;
+
+         m->pertag->enablegaps[i] = 1;
+         m->pertag->gaps[i] = ((tagrules[i - 1].gapoh & 0xFF) << 0) | ((tagrules[i - 1].gapov & 0xFF) << 8) | ((tagrules[i - 1].gapih & 0xFF) << 16) | ((tagrules[i - 1].gapiv & 0xFF) << 24);
+         m->pertag->vertpd[i] = tagrules[i - 1].vpad;
+         m->pertag->sidepd[i] = tagrules[i - 1].spad;
+         m->pertag->topbar[i] = tagrules[i - 1].topbar;
+         m->pertag->smartgaps[i] = tagrules[i - 1].smartgaps;
+         m->pertag->vactags[i] = tagrules[i - 1].vacant;
+         m->pertag->borderpx[i] = tagrules[i - 1].borderpx;
     }
     return m;
 }
@@ -2417,10 +2406,10 @@ removesystrayicon(Client *i)
 void
 removescratch(const Arg *arg)
 {
-	Client *c = selmon->sel;
-	if (!c)
-		return;
-	c->scratchkey = 0;
+     Client *c = selmon->sel;
+     if (!c)
+          return;
+     c->scratchkey = 0;
 }
 
 void
@@ -2923,11 +2912,11 @@ setmfact(const Arg *arg)
 void
 setscratch(const Arg *arg)
 {
-	Client *c = selmon->sel;
-	if (!c)
-		return;
+     Client *c = selmon->sel;
+     if (!c)
+          return;
 
-	c->scratchkey = ((char**)arg->v)[0][0];
+     c->scratchkey = ((char**)arg->v)[0][0];
 }
 
 void
@@ -3090,9 +3079,9 @@ showhide(Client *c)
             resize(c, c->x, c->y, c->w, c->h, 0);
         showhide(c->snext);
     } else {
-		/* optional: auto-hide scratchpads when moving to other tags */
-		if (c->scratchkey != 0 && !(c->tags & c->mon->tagset[c->mon->seltags]))
-			c->tags = 0;
+          /* optional: auto-hide scratchpads when moving to other tags */
+          if (c->scratchkey != 0 && !(c->tags & c->mon->tagset[c->mon->seltags]))
+               c->tags = 0;
         /* hide clients bottom up */
         showhide(c->snext);
         XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
@@ -3201,15 +3190,15 @@ spawndefault()
 void
 spawnscratch(const Arg *arg)
 {
-	if (fork() == 0) {
-		if (dpy)
-			close(ConnectionNumber(dpy));
-		setsid();
-		execvp(((char **)arg->v)[1], ((char **)arg->v)+1);
-		fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[1]);
-		perror(" failed");
-		exit(EXIT_SUCCESS);
-	}
+     if (fork() == 0) {
+          if (dpy)
+               close(ConnectionNumber(dpy));
+          setsid();
+          execvp(((char **)arg->v)[1], ((char **)arg->v)+1);
+          fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[1]);
+          perror(" failed");
+          exit(EXIT_SUCCESS);
+     }
 }
 
 void
@@ -3441,96 +3430,96 @@ togglefullscr(const Arg *arg)
 void
 togglescratch(const Arg *arg)
 {
-	Client *c, *next, *last = NULL, *found = NULL, *monclients = NULL;
-	Monitor *mon;
-	int scratchvisible = 0;
-	int multimonscratch = 0;
-	int scratchmon = -1;
-	int numscratchpads = 0;
+     Client *c, *next, *last = NULL, *found = NULL, *monclients = NULL;
+     Monitor *mon;
+     int scratchvisible = 0;
+     int multimonscratch = 0;
+     int scratchmon = -1;
+     int numscratchpads = 0;
 
-	for (mon = mons; mon; mon = mon->next)
-		for (c = mon->clients; c; c = c->next) {
-			if (c->scratchkey != ((char**)arg->v)[0][0])
-				continue;
-			if (scratchmon != -1 && scratchmon != mon->num)
-				multimonscratch = 1;
-			if (c->mon->tagset[c->mon->seltags] & c->tags)
-				++scratchvisible;
-			scratchmon = mon->num;
-			++numscratchpads;
-		}
+     for (mon = mons; mon; mon = mon->next)
+          for (c = mon->clients; c; c = c->next) {
+               if (c->scratchkey != ((char**)arg->v)[0][0])
+                    continue;
+               if (scratchmon != -1 && scratchmon != mon->num)
+                    multimonscratch = 1;
+               if (c->mon->tagset[c->mon->seltags] & c->tags)
+                    ++scratchvisible;
+               scratchmon = mon->num;
+               ++numscratchpads;
+          }
 
-	for (mon = mons; mon; mon = mon->next) {
-		for (c = mon->stack; c; c = next) {
-			next = c->snext;
-			if (c->scratchkey != ((char**)arg->v)[0][0])
-				continue;
+     for (mon = mons; mon; mon = mon->next) {
+          for (c = mon->stack; c; c = next) {
+               next = c->snext;
+               if (c->scratchkey != ((char**)arg->v)[0][0])
+                    continue;
 
-			if (!found || (mon == selmon && c->mon != selmon))
-				found = c;
+               if (!found || (mon == selmon && c->mon != selmon))
+                    found = c;
 
-			unfocus(c, 0);
+               unfocus(c, 0);
 
-			if (!multimonscratch && c->mon != selmon) {
-				detach(c);
-				detachstack(c);
-				c->next = NULL;
+               if (!multimonscratch && c->mon != selmon) {
+                    detach(c);
+                    detachstack(c);
+                    c->next = NULL;
 
-				if (last)
-					last = last->next = c;
-				else
-					last = monclients = c;
-			} else if (scratchvisible == numscratchpads) {
-				c->tags = 0;
-			} else {
-				c->tags = c->mon->tagset[c->mon->seltags];
-				if (c->isfloating)
-					XRaiseWindow(dpy, c->win);
-			}
-		}
-	}
+                    if (last)
+                         last = last->next = c;
+                    else
+                         last = monclients = c;
+               } else if (scratchvisible == numscratchpads) {
+                    c->tags = 0;
+               } else {
+                    c->tags = c->mon->tagset[c->mon->seltags];
+                    if (c->isfloating)
+                         XRaiseWindow(dpy, c->win);
+               }
+          }
+     }
 
-	for (c = monclients; c; c = next) {
-		next = c->next;
-		mon = c->mon;
-		c->mon = selmon;
-		c->tags = selmon->tagset[selmon->seltags];
+     for (c = monclients; c; c = next) {
+          next = c->next;
+          mon = c->mon;
+          c->mon = selmon;
+          c->tags = selmon->tagset[selmon->seltags];
 
-		if (selmon->clients) {
-			for (last = selmon->clients; last && last->next; last = last->next);
-			last->next = c;
-		} else
-			selmon->clients = c;
-		c->next = NULL;
-		attachstack(c);
+          if (selmon->clients) {
+               for (last = selmon->clients; last && last->next; last = last->next);
+               last->next = c;
+          } else
+               selmon->clients = c;
+          c->next = NULL;
+          attachstack(c);
 
-		if (c->isfloating) {
-			if (c->w > selmon->ww)
-				c->w = selmon->ww - c->bw * 2;
-			if (c->h > selmon->wh)
-				c->h = selmon->wh - c->bw * 2;
+          if (c->isfloating) {
+               if (c->w > selmon->ww)
+                    c->w = selmon->ww - c->bw * 2;
+               if (c->h > selmon->wh)
+                    c->h = selmon->wh - c->bw * 2;
 
-			if (numscratchpads > 1) {
-				c->x = c->mon->wx + (c->x - mon->wx) * ((double)(abs(c->mon->ww - WIDTH(c))) / MAX(abs(mon->ww - WIDTH(c)), 1));
-				c->y = c->mon->wy + (c->y - mon->wy) * ((double)(abs(c->mon->wh - HEIGHT(c))) / MAX(abs(mon->wh - HEIGHT(c)), 1));
-			} else if (c->x < c->mon->mx || c->x > c->mon->mx + c->mon->mw ||
-			           c->y < c->mon->my || c->y > c->mon->my + c->mon->mh)	{
-				c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
-				c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
-			}
-			resizeclient(c, c->x, c->y, c->w, c->h);
-			XRaiseWindow(dpy, c->win);
-		}
-	}
+               if (numscratchpads > 1) {
+                    c->x = c->mon->wx + (c->x - mon->wx) * ((double)(abs(c->mon->ww - WIDTH(c))) / MAX(abs(mon->ww - WIDTH(c)), 1));
+                    c->y = c->mon->wy + (c->y - mon->wy) * ((double)(abs(c->mon->wh - HEIGHT(c))) / MAX(abs(mon->wh - HEIGHT(c)), 1));
+               } else if (c->x < c->mon->mx || c->x > c->mon->mx + c->mon->mw ||
+                          c->y < c->mon->my || c->y > c->mon->my + c->mon->mh)     {
+                    c->x = c->mon->wx + (c->mon->ww / 2 - WIDTH(c) / 2);
+                    c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
+               }
+               resizeclient(c, c->x, c->y, c->w, c->h);
+               XRaiseWindow(dpy, c->win);
+          }
+     }
 
-	if (found) {
-		focus(ISVISIBLE(found) ? found : NULL);
-		arrange(NULL);
-		if (found->isfloating)
-			XRaiseWindow(dpy, found->win);
-	} else {
-		spawnscratch(arg);
-	}
+     if (found) {
+          focus(ISVISIBLE(found) ? found : NULL);
+          arrange(NULL);
+          if (found->isfloating)
+               XRaiseWindow(dpy, found->win);
+     } else {
+          spawnscratch(arg);
+     }
 }
 
 void
@@ -3572,7 +3561,7 @@ toggleview(const Arg *arg)
 void
 togglevacant(const Arg *arg)
 {
-    selmon->vactag = selmon->vactag? 0 : 1;
+    selmon->pertag->vactags[selmon->pertag->curtag] = selmon->vactag = selmon->vactag ? 0 : 1;
     drawbar(selmon);
 }
 
@@ -3590,12 +3579,12 @@ togglepadding(const Arg *arg)
     if (padding) {
         selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag] = 0;
         selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag] = 0;
-        smartgaps = 1;
+        selmon->smartgaps = 1;
         setgaps(gappoh, gappov, gappih, gappiv);
     } else {
         selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag] = vertpadtoggle;
         selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag] = sidepadtoggle;
-        smartgaps = 0;
+        selmon->smartgaps = 0;
         setgaps(sidepadtoggle, sidepadtoggle, gappih, gappiv);
     }
     updatebarpos(selmon);

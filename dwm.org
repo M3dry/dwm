@@ -48,7 +48,7 @@
 - [[#scratchpads][Scratchpads]]
 - [[#rules][Rules]]
   - [[#client-rules][Client rules]]
-  - [[#monitor-rules][Monitor rules]]
+  - [[#tag-rules][Tag rules]]
 - [[#layouts][Layouts]]
   - [[#layout-modifiers][Layout modifiers]]
   - [[#layout-definitions][Layout definitions]]
@@ -99,7 +99,7 @@ static const int showsystray               = 1;   /* 0 means no systray */
 #+end_src
 *** Vacant tags
 #+begin_src C
-static       unsigned int vacantonstart    = 1;   /* 0 means no vacant tags */
+/* static       unsigned int vacantonstart    = 1;   /\* 0 means no vacant tags *\/ */
 #+end_src
 *** Underline
 **** Underline size
@@ -119,7 +119,7 @@ static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle 
 static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 0;  /* vert inner gap between windows */
 static const unsigned int gappoh           = vertpad            ? sidepadtoggle : 0;  /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = sidepad            ? sidepadtoggle : 0;  /* vert outer gap between windows and screen edge */
-static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
+/* static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /\* 1 means no outer gap when there is only one window one window *\/ */
 static       unsigned int padding          = vertpad || sidepad ? 1 : 0;
 #+end_src
 ** Swallow floating
@@ -128,7 +128,7 @@ static const int swallowfloating           = 1;   /* 1 means swallow floating wi
 #+end_src
 ** Window border
 #+begin_src C
-static const unsigned int borderpx         = 1;   /* border pixel of windows */
+static unsigned int borderpx         = 1;   /* border pixel of windows */
 #+end_src
 ** Snap
 #+begin_src C
@@ -326,15 +326,21 @@ static const Rule rules[] = {
     { NULL,       NULL,       NULL, WTYPE "SPLASH",  0,        0,          1,         1,         0,          0,         0,        -1, 0 },
 };
 #+end_src
-** Monitor rules
+** Tag rules
 #+begin_src C
-static const MonitorRule monrules[] = {
-   /* monitor  tag  layout  mfact  nmaster  showbar  topbar */
-   {  1,       -1,  5,      -1,    -1,      -1,      -1     }, // use a different layout for the second monitor
-   {  -1,      -1,  0,      -1,    -1,      -1,      -1     }, // default
+static const TagRule tagrules[9] = {
+    /* showbar topbar vacant layout gapih gapiv gapoh gapov smartgaps vpad spad borderpx nmaster mfact */
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
 };
 #+end_src
-
 * Layouts
 ** Layout modifiers
 + mfact defines how wide master stack is
@@ -459,7 +465,7 @@ static const Layout layouts[] = {
 | M:C   | XK_u                    |        -1 | setmfact             | { .f = mfact + 1 }                                                    |
 | A:S   | XK_j                    |        -1 | setcfact             | { .f = +0.25 }                                                        |
 | A:S   | XK_k                    |        -1 | setcfact             | { .f = -0.25 }                                                        |
-| A:C:S | XK_u                    |        -1 | setcfact             | {0}                                                                   |
+| M:C:S | XK_u                    |        -1 | setcfact             | {0}                                                                   |
 | A     | XK_bracketleft          |        -1 | incnmaster           | { .i = +1 }                                                           |
 | A     | XK_bracketright         |        -1 | incnmaster           | { .i = -1 }                                                           |
 | M     | XK_space                |        -1 | focusmaster          | {0}                                                                   |
@@ -523,7 +529,6 @@ static const Layout layouts[] = {
 
 #+begin_src sh :tangle no :var keys=binds :results output :wrap "src C"
 echo "#define SHCMD(cmd) { .v = (const char*[]){ \"/bin/sh\", \"-c\", cmd, NULL } }\n\nstatic Key keys[] = {"
-# echo $keys | sed "s/)\ /)\n/g ; s/}\ /}\n/g ; s/:/|/g" | sed "s/\ /^/ ; s/\ /^/ ; s/\ /^/ ; s/\ /^/" | awk -F'^' '{print "    { " $1 ", " $3 ", " $2 ", " $4 ", " $5 " }," }'
 echo $keys | sed "s/)\ /)\n/g ; s/}\ /}\n/g" | sed "s/\ /^/ ; s/\ /^/ ; s/\ /^/ ; s/\ /^/" | awk -F'^' '{ gsub(":", "|", $0) ; print "{"$1","$3","$2","$4","$5"}," }'
 echo "
 TAGKEYS(                XK_1,                                  0)
@@ -590,7 +595,7 @@ static Key keys[] = {
 {M|C,-1,XK_u,setmfact,{ .f = mfact + 1 }},
 {A|S,-1,XK_j,setcfact,{ .f = +0.25 }},
 {A|S,-1,XK_k,setcfact,{ .f = -0.25 }},
-{A|C|S,-1,XK_u,setcfact,{0}},
+{M|C|S,-1,XK_u,setcfact,{0}},
 {A,-1,XK_bracketleft,incnmaster,{ .i = +1 }},
 {A,-1,XK_bracketright,incnmaster,{ .i = -1 }},
 {M,-1,XK_space,focusmaster,{0}},

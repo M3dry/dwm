@@ -21,7 +21,7 @@ static const unsigned int systrayspacing   = 2;   /* systray spacing */
 static const int systraypinningfailfirst   = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray               = 1;   /* 0 means no systray */
 
-static       unsigned int vacantonstart    = 1;   /* 0 means no vacant tags */
+/* static       unsigned int vacantonstart    = 1;   /\* 0 means no vacant tags *\/ */
 
 static const unsigned int ulinepad         = 6;   /* horizontal padding between the underline and tag */
 static const unsigned int ulinestroke      = 2;   /* thickness / height of the underline */
@@ -34,12 +34,12 @@ static const unsigned int gappih           = vertpad || sidepad ? vertpadtoggle 
 static const unsigned int gappiv           = vertpad || sidepad ? vertpadtoggle : 0;  /* vert inner gap between windows */
 static const unsigned int gappoh           = vertpad            ? sidepadtoggle : 0;  /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = sidepad            ? sidepadtoggle : 0;  /* vert outer gap between windows and screen edge */
-static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /* 1 means no outer gap when there is only one window one window */
+/* static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1;   /\* 1 means no outer gap when there is only one window one window *\/ */
 static       unsigned int padding          = vertpad || sidepad ? 1 : 0;
 
 static const int swallowfloating           = 1;   /* 1 means swallow floating windows by default */
 
-static const unsigned int borderpx         = 1;   /* border pixel of windows */
+static unsigned int borderpx         = 1;   /* border pixel of windows */
 
 static const unsigned int snap             = 0;  /* snap pixel */
 
@@ -181,10 +181,17 @@ static const Rule rules[] = {
     { NULL,       NULL,       NULL, WTYPE "SPLASH",  0,        0,          1,         1,         0,          0,         0,        -1, 0 },
 };
 
-static const MonitorRule monrules[] = {
-   /* monitor  tag  layout  mfact  nmaster  showbar  topbar */
-   {  1,       -1,  5,      -1,    -1,      -1,      -1     }, // use a different layout for the second monitor
-   {  -1,      -1,  0,      -1,    -1,      -1,      -1     }, // default
+static const TagRule tagrules[9] = {
+    /* showbar topbar vacant layout gapih gapiv gapoh gapov smartgaps vpad spad borderpx nmaster mfact */
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
+    {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
 };
 
 static const float mfact     = 0.5;
@@ -280,7 +287,7 @@ static Key keys[] = {
 {M|C,-1,XK_u,setmfact,{ .f = mfact + 1 }},
 {A|S,-1,XK_j,setcfact,{ .f = +0.25 }},
 {A|S,-1,XK_k,setcfact,{ .f = -0.25 }},
-{A|C|S,-1,XK_u,setcfact,{0}},
+{M|C|S,-1,XK_u,setcfact,{0}},
 {A,-1,XK_bracketleft,incnmaster,{ .i = +1 }},
 {A,-1,XK_bracketright,incnmaster,{ .i = -1 }},
 {M,-1,XK_space,focusmaster,{0}},
