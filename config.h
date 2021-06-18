@@ -49,8 +49,7 @@ static const int decorhints                = 1;   /* 1 means respect decoration 
 
 static const int focusonwheel              = 0;
 
-static const char *fonts[] = { "Operator Mono SSm Lig:size=12:antialias=true:autohint=true"
-                               "mononoki Nerd Font:size=12:antialias=true:autohint=true" };
+static const char *fonts[] = { "Operator Mono SSm Lig Nerd Font:size=12:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#4E5579";
 static const char selfg[]                 = "#5fafff";
@@ -312,7 +311,6 @@ static Key keys[] = {
 {A|S,-1,XK_t,tabmode,{-1}},
 {A|C,-1,XK_i,cyclelayout,{ .i = -1 }},
 {A|C,-1,XK_p,cyclelayout,{ .i = +1 }},
-{A,-1,XK_0,view,{.ui = ~0 }},
 {A,-1,XK_Tab,goback,{0}},
 {A|S,-1,XK_n,shiftviewclients,{ .i = +1 }},
 {A|S,-1,XK_p,shiftviewclients,{ .i = -1 }},

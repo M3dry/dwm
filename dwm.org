@@ -148,8 +148,7 @@ static const int focusonwheel              = 0;
 #+end_src
 ** Fonts
 #+begin_src C
-static const char *fonts[] = { "Operator Mono SSm Lig:size=12:antialias=true:autohint=true"
-                               "mononoki Nerd Font:size=12:antialias=true:autohint=true" };
+static const char *fonts[] = { "Operator Mono SSm Lig Nerd Font:size=12:antialias=true:autohint=true" };
 #+end_src
 * Colors
 ** Color variables
@@ -490,7 +489,6 @@ static const Layout layouts[] = {
 | A:S   | XK_t                    |        -1 | tabmode              | {-1}                                                                  |
 | A:C   | XK_i                    |        -1 | cyclelayout          | { .i = -1 }                                                           |
 | A:C   | XK_p                    |        -1 | cyclelayout          | { .i = +1 }                                                           |
-| A     | XK_0                    |        -1 | view                 | {.ui = ~0 }                                                           |
 | A     | XK_Tab                  |        -1 | goback               | {0}                                                                   |
 | A:S   | XK_n                    |        -1 | shiftviewclients     | { .i = +1 }                                                           |
 | A:S   | XK_p                    |        -1 | shiftviewclients     | { .i = -1 }                                                           |
@@ -620,7 +618,6 @@ static Key keys[] = {
 {A|S,-1,XK_t,tabmode,{-1}},
 {A|C,-1,XK_i,cyclelayout,{ .i = -1 }},
 {A|C,-1,XK_p,cyclelayout,{ .i = +1 }},
-{A,-1,XK_0,view,{.ui = ~0 }},
 {A,-1,XK_Tab,goback,{0}},
 {A|S,-1,XK_n,shiftviewclients,{ .i = +1 }},
 {A|S,-1,XK_p,shiftviewclients,{ .i = -1 }},

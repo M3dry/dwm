@@ -1106,7 +1106,6 @@ Monitor *
 createmon(void)
 {
     Monitor *m;
-    const TagRule *tr;
     int i;
 
     m = ecalloc(1, sizeof(Monitor));
