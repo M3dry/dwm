@@ -461,7 +461,7 @@ keyrelease(XEvent *e) {
 
 void
 combotag(const Arg *arg) {
-    if(selmon->sel && arg->ui & TAGMASK) {
+    if (selmon->sel && arg->ui & TAGMASK) {
         if (selmon->sel->switchtag)
             selmon->sel->switchtag = 0;
         if (combo) {
@@ -498,8 +498,8 @@ comboview(const Arg *arg)
                 if (arg->ui == ~TAGMASK)
                     selmon->pertag->curtag = 0;
                 else {
-                    for (i = 0; !(arg->ui & 1 << i); i++) ;
-                    selmon->pertag->curtag = i + 1;
+                    for (i = 0; !(arg->ui & 1 << i); i++)
+                        selmon->pertag->curtag = i + 1;
                 }
             }
             } else {
@@ -703,7 +703,7 @@ void
 attachBelow(Client *c)
 {
     //If there is nothing on the monitor or the selected client is floating, attach as normal
-    if(c->mon->sel == NULL || c->mon->sel == c || c->mon->sel->isfloating) {
+    if (c->mon->sel == NULL || c->mon->sel == c || c->mon->sel->isfloating) {
         attach(c);
         return;
     }
@@ -831,23 +831,23 @@ buttonpress(XEvent *e)
                 click = ClkStatusText;
         }
     }
-    if(ev->window == selmon->tabwin) {
+    if (ev->window == selmon->tabwin) {
         i = 0; x = 0;
         for(c = selmon->clients; c; c = c->next){
-            if(!ISVISIBLE(c)) continue;
+            if (!ISVISIBLE(c)) continue;
             x += selmon->tab_widths[i];
             if (ev->x > x)
                 ++i;
             else
                 break;
-            if(i >= m->ntabs) break;
+            if (i >= m->ntabs) break;
         }
-        if(c) {
+        if (c) {
             click = ClkTabBar;
             arg.ui = i;
         }
     }
-    else if((c = wintoclient(ev->window))) {
+    else if ((c = wintoclient(ev->window))) {
         if (focusonwheel || (ev->button != Button4 && ev->button != Button5))
             focus(c);
         XAllowEvents(dpy, ReplayPointer, CurrentTime);
@@ -1165,13 +1165,13 @@ void
 cyclelayout(const Arg *arg) {
     Layout *l;
     for(l = (Layout *)layouts; l != selmon->lt[selmon->sellt]; l++);
-    if(arg->i > 0) {
-        if(l->symbol && (l + 1)->symbol)
+    if (arg->i > 0) {
+        if (l->symbol && (l + 1)->symbol)
             setlayout(&((Arg) { .v = (l + 1) }));
         else
             setlayout(&((Arg) { .v = layouts }));
     } else {
-        if(l != layouts && (l - 1)->symbol)
+        if (l != layouts && (l - 1)->symbol)
             setlayout(&((Arg) { .v = (l - 1) }));
         else
             setlayout(&((Arg) { .v = &layouts[LENGTH(layouts) - 2] }));
@@ -1352,7 +1352,7 @@ drawbar(Monitor *m)
     char *masterclientontag[LENGTH(tags)];
     char ntext[16];
 
-    if(showsystray && m == systraytomon(m))
+    if (showsystray && m == systraytomon(m))
         stw = getsystraywidth();
 
     resizebarwin(m);
@@ -1489,8 +1489,8 @@ drawtab(Monitor *m) {
 
     //view_info: indicate the tag which is displayed in the view
     for(i = 0; i < LENGTH(tags); ++i){
-      if((selmon->tagset[selmon->seltags] >> i) & 1) {
-        if(itag >= 0){ //more than one tag selected
+      if ((selmon->tagset[selmon->seltags] >> i) & 1) {
+        if (itag >= 0){ //more than one tag selected
           itag = -1;
           break;
         }
@@ -1562,7 +1562,7 @@ expose(XEvent *e)
     Monitor *m;
     XExposeEvent *ev = &e->xexpose;
 
-    if(ev->count == 0 && (m = wintomon(ev->window))) {
+    if (ev->count == 0 && (m = wintomon(ev->window))) {
         drawbar(m);
         drawtab(m);
         if (m == selmon)
@@ -1597,11 +1597,11 @@ focus(Client *c)
         detachstack(c);
         attachstack(c);
         grabbuttons(c, 1);
-        if(c->fakefullscreen && c->isfloating)
+        if (c->fakefullscreen && c->isfloating)
             XSetWindowBorder(dpy, c->win, scheme[SchemeSel][ColFakeFullscrFloat].pixel);
         else if (c->fakefullscreen)
             XSetWindowBorder(dpy, c->win, scheme[SchemeSel][ColFakeFullscr].pixel);
-        else if(c->isfloating && c->issticky)
+        else if (c->isfloating && c->issticky)
             XSetWindowBorder(dpy, c->win, scheme[SchemeSel][ColStickyFloat].pixel);
         else if (c->issticky)
             XSetWindowBorder(dpy, c->win, scheme[SchemeSel][ColSticky].pixel);
@@ -1762,9 +1762,9 @@ focuswin(const Arg* arg){
   int iwin = arg->i;
   Client* c = NULL;
   for(c = selmon->clients; c && (iwin || !ISVISIBLE(c)) ; c = c->next){
-    if(ISVISIBLE(c)) --iwin;
+    if (ISVISIBLE(c)) --iwin;
   };
-  if(c) {
+  if (c) {
     focus(c);
     restack(selmon);
   }
@@ -1826,7 +1826,7 @@ getsystraywidth()
 {
     unsigned int w = 0;
     Client *i;
-    if(showsystray)
+    if (showsystray)
         for(i = systray->icons; i; w += i->w + systrayspacing, i = i->next) ;
     return w ? w + systrayspacing : 1;
 }
@@ -2108,11 +2108,11 @@ manage(Window w, XWindowAttributes *wa)
 
     wc.border_width = c->bw;
     XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-    if(c->fakefullscreen && c->isfloating)
+    if (c->fakefullscreen && c->isfloating)
         XSetWindowBorder(dpy, w, scheme[SchemeSel][ColFakeFullscrFloat].pixel);
     else if (c->fakefullscreen)
         XSetWindowBorder(dpy, w, scheme[SchemeSel][ColFakeFullscr].pixel);
-    else if(c->isfloating && c->issticky)
+    else if (c->isfloating && c->issticky)
         XSetWindowBorder(dpy, w, scheme[SchemeSel][ColStickyFloat].pixel);
     else if (c->issticky)
         XSetWindowBorder(dpy, w, scheme[SchemeSel][ColSticky].pixel);
@@ -2144,7 +2144,7 @@ manage(Window w, XWindowAttributes *wa)
         XRaiseWindow(dpy, c->win);
         XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColFloat].pixel);
     }
-    if( attachbelow )
+    if ( attachbelow )
         attachBelow(c);
     else
         attach(c);
@@ -2284,7 +2284,7 @@ prevtiled(Client *c) {
     Client *p, *r;
 
     for(p = selmon->clients, r = NULL; p && p != c; p = p->next)
-        if(!p->isfloating && ISVISIBLE(p))
+        if (!p->isfloating && ISVISIBLE(p))
             r = p;
     return r;
 }
@@ -2340,9 +2340,9 @@ void
 pushdown(const Arg *arg) {
     Client *sel = selmon->sel, *c;
 
-    if(!sel || sel->isfloating || sel == nexttiled(selmon->clients))
+    if (!sel || sel->isfloating || sel == nexttiled(selmon->clients))
         return;
-    if((c = nexttiled(sel->next))) {
+    if ((c = nexttiled(sel->next))) {
         detach(sel);
         sel->next = c->next;
         c->next = sel;
@@ -2355,9 +2355,9 @@ void
 pushup(const Arg *arg) {
     Client *sel = selmon->sel, *c;
 
-    if(!sel || sel->isfloating)
+    if (!sel || sel->isfloating)
         return;
-    if((c = prevtiled(sel)) && c != nexttiled(selmon->clients)) {
+    if ((c = prevtiled(sel)) && c != nexttiled(selmon->clients)) {
         detach(sel);
         sel->next = c;
         for(c = selmon->clients; c->next != sel->next; c = c->next);
@@ -2370,7 +2370,7 @@ pushup(const Arg *arg) {
 void
 quit(const Arg *arg)
 {
-    if(arg->i)
+    if (arg->i)
         restart = 1;
     running = 0;
 }
@@ -2682,7 +2682,7 @@ sendmon(Client *c, Monitor *m)
     detachstack(c);
     c->mon = m;
     c->tags = (m->tagset[m->seltags] ? m->tagset[m->seltags] : 1);
-    if( attachbelow )
+    if ( attachbelow )
         attachBelow(c);
     else
         attach(c);
@@ -2882,12 +2882,12 @@ void setcfact(const Arg *arg) {
 
     c = selmon->sel;
 
-    if(!arg || !c || !selmon->lt[selmon->sellt]->arrange)
+    if (!arg || !c || !selmon->lt[selmon->sellt]->arrange)
         return;
     f = arg->f + c->cfact;
-    if(arg->f == 0.0)
+    if (arg->f == 0.0)
         f = 1.0;
-    else if(f < 0.25 || f > 4.0)
+    else if (f < 0.25 || f > 4.0)
         return;
     c->cfact = f;
     arrange(selmon);
@@ -3162,7 +3162,7 @@ swaptags(const Arg *arg)
         return;
 
     for (Client *c = selmon->clients; c != NULL; c = c->next) {
-        if((c->tags & newtag) || (c->tags & curtag))
+        if ((c->tags & newtag) || (c->tags & curtag))
             c->tags ^= curtag ^ newtag;
 
         if (!c->tags)
@@ -3221,13 +3221,13 @@ tagall(const Arg *arg) {
     int tag = (char *)arg->v ? atoi(((char *)arg->v) + floating_only) : 0;
     int j;
     Client* c;
-    if(tag >= 0 && tag < LENGTH(tags))
+    if (tag >= 0 && tag < LENGTH(tags))
         for(c = selmon->clients; c; c = c->next)
         {
-            if(!floating_only || c->isfloating)
+            if (!floating_only || c->isfloating)
                 for(j = 0; j < LENGTH(tags); j++)
                 {
-                    if(c->tags & 1 << j && selmon->tagset[selmon->seltags] & 1 << j)
+                    if (c->tags & 1 << j && selmon->tagset[selmon->seltags] & 1 << j)
                     {
                         c->tags = c->tags ^ (1 << j & TAGMASK);
                         c->tags = c->tags | 1 << (1-tag);
@@ -3321,7 +3321,7 @@ togglefakefullscreen(const Arg *arg)
 void
 tabmode(const Arg *arg)
 {
-    if(arg && arg->i >= 0)
+    if (arg && arg->i >= 0)
         selmon->showtab = arg->ui % showtab_nmodes;
     else
         selmon->showtab = (selmon->showtab + 1 ) % showtab_nmodes;
@@ -3337,7 +3337,7 @@ togglefloating(const Arg *arg)
     if (selmon->sel->isfullscreen && selmon->sel->fakefullscreen != 1) /* no support for fullscreen windows */
         return;
     selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
-    if(selmon->sel->isfloating) {
+    if (selmon->sel->isfloating) {
         if (selmon->sel->issticky)
             XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColStickyFloat].pixel);
         else if (selmon->sel->fakefullscreen)
@@ -3421,7 +3421,7 @@ togglesticky(const Arg *arg)
 void
 togglefullscr(const Arg *arg)
 {
-  if(selmon->sel) {
+  if (selmon->sel) {
     setfullscreen(selmon->sel, !selmon->sel->isfullscreen);
   }
 }
@@ -3595,11 +3595,11 @@ unfocus(Client *c, int setfocus)
     if (!c)
         return;
     grabbuttons(c, 0);
-    if(c->fakefullscreen && c->isfloating)
+    if (c->fakefullscreen && c->isfloating)
         XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColFakeFullscrFloat].pixel);
-    else if(c->fakefullscreen)
+    else if (c->fakefullscreen)
         XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColFakeFullscr].pixel);
-    else if(c->isfloating && c->issticky)
+    else if (c->isfloating && c->issticky)
         XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColStickyFloat].pixel);
     else if (c->issticky)
         XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColSticky].pixel);
@@ -3736,10 +3736,10 @@ updatebarpos(Monitor *m)
     }
 
     for(c = m->clients; c; c = c->next) {
-        if(ISVISIBLE(c)) ++nvis;
+        if (ISVISIBLE(c)) ++nvis;
     }
 
-    if(m->showtab == showtab_always
+    if (m->showtab == showtab_always
        || ((m->showtab == showtab_auto) && (nvis > 1) && (m->lt[m->sellt]->arrange == monocle))) {
         m->wh -= th;
         m->ty = m->toptab ? m->wy : m->wy + m->wh;
@@ -3825,7 +3825,7 @@ updategeom(void)
                     m->clients = c->next;
                     detachstack(c);
                     c->mon = mons;
-                    if( attachbelow )
+                    if ( attachbelow )
                         attachBelow(c);
                     else
                         attach(c);
@@ -4107,7 +4107,7 @@ view(const Arg *arg)
     int i;
     unsigned int tmptag;
 
-    if(arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
+    if (arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
         view(&((Arg) { .ui = 0 }));
         return;
     }
@@ -4403,14 +4403,14 @@ Monitor *
 systraytomon(Monitor *m) {
     Monitor *t;
     int i, n;
-    if(!systraypinning) {
-        if(!m)
+    if (!systraypinning) {
+        if (!m)
             return selmon;
         return m == selmon ? m : NULL;
     }
     for(n = 1, t = mons; t && t->next; n++, t = t->next) ;
     for(i = 1, t = mons; t && t->next && i < systraypinning; i++, t = t->next) ;
-    if(systraypinningfailfirst && n < systraypinning)
+    if (systraypinningfailfirst && n < systraypinning)
         return mons;
     return t;
 }
@@ -4482,7 +4482,7 @@ main(int argc, char *argv[])
 #endif /* __OpenBSD__ */
     scan();
     run();
-    if(restart) execvp(argv[0], argv);
+    if (restart) execvp(argv[0], argv);
     cleanup();
     XCloseDisplay(dpy);
     return EXIT_SUCCESS;
@@ -4556,7 +4556,7 @@ insertclient(Client *item, Client *insertItem, int after) {
 void
 inplacerotate(const Arg *arg)
 {
-    if(!selmon->sel || (selmon->sel->isfloating && !arg->f)) return;
+    if (!selmon->sel || (selmon->sel->isfloating && !arg->f)) return;
 
     unsigned int selidx = 0, i = 0;
     Client *c = NULL, *stail = NULL, *mhead = NULL, *mtail = NULL, *shead = NULL;
