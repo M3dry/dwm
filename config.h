@@ -180,7 +180,7 @@ static const Rule rules[] = {
     { NULL,       NULL,       NULL, WTYPE "SPLASH",  0,        0,          1,         1,         0,          0,         0,        -1, 0 },
 };
 
-static const TagRule tagrules[9] = {
+static const TagRule tagrules[LENGTH(tags) + 1] = {
     /* showbar topbar vacant layout gapih gapiv gapoh gapov smartgaps vpad spad borderpx nmaster mfact */
     {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },
     {  1,      1,     1,     0,     0,    0,    0,    0,    1,        0,   0,   1,       1,      0.5 },

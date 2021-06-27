@@ -1136,27 +1136,27 @@ createmon(void)
 
      for (i = 0; i <= LENGTH(tags); i++) {
          /* init nmaster */
-         m->pertag->nmasters[i] = tagrules[i - 1].nmaster;
+         m->pertag->nmasters[i] = tagrules[i].nmaster;
 
          /* init mfacts */
-         m->pertag->mfacts[i] = tagrules[i - 1].mfact;
+         m->pertag->mfacts[i] = tagrules[i].mfact;
 
          /* init layouts */
          m->pertag->ltidxs[i][0] = m->lt[0];
          m->pertag->ltidxs[i][1] = m->lt[1];
-         m->pertag->sellts[i] = tagrules[i - 1].layout;
+         m->pertag->sellts[i] = tagrules[i].layout;
 
          /* init showbar */
-         m->pertag->showbars[i] = tagrules[i - 1].showbar;
+         m->pertag->showbars[i] = tagrules[i].showbar;
 
          m->pertag->enablegaps[i] = 1;
-         m->pertag->gaps[i] = ((tagrules[i - 1].gapoh & 0xFF) << 0) | ((tagrules[i - 1].gapov & 0xFF) << 8) | ((tagrules[i - 1].gapih & 0xFF) << 16) | ((tagrules[i - 1].gapiv & 0xFF) << 24);
-         m->pertag->vertpd[i] = tagrules[i - 1].vpad;
-         m->pertag->sidepd[i] = tagrules[i - 1].spad;
-         m->pertag->topbar[i] = tagrules[i - 1].topbar;
-         m->pertag->smartgaps[i] = tagrules[i - 1].smartgaps;
-         m->pertag->vactags[i] = tagrules[i - 1].vacant;
-         m->pertag->borderpx[i] = tagrules[i - 1].borderpx;
+         m->pertag->gaps[i] = ((tagrules[i].gapoh & 0xFF) << 0) | ((tagrules[i].gapov & 0xFF) << 8) | ((tagrules[i].gapih & 0xFF) << 16) | ((tagrules[i].gapiv & 0xFF) << 24);
+         m->pertag->vertpd[i] = tagrules[i].vpad;
+         m->pertag->sidepd[i] = tagrules[i].spad;
+         m->pertag->topbar[i] = tagrules[i].topbar;
+         m->pertag->smartgaps[i] = tagrules[i].smartgaps;
+         m->pertag->vactags[i] = tagrules[i].vacant;
+         m->pertag->borderpx[i] = tagrules[i].borderpx;
     }
     return m;
 }
