@@ -246,7 +246,6 @@ static Key keys[] = {
 {A|S,    -1,    XK_w,                    spawn,                SHCMD("Booky 'firefox' '_' 'Bconfig'") },
 {A,      -1,    XK_z,                    spawn,                SHCMD("music-changer cmus") },
 {A|S,    XK_d,  XK_s,                    spawn,                SHCMD("switch") },
-{A|S,    XK_d,  XK_e,                    spawn,                SHCMD("emoji-script") },
 {A|S,    XK_d,  XK_c,                    spawn,                SHCMD("calc") },
 {A|S,    XK_d,  XK_p,                    spawn,                SHCMD("passmenu2 -F -p 'Passwords'") },
 {A|S,    XK_d,  XK_v,                    spawn,                SHCMD("manview") },
