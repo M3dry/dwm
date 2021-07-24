@@ -1,9 +1,6 @@
-/*, stw* See LICENSE file for copyright and license details.
+/* See LICENSE file for copyright and license details.
  *
  * dynamic window manager is designed like any other X client as well. It is
- * driven through handling X events. In contrast to other X clients, a window
- * manager selects for SubstructureRedirectMask on the root window, to receive
- * events about window (dis-)appearance. Only one X connection at a time is
  * allowed to select for this event mask.
  *
  * The event handlers of dwm are organized in an array which is accessed
@@ -401,7 +398,7 @@ static Client *termforwin(const Client *c);
 static pid_t winpid(Window w);
 
 /* variables */
-static Systray *systray =  NULL;
+static Systray *systray = NULL;
 static Client *prevzoom = NULL;
 static const char broken[] = "broken";
 static char stext[1024];
@@ -481,10 +478,12 @@ comboview(const Arg *arg)
     int i;
     unsigned int tmptag;
     unsigned newtags = arg->ui & TAGMASK;
+
     if (arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
-        view(&((Arg) { .ui = 0 }));
+        comboview(&((Arg) { .ui = 0 }));
         return;
     }
+
     if (combo) {
         selmon->tagset[selmon->seltags] |= newtags;
     } else {
@@ -502,34 +501,36 @@ comboview(const Arg *arg)
                         selmon->pertag->curtag = i + 1;
                 }
             }
-            } else {
+        } else {
                 tmptag = selmon->pertag->prevtag;
                 selmon->pertag->prevtag = selmon->pertag->curtag;
                 selmon->pertag->curtag = tmptag;
-            }
-            selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
-            selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
-            selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
-            selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
-            selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
+        }
 
-            selmon->gappoh = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff) >> 0;
-            selmon->gappov = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff00) >> 8;
-            selmon->gappih = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff0000) >> 16;
-            selmon->gappiv = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff000000) >> 24;
-            selmon->smartgaps = selmon->pertag->smartgaps[selmon->pertag->curtag];
-            selmon->vactag = selmon->pertag->vactags[selmon->pertag->curtag];
-            selmon->borderpx = selmon->pertag->borderpx[selmon->pertag->curtag];
+        selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+        selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
+        selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+        selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+        selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
 
-            selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag];
-            selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag];
-            selmon->topbar = selmon->pertag->topbar[selmon->pertag->curtag];
+        selmon->gappoh = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff) >> 0;
+        selmon->gappov = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff00) >> 8;
+        selmon->gappih = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff0000) >> 16;
+        selmon->gappiv = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff000000) >> 24;
 
-            if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-                togglebar(NULL);
+        selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag];
+        selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag];
+        selmon->smartgaps = selmon->pertag->smartgaps[selmon->pertag->curtag];
+        selmon->vactag = selmon->pertag->vactags[selmon->pertag->curtag];
+        selmon->borderpx = selmon->pertag->borderpx[selmon->pertag->curtag];
+        selmon->topbar = selmon->pertag->topbar[selmon->pertag->curtag];
+        selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag];
+
     }
+
     focus(NULL);
     arrange(selmon);
+    updatecurrentdesktop();
 }
 
 void
@@ -1134,30 +1135,23 @@ createmon(void)
         die("fatal: could not malloc() %u bytes\n", sizeof(Pertag));
     m->pertag->curtag = m->pertag->prevtag = 1;
 
-     for (i = 0; i <= LENGTH(tags); i++) {
-         /* init nmaster */
-         m->pertag->nmasters[i] = tagrules[i].nmaster;
-
-         /* init mfacts */
-         m->pertag->mfacts[i] = tagrules[i].mfact;
-
-         /* init layouts */
-         m->pertag->ltidxs[i][0] = m->lt[0];
-         m->pertag->ltidxs[i][1] = m->lt[1];
-         m->pertag->sellts[i] = tagrules[i].layout;
-
-         /* init showbar */
-         m->pertag->showbars[i] = tagrules[i].showbar;
-
-         m->pertag->enablegaps[i] = 1;
-         m->pertag->gaps[i] = ((tagrules[i].gapoh & 0xFF) << 0) | ((tagrules[i].gapov & 0xFF) << 8) | ((tagrules[i].gapih & 0xFF) << 16) | ((tagrules[i].gapiv & 0xFF) << 24);
-         m->pertag->vertpd[i] = tagrules[i].vpad;
-         m->pertag->sidepd[i] = tagrules[i].spad;
-         m->pertag->topbar[i] = tagrules[i].topbar;
-         m->pertag->smartgaps[i] = tagrules[i].smartgaps;
-         m->pertag->vactags[i] = tagrules[i].vacant;
-         m->pertag->borderpx[i] = tagrules[i].borderpx;
+     for (i = 0; i < LENGTH(tags); i++) {
+         m->pertag->nmasters[i+1] = tagrules[i].nmaster;
+         m->pertag->mfacts[i+1] = tagrules[i].mfact;
+         m->pertag->ltidxs[i+1][0] = m->lt[0];
+         m->pertag->ltidxs[i+1][1] = m->lt[1];
+         m->pertag->sellts[i+1] = tagrules[i].layout;
+         m->pertag->showbars[i+1] = tagrules[i].showbar;
+         m->pertag->enablegaps[i+1] = 1;
+         m->pertag->gaps[i+1] = ((tagrules[i].gapoh & 0xFF) << 0) | ((tagrules[i].gapov & 0xFF) << 8) | ((tagrules[i].gapih & 0xFF) << 16) | ((tagrules[i].gapiv & 0xFF) << 24);
+         m->pertag->vertpd[i+1] = tagrules[i].vpad;
+         m->pertag->sidepd[i+1] = tagrules[i].spad;
+         m->pertag->topbar[i+1] = tagrules[i].topbar;
+         m->pertag->smartgaps[i+1] = tagrules[i].smartgaps;
+         m->pertag->vactags[i+1] = tagrules[i].vacant;
+         m->pertag->borderpx[i+1] = tagrules[i].borderpx;
     }
+
     return m;
 }
 
@@ -4129,6 +4123,7 @@ view(const Arg *arg)
         selmon->pertag->prevtag = selmon->pertag->curtag;
         selmon->pertag->curtag = tmptag;
     }
+
     selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
     selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
     selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
@@ -4142,10 +4137,12 @@ view(const Arg *arg)
 
     selmon->vp = selmon->pertag->vertpd[selmon->pertag->curtag];
     selmon->sp = selmon->pertag->sidepd[selmon->pertag->curtag];
+    selmon->smartgaps = selmon->pertag->smartgaps[selmon->pertag->curtag];
+    selmon->vactag = selmon->pertag->vactags[selmon->pertag->curtag];
+    selmon->borderpx = selmon->pertag->borderpx[selmon->pertag->curtag];
     selmon->topbar = selmon->pertag->topbar[selmon->pertag->curtag];
+    selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag];
 
-    if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-        togglebar(NULL);
     focus(NULL);
     arrange(selmon);
     updatecurrentdesktop();
@@ -4564,12 +4561,12 @@ inplacerotate(const Arg *arg)
     // Determine positionings for insertclient
     for (c = selmon->clients; c; c = c->next) {
         if (ISVISIBLE(c) && !(c->isfloating)) {
-        if (selmon->sel == c) { selidx = i; }
-        if (i == selmon->nmaster - 1) { mtail = c; }
-        if (i == selmon->nmaster) { shead = c; }
-        if (mhead == NULL) { mhead = c; }
-        stail = c;
-        i++;
+            if (selmon->sel == c) selidx = i;
+            if (i == selmon->nmaster - 1) mtail = c;
+            if (i == selmon->nmaster) shead = c;
+            if (mhead == NULL) mhead = c;
+            stail = c;
+            i++;
         }
     }
 
