@@ -19,6 +19,7 @@
  */
 #include <ctype.h>
 #include <errno.h>
+#include <limits.h>
 #include <locale.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -118,6 +119,7 @@ struct Client {
     float mina, maxa;
     float cfact;
     int x, y, w, h;
+	int sfx, sfy, sfw, sfh; /* stored float geometry, used on mode revert */
     int oldx, oldy, oldw, oldh;
     int basew, baseh, incw, inch, maxw, maxh, minw, minh;
     int bw, oldbw;
@@ -338,7 +340,7 @@ static void tag(const Arg *arg);
 static void tagall(const Arg *arg);
 static void tagwith(const Arg *arg);
 static void tagmon(const Arg *arg);
-static void killontag(const Arg *arg);
+static void killontag(Arg *arg);
 static void focusnextmon(const Arg *arg);
 static void focusprevmon(const Arg *arg);
 static void focusothermon(const Arg *arg, int dir);
@@ -897,6 +899,7 @@ cleanup(void)
         drw_cur_free(drw, cursor[i]);
     for (i = 0; i < LENGTH(colors) + 1; i++)
         free(scheme[i]);
+ 	free(scheme);
     XDestroyWindow(dpy, wmcheckwin);
     drw_free(drw);
     XSync(dpy, False);
@@ -919,6 +922,7 @@ cleanupmon(Monitor *mon)
     XDestroyWindow(dpy, mon->barwin);
     XUnmapWindow(dpy, mon->tabwin);
     XDestroyWindow(dpy, mon->tabwin);
+ 	free(mon->pertag);
     free(mon);
 }
 
@@ -1082,6 +1086,10 @@ configurerequest(XEvent *e)
                 c->oldh = c->h;
                 c->h = ev->height;
             }
+			if ((c->x + c->w) > m->mx + m->mw && c->isfloating)
+				c->x = m->mx + (m->mw / 2 - WIDTH(c) / 2); /* center in x direction */
+			if ((c->y + c->h) > m->my + m->mh && c->isfloating)
+				c->y = m->my + (m->mh / 2 - HEIGHT(c) / 2); /* center in y direction */
             if ((ev->value_mask & (CWX|CWY)) && !(ev->value_mask & (CWWidth|CWHeight)))
                 configure(c);
             if (ISVISIBLE(c))
@@ -1425,20 +1433,14 @@ drawbar(Monitor *m)
     /* Drawing client number indicator (same color as layout symbol) */
     if (n > 1) {
         drw_setscheme(drw, scheme[m == selmon ? SchemeClientNum : SchemeInvMon]);
-        if (m->vactag)
-            snprintf(ntext, sizeof ntext, " {%u}", n);
-        else
-            snprintf(ntext, sizeof ntext, " | {%u}", n);
+        snprintf(ntext, sizeof ntext, " {%u}", n);
         w = TEXTW(ntext);
         x = drw_text(drw, x, 0, w, bh, lrpad / 2, ntext, 0);
     }
 
     drw_setscheme(drw, scheme[m == selmon ? SchemeStatus : SchemeInvMon]);
     drw_rect(drw, x, 0, m->ww - x, bh, 1, 1);
-
-    sw = TEXTW(stext) - lrpad / 2 + 2;
-    sw = m->ww - drawstatusbar(m, bh, stext, stw);
-
+    drawstatusbar(m, bh, stext, stw);
     drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
 }
 
@@ -2199,62 +2201,62 @@ monocle(Monitor *m)
 void
 movemouse(const Arg *arg)
 {
-    int x, y, ocx, ocy, nx, ny;
-    Client *c;
-    Monitor *m;
-    XEvent ev;
-    Time lasttime = 0;
+	int x, y, ocx, ocy, nx, ny;
+	Client *c;
+	Monitor *m;
+	XEvent ev;
+	Time lasttime = 0;
 
-    if (!(c = selmon->sel))
-        return;
-    if (c->isfullscreen && c->fakefullscreen != 1) /* no support moving fullscreen windows by mouse */
-        return;
-    restack(selmon);
-    ocx = c->x;
-    ocy = c->y;
-    if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-        None, cursor[CurMove]->cursor, CurrentTime) != GrabSuccess)
-        return;
-    if (!getrootptr(&x, &y))
-        return;
-    do {
-        XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
-        switch(ev.type) {
-        case ConfigureRequest:
-        case Expose:
-        case MapRequest:
-            handler[ev.type](&ev);
-            break;
-        case MotionNotify:
-            if ((ev.xmotion.time - lasttime) <= (1000 / 60))
-                continue;
-            lasttime = ev.xmotion.time;
+	if (!(c = selmon->sel))
+		return;
+	if (c->isfullscreen && c->fakefullscreen != 1) /* no support moving fullscreen windows by mouse */
+		return;
+	restack(selmon);
+	ocx = c->x;
+	ocy = c->y;
+	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+		None, cursor[CurMove]->cursor, CurrentTime) != GrabSuccess)
+		return;
+	if (!getrootptr(&x, &y))
+		return;
+	do {
+		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
+		switch(ev.type) {
+		case ConfigureRequest:
+		case Expose:
+		case MapRequest:
+			handler[ev.type](&ev);
+			break;
+		case MotionNotify:
+			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
+				continue;
+			lasttime = ev.xmotion.time;
 
-            nx = ocx + (ev.xmotion.x - x);
-            ny = ocy + (ev.xmotion.y - y);
-            if (abs(selmon->wx - nx) < snap)
-                nx = selmon->wx;
-            else if (abs((selmon->wx + selmon->ww) - (nx + WIDTH(c))) < snap)
-                nx = selmon->wx + selmon->ww - WIDTH(c);
-            if (abs(selmon->wy - ny) < snap)
-                ny = selmon->wy;
-            else if (abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap)
-                ny = selmon->wy + selmon->wh - HEIGHT(c);
-            if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
-            && (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
-                togglefloating(NULL);
-            if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
-                resize(c, nx, ny, c->w, c->h, 1);
-            break;
-        }
-    } while (ev.type != ButtonRelease);
-    XUngrabPointer(dpy, CurrentTime);
-    if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
-        sendmon(c, m);
-        prevmon = selmon;
-        selmon = m;
-        focus(NULL);
-    }
+			nx = ocx + (ev.xmotion.x - x);
+			ny = ocy + (ev.xmotion.y - y);
+			if (abs(selmon->wx - nx) < snap)
+				nx = selmon->wx;
+			else if (abs((selmon->wx + selmon->ww) - (nx + WIDTH(c))) < snap)
+				nx = selmon->wx + selmon->ww - WIDTH(c);
+			if (abs(selmon->wy - ny) < snap)
+				ny = selmon->wy;
+			else if (abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap)
+				ny = selmon->wy + selmon->wh - HEIGHT(c);
+			if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
+			&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
+				togglefloating(NULL);
+			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
+				resize(c, nx, ny, c->w, c->h, 1);
+			break;
+		}
+	} while (ev.type != ButtonRelease);
+	XUngrabPointer(dpy, CurrentTime);
+	if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
+		sendmon(c, m);
+		prevmon = selmon;
+		selmon = m;
+		focus(NULL);
+	}
 }
 
 Client *
@@ -2449,63 +2451,79 @@ resizeclient(Client *c, int x, int y, int w, int h)
 void
 resizemouse(const Arg *arg)
 {
-    int ocx, ocy, nw, nh;
-    Client *c;
-    Monitor *m;
-    XEvent ev;
-    Time lasttime = 0;
+	int ocx, ocy, nw, nh;
+	int ocx2, ocy2, nx, ny;
+	Client *c;
+	Monitor *m;
+	XEvent ev;
+	int horizcorner, vertcorner;
+	int di;
+	unsigned int dui;
+	Window dummy;
+	Time lasttime = 0;
 
-    if (!(c = selmon->sel))
-        return;
-    if (c->isfullscreen && c->fakefullscreen != 1) /* no support resizing fullscreen windows by mouse */
-        return;
-    restack(selmon);
-    ocx = c->x;
-    ocy = c->y;
+	if (!(c = selmon->sel))
+		return;
+	if (c->isfullscreen && c->fakefullscreen != 1) /* no support resizing fullscreen windows by mouse */
+		return;
+	restack(selmon);
+	ocx = c->x;
+	ocy = c->y;
+	ocx2 = c->x + c->w;
+	ocy2 = c->y + c->h;
+	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+		None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess)
+		return;
+	if (!XQueryPointer (dpy, c->win, &dummy, &dummy, &di, &di, &nx, &ny, &dui))
+		return;
+	horizcorner = nx < c->w / 2;
+	vertcorner  = ny < c->h / 2;
+	XWarpPointer (dpy, None, c->win, 0, 0, 0, 0,
+			horizcorner ? (-c->bw) : (c->w + c->bw -1),
+			vertcorner  ? (-c->bw) : (c->h + c->bw -1));
+	do {
+		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
+		switch(ev.type) {
+		case ConfigureRequest:
+		case Expose:
+		case MapRequest:
+			handler[ev.type](&ev);
+			break;
+		case MotionNotify:
+			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
+				continue;
+			lasttime = ev.xmotion.time;
 
-    if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-        None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess)
-        return;
-    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
-    do {
-        XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
-        switch(ev.type) {
-        case ConfigureRequest:
-        case Expose:
-        case MapRequest:
-            handler[ev.type](&ev);
-            break;
-        case MotionNotify:
-            if ((ev.xmotion.time - lasttime) <= (1000 / 60))
-                continue;
-            lasttime = ev.xmotion.time;
+			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
+			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
+			nx = horizcorner ? ev.xmotion.x : c->x;
+			ny = vertcorner ? ev.xmotion.y : c->y;
+			nw = MAX(horizcorner ? (ocx2 - nx) : (ev.xmotion.x - ocx - 2 * c->bw + 1), 1);
+			nh = MAX(vertcorner ? (ocy2 - ny) : (ev.xmotion.y - ocy - 2 * c->bw + 1), 1);
 
-            nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
-            nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-
-            if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
-            && c->mon->wy + nh >= selmon->wy && c->mon->wy + nh <= selmon->wy + selmon->wh)
-            {
-                if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
-                && (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
-                    togglefloating(NULL);
-            }
-            if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
-                resize(c, c->x, c->y, nw, nh, 1);
-            break;
-        }
-    } while (ev.type != ButtonRelease);
-
-    XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
-    XUngrabPointer(dpy, CurrentTime);
-
-    while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
-    if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
-        sendmon(c, m);
-        prevmon = selmon;
-        selmon = m;
-        focus(NULL);
-    }
+			if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
+			&& c->mon->wy + nh >= selmon->wy && c->mon->wy + nh <= selmon->wy + selmon->wh)
+			{
+				if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
+				&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap))
+					togglefloating(NULL);
+			}
+			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
+				resize(c, nx, ny, nw, nh, 1);
+			break;
+		}
+	} while (ev.type != ButtonRelease);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0,
+		      horizcorner ? (-c->bw) : (c->w + c->bw - 1),
+		      vertcorner ? (-c->bw) : (c->h + c->bw - 1));
+	XUngrabPointer(dpy, CurrentTime);
+	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+	if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
+		sendmon(c, m);
+		prevmon = selmon;
+		selmon = m;
+		focus(NULL);
+	}
 }
 
 void
@@ -2590,9 +2608,10 @@ scan(void)
 }
 
 void
-killontag(const Arg *arg)
+killontag(Arg *arg)
 {
     Client *c = NULL;
+    arg->i = INT_MAX;
 
     view(arg);
 
@@ -2600,7 +2619,7 @@ killontag(const Arg *arg)
         return view(arg);
 
     for (c = selmon->clients; c; c = c->next) {
-        if (ISVISIBLE(c) && !c->ispermanent &&
+        if (ISVISIBLE(c) &&
             !sendevent(c, wmatom[WMDelete], NoEventMask, wmatom[WMDelete], CurrentTime, 0 , 0, 0)) {
             XGrabServer(dpy);
             XSetErrorHandler(xerrordummy);
@@ -3326,35 +3345,41 @@ tabmode(const Arg *arg)
 void
 togglefloating(const Arg *arg)
 {
-    if (!selmon->sel)
-        return;
-    if (selmon->sel->isfullscreen && selmon->sel->fakefullscreen != 1) /* no support for fullscreen windows */
-        return;
-    selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
-    if (selmon->sel->isfloating) {
+	if (!selmon->sel)
+		return;
+	if (selmon->sel->isfullscreen && selmon->sel->fakefullscreen != 1) /* no support for fullscreen windows */
+		return;
+	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
+	if(selmon->sel->isfloating) {
         if (selmon->sel->issticky)
-            XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColStickyFloat].pixel);
+		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColStickyFloat].pixel);
         else if (selmon->sel->fakefullscreen)
-            XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFakeFullscrFloat].pixel);
+		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFakeFullscrFloat].pixel);
         else
-            XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFloat].pixel);
-        resize(selmon->sel, selmon->sel->x, selmon->sel->y,
-               selmon->sel->w, selmon->sel->h, 0);
+		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFloat].pixel);
+		/* restore last known float dimensions */
+		resize(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
+		       selmon->sel->sfw, selmon->sel->sfh, False);
     } else {
         if (selmon->sel->issticky)
-            XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColSticky].pixel);
+		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColSticky].pixel);
         else if (selmon->sel->fakefullscreen)
-            XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFakeFullscr].pixel);
+		    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSel][ColFakeFullscr].pixel);
         else {
             for (unsigned int i = 0; i < 9; i++) {
                 if (&layouts[i] == selmon->lt[selmon->sellt]) {
-                    XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSelLayout][i].pixel);
+		            XSetWindowBorder(dpy, selmon->sel->win, scheme[SchemeSelLayout][i].pixel);
                     break;
                 }
             }
         }
-    }
-    arrange(selmon);
+		/* save last known float dimensions */
+		selmon->sel->sfx = selmon->sel->x;
+		selmon->sel->sfy = selmon->sel->y;
+		selmon->sel->sfw = selmon->sel->w;
+		selmon->sel->sfh = selmon->sel->h;
+	}
+	arrange(selmon);
 }
 
 void
@@ -4101,7 +4126,7 @@ view(const Arg *arg)
     int i;
     unsigned int tmptag;
 
-    if (arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]) {
+    if (arg->ui && (arg->ui & TAGMASK) == selmon->tagset[selmon->seltags] && arg->i != INT_MAX) {
         view(&((Arg) { .ui = 0 }));
         return;
     }
