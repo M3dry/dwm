@@ -224,7 +224,6 @@ static Key keys[] = {
 {A,      -1,    XK_Return,               spawn,                SHCMD("$TERMINAL") },
 {A|S,    -1,    XK_c,                    spawn,                SHCMD("$TERMINAL htop") },
 {A|S,    -1,    XK_z,                    spawn,                SHCMD("playerctl play-pause") },
-{A,      -1,    XK_e,                    spawn,                SHCMD("$TERMINAL nvim") },
 {A|S,    XK_e,  XK_e,                    spawn,                SHCMD("emacsclient -c") },
 {A|S,    XK_e,  XK_c,                    spawn,                SHCMD("emacsclient -c -e '(ibuffer)'") },
 {A|S,    XK_e,  XK_d,                    spawn,                SHCMD("emacsclient -c -e '(dired nil)'") },
