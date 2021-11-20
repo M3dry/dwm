@@ -1,6 +1,8 @@
 enum showtab_modes { showtab_never, showtab_auto, showtab_nmodes, showtab_always};
 static const int showtab                   = showtab_never; /* Default tab bar show mode */
 static const int toptab                    = 0; /* False means bottom tab bar */
+static       int showpreview               = 0; /* show tag preview */
+static const int scalepreview              = 4; /* tag preview scaling */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
 static const int horizpadbar               = 0; /* horizontal padding for statusbar */
@@ -28,6 +30,7 @@ static       unsigned int smartgaps        = vertpad || sidepad ? 0 : 1; /* 1 me
 static       unsigned int padding          = vertpad || sidepad ? 1 : 0;
 static const int swallowfloating           = 1; /* 1 means swallow floating windows by default */
 static unsigned int borderpx               = 1; /* border pixel of windows */
+static unsigned int floatborderpx          = 2; /* border pixel of floating windows */
 static const unsigned int snap             = 0; /* snap pixel */
 static const int startontag                = 1; /* 0 means no tag active on start */
 static const int decorhints                = 1; /* 1 means respect decoration hints */
@@ -44,11 +47,11 @@ static const char invnormfg[]             = "#000000";
 static const char invselfg[]              = "#5fafff";
 static const char invselbg[]              = "#f0f0f0";
 
-static const char normfloatwinborder[]    = "#000000";
-static const char selfloatwinborder[]     = "#ffffff";
-static const char normstickyborder[]      = "#000000";
+static const char normfloatwinborder[]    = "#0f111b";
+static const char selfloatwinborder[]     = "#ff5370";
+static const char normstickyborder[]      = "#0f111b";
 static const char selstickyborder[]       = "#98be65";
-static const char normstickyfloatborder[] = "#000000";
+static const char normstickyfloatborder[] = "#0f111b";
 static const char selstickyfloatborder[]  = "#8acc35";
 static const char normfakefullscr[]       = "#408ab2";
 static const char selfakefullscr[]        = "#b869e5";
@@ -128,13 +131,14 @@ static const char ptagf[] = "[%s:%s]";
 static const char etagf[] = "%s";
 static const int lcaselbl = 0;
 
-static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL, NULL, NULL, "discord", "gimp" };
+static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL, NULL, "spotify", "discord", "gimp" };
 
 static const char *scpclean[] = {"u", NULL};
 static const char *scpcmus[]  = {"i", "st", "-c", "scpcmus",  "-t", "cmusSCP", "-e", "cmus", NULL};
 static const char *scpcal[]   = {"y", "qalculate-gtk", "--title", "calSCP", NULL};
 
 #define WTYPE "_NET_WM_WINDOW_TYPE_"
+
 static const Rule rules[] = {
     /* class      instance    title          wintype tags mask switchtotag isfloating iscentered ispermanent isterminal noswallow monitor scratch key */
     /* Scratchpads */
@@ -152,10 +156,10 @@ static const Rule rules[] = {
     { "Gimp",     NULL,       NULL,          NULL,   1 << 8,   3,          1,         1,         0,          0,         1,        -1, 0 },
     { NULL,       NULL,       "glxgears",    NULL,   0,        0,          1,         0,         0,          0,         1,        -1, 0 },
     /* General windows */
-    { NULL,       "discord",  NULL,          NULL,   1 << 7,   0,          0,         0,         0,          0,         0,        -1, 0 },
     { NULL,       "Navigator",NULL,          NULL,   1,        0,          0,         0,         1,          0,         1,        -1, 0 },
-    { NULL,       "nyxt",     NULL,          NULL,   1,        0,          0,         0,         1,          0,         1,        -1, 0 },
     { NULL,       "chromium", NULL,          NULL,   1 << 3,   0,          0,         0,         1,          0,         1,        -1, 0 },
+    { NULL,       "spotify",  NULL,          NULL,   1 << 6,   0,          0,         0,         0,          0,         0,        -1, 0 },
+    { NULL,       "discord",  NULL,          NULL,   1 << 7,   0,          0,         0,         0,          0,         0,        -1, 0 },
     /* Wintype */
     { NULL,       NULL,       NULL, WTYPE "DIALOG",  0,        0,          1,         1,         0,          0,         0,        -1, 0 },
     { NULL,       NULL,       NULL, WTYPE "UTILITY", 0,        0,          1,         1,         0,          0,         0,        -1, 0 },
@@ -212,11 +216,11 @@ static const Layout layouts[] = {
     { A|S,     -1,        KEY,   combotag,     {.ui = 1 << TAG} }, \
     { A|C,     -1,        KEY,   tagwith,      {.ui = 1 << TAG} }, \
     { M|S,     -1,        KEY,   swaptags,     {.ui = 1 << TAG} }, \
+    { A|C,     XK_q,      KEY,   killontag,    {.ui = 1 << TAG} }, \
     { A|C,     XK_comma,  KEY,   focusnextmon, {.ui = 1 << TAG} }, \
     { A|C,     XK_period, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
     { A|C|S,   XK_comma,  KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|C|S,   XK_period, KEY,   tagprevmon,   {.ui = 1 << TAG} }, \
-    { A|C,     XK_q,      KEY,   killontag,    {.ui = 1 << TAG} },
+    { A|C|S,   XK_period, KEY,   tagprevmon,   {.ui = 1 << TAG} },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
@@ -233,13 +237,14 @@ static Key keys[] = {
 {M,      -1,    XK_w,                    spawn,                SHCMD("xdo activate -N Chromium || chromium") },
 {A|C,    -1,    XK_KP_Down,              spawn,                SHCMD("xkill") },
 {A|C,    -1,    XK_d,                    spawn,                SHCMD("discord") },
+{A|C,    -1,    XK_s,                    spawn,                SHCMD("spotify") },
 {A|C,    -1,    XK_u,                    spawn,                SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png") },
 {A,      -1,    XK_p,                    spawn,                SHCMD("pcmanfm") },
 {A|C,    -1,    XK_m,                    spawn,                SHCMD("multimc") },
 {A|M|C,  -1,    XK_l,                    spawn,                SHCMD("slock") },
 {M,      -1,    XK_g,                    spawn,                SHCMD("xmenu.sh -p 0x0") },
 {A,      -1,    XK_r,                    spawndefault,         {0} },
-{A|S,    -1,    XK_Return,               spawn,                SHCMD("dmenu_run_history -l 5 -g 10 -p 'Run'") },
+{A|S,    -1,    XK_Return,               spawn,                SHCMD("dmenu_run_history -F -l 5 -g 10 -p 'Run'") },
 {A,      -1,    XK_c,                    spawn,                SHCMD("volume-script") },
 {A|C,    -1,    XK_Return,               spawn,                SHCMD("Booky 'st -e nvim' '><' 'Cconfig'") },
 {A|S,    -1,    XK_w,                    spawn,                SHCMD("Booky 'firefox' '_' 'Bconfig'") },
@@ -260,6 +265,7 @@ static Key keys[] = {
 {M,      -1,    XK_v,                    togglevacant,         {0} },
 {A|C,    -1,    XK_v,                    toggletopbar,         {0} },
 {M|S,    -1,    XK_v,                    togglepadding,        {0} },
+{A|S,    -1,    XK_p,                    togglepreview,        {0} },
 {A,      -1,    XK_n,                    togglebar,            {0} },
 {A|S,    -1,    XK_h,                    setmfact,             { .f = -0.05 } },
 {A|S,    -1,    XK_l,                    setmfact,             { .f = +0.05 } },
@@ -277,8 +283,6 @@ static Key keys[] = {
 {A,      -1,    XK_j,                    focusdir,             { .i = 3 } },
 {M|S,    -1,    XK_j,                    focusstack,           { .i = +1 } },
 {M|S,    -1,    XK_k,                    focusstack,           { .i = -1 } },
-{M|A,    -1,    XK_h,                    inplacerotate,        { .i = +2 } },
-{M|A,    -1,    XK_l,                    inplacerotate,        { .i = -2 } },
 {A,      -1,    XK_t,                    setlayout,            { .v = &layouts[0] }},
 {A,      -1,    XK_v,                    setlayout,            { .v = &layouts[1] }},
 {A|S,    -1,    XK_f,                    setlayout,            { .v = &layouts[2] }},
@@ -292,8 +296,8 @@ static Key keys[] = {
 {A|C,    -1,    XK_i,                    cyclelayout,          { .i = -1 } },
 {A|C,    -1,    XK_p,                    cyclelayout,          { .i = +1 } },
 {A,      -1,    XK_Tab,                  goback,               {0} },
-{A|S,    -1,    XK_n,                    shiftviewclients,     { .i = +1 } },
-{A|S,    -1,    XK_p,                    shiftviewclients,     { .i = -1 } },
+{A|S,    -1,    XK_bracketright,         viewnext,             {0} },
+{A|S,    -1,    XK_bracketleft,          viewprev,             {0} },
 {A|S,    -1,    XK_a,                    winview,              {0} },
 {A,      -1,    XK_semicolon,            zoom,                 {0} },
 {A|S,    -1,    XK_v,                    transfer,             {0} },
@@ -350,6 +354,7 @@ static Button buttons[] = {
     { ClkClientWin,         A,              Button1,        movemouse,      {0} },
     { ClkClientWin,         A,              Button2,        togglefloating, {0} },
     { ClkClientWin,         A,              Button3,        resizemouse,    {0} },
+    { ClkClientWin,         A|S,            Button2,        movecenter,     {0} },
     { ClkTabBar,            0,              Button1,        focuswin,       {0} },
 };
 
