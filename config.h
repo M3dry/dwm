@@ -210,17 +210,17 @@ static const Layout layouts[] = {
 #define C ControlMask
 
 #define TAGKEYS(KEY,TAG) \
-    { A,       -1,        KEY,   view,         {.ui = 1 << TAG} }, \
-    { C,       -1,        KEY,   toggleview,   {.ui = 1 << TAG} }, \
-    { M,       -1,        KEY,   toggletag,    {.ui = 1 << TAG} }, \
-    { A|S,     -1,        KEY,   combotag,     {.ui = 1 << TAG} }, \
-    { A|C,     -1,        KEY,   tagwith,      {.ui = 1 << TAG} }, \
-    { M|S,     -1,        KEY,   swaptags,     {.ui = 1 << TAG} }, \
-    { A|C,     XK_q,      KEY,   killontag,    {.ui = 1 << TAG} }, \
-    { A|C,     XK_comma,  KEY,   focusnextmon, {.ui = 1 << TAG} }, \
-    { A|C,     XK_period, KEY,   focusprevmon, {.ui = 1 << TAG} }, \
-    { A|C|S,   XK_comma,  KEY,   tagnextmon,   {.ui = 1 << TAG} }, \
-    { A|C|S,   XK_period, KEY,   tagprevmon,   {.ui = 1 << TAG} },
+    { A,       -1,        KEY,   view,               {.ui = 1 << TAG } }, \
+    { C,       -1,        KEY,   toggleview,         {.ui = 1 << TAG } }, \
+    { M,       -1,        KEY,   toggletag,          {.ui = 1 << TAG } }, \
+    { A|S,     -1,        KEY,   combotag,           {.ui = 1 << TAG } }, \
+    { A|C,     -1,        KEY,   tagwith,            {.ui = 1 << TAG } }, \
+    { M|S,     -1,        KEY,   swaptags,           {.ui = 1 << TAG } }, \
+    { A|C,     XK_q,      KEY,   killontag,          {.ui = 1 << TAG } }, \
+    { A|C,     XK_comma,  KEY,   focusnextmon,       {.ui = 1 << TAG } }, \
+    { A|C,     XK_period, KEY,   focusprevmon,       {.ui = 1 << TAG } }, \
+    { A|C|S,   XK_comma,  KEY,   tagnextmon,         {.ui = 1 << TAG } }, \
+    { A|C|S,   XK_period, KEY,   tagprevmon,         {.ui = 1 << TAG } },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
@@ -257,8 +257,8 @@ static Key keys[] = {
 {0,      -1,    XF86XK_AudioPrev,        spawn,                SHCMD("playerctl --player cmus previous") },
 {0,      -1,    XF86XK_AudioNext,        spawn,                SHCMD("playerctl --player cmus next") },
 {0,      -1,    XF86XK_AudioPlay,        spawn,                SHCMD("playerctl --player cmus play-pause") },
-{0,      -1,    XF86XK_AudioLowerVolume, spawn,                SHCMD("pamixer --allow-boost -d 1 ; killall dwmStatus ; dwmStatus &") },
-{0,      -1,    XF86XK_AudioRaiseVolume, spawn,                SHCMD("pamixer --allow-boost -i 1 ; killall dwmStatus ; dwmStatus &") },
+{0,      -1,    XF86XK_AudioLowerVolume, spawn,                SHCMD("pamixer --allow-boost -d 1 ; sdwm -v") },
+{0,      -1,    XF86XK_AudioRaiseVolume, spawn,                SHCMD("pamixer --allow-boost -i 1 ; sdwm -v") },
 {A,      -1,    XK_q,                    killclient,           {0} },
 {A|C|S,  -1,    XK_x,                    killpermanent,        {0} },
 {A|S,    -1,    XK_q,                    killunsel,            {0} },
