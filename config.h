@@ -210,135 +210,132 @@ static const Layout layouts[] = {
 #define C ControlMask
 
 #define TAGKEYS(KEY,TAG) \
-    { A,       -1,        KEY,   view,               {.ui = 1 << TAG } }, \
-    { C,       -1,        KEY,   toggleview,         {.ui = 1 << TAG } }, \
-    { M,       -1,        KEY,   toggletag,          {.ui = 1 << TAG } }, \
-    { A|S,     -1,        KEY,   combotag,           {.ui = 1 << TAG } }, \
-    { A|C,     -1,        KEY,   tagwith,            {.ui = 1 << TAG } }, \
-    { M|S,     -1,        KEY,   swaptags,           {.ui = 1 << TAG } }, \
-    { A|C,     XK_q,      KEY,   killontag,          {.ui = 1 << TAG } }, \
-    { A|C,     XK_comma,  KEY,   focusnextmon,       {.ui = 1 << TAG } }, \
-    { A|C,     XK_period, KEY,   focusprevmon,       {.ui = 1 << TAG } }, \
-    { A|C|S,   XK_comma,  KEY,   tagnextmon,         {.ui = 1 << TAG } }, \
-    { A|C|S,   XK_period, KEY,   tagprevmon,         {.ui = 1 << TAG } },
+    {1, {{A,     KEY}},                 view,          {.ui = 1 << TAG } }, \
+    {1, {{C,     KEY}},                 toggleview,    {.ui = 1 << TAG } }, \
+    {1, {{M,     KEY}},                 toggletag,     {.ui = 1 << TAG } }, \
+    {1, {{A|S,   KEY}},                 combotag,      {.ui = 1 << TAG } }, \
+    {1, {{A|C,   KEY}},                 tagwith,       {.ui = 1 << TAG } }, \
+    {1, {{M|S,   KEY}},                 swaptags,      {.ui = 1 << TAG } }, \
+    {2, {{A|C,   XK_q},      {0, KEY}}, killontag,     {.ui = 1 << TAG } }, \
+    {2, {{A|C,   XK_comma},  {0, KEY}}, focusprevmon,  {.ui = 1 << TAG } }, \
+    {2, {{A|C,   XK_period}, {0, KEY}}, focusnextmon,  {.ui = 1 << TAG } }, \
+    {2, {{A|C|S, XK_comma},  {0, KEY}}, tagprevmon,    {.ui = 1 << TAG } }, \
+    {2, {{A|C|S, XK_period}, {0, KEY}}, tagnextmon,    {.ui = 1 << TAG } },
 
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
-static Key keys[] = {
-{A,      -1,    XK_Return,               spawn,                SHCMD("$TERMINAL") },
-{A|S,    -1,    XK_c,                    spawn,                SHCMD("$TERMINAL htop") },
-{A|S,    -1,    XK_z,                    spawn,                SHCMD("playerctl play-pause") },
-{A|S,    XK_e,  XK_e,                    spawn,                SHCMD("emacsclient -c") },
-{A|S,    XK_e,  XK_c,                    spawn,                SHCMD("emacsclient -c -e '(ibuffer)'") },
-{A|S,    XK_e,  XK_d,                    spawn,                SHCMD("emacsclient -c -e '(dired nil)'") },
-{A|S,    XK_e,  XK_f,                    spawn,                SHCMD("emacsclient -c -e '(elfeed)'") },
-{A,      -1,    XK_s,                    spawn,                SHCMD("~/.emacs.d/bin/doom everywhere") },
-{A,      -1,    XK_w,                    spawn,                SHCMD("xdo activate -N firefox || firefox") },
-{M,      -1,    XK_w,                    spawn,                SHCMD("xdo activate -N Chromium || chromium") },
-{A|C,    -1,    XK_KP_Down,              spawn,                SHCMD("xkill") },
-{A|C,    -1,    XK_d,                    spawn,                SHCMD("discord") },
-{A|C,    -1,    XK_s,                    spawn,                SHCMD("spotify") },
-{A|C,    -1,    XK_u,                    spawn,                SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png") },
-{A,      -1,    XK_p,                    spawn,                SHCMD("pcmanfm") },
-{A|C,    -1,    XK_m,                    spawn,                SHCMD("multimc") },
-{A|M|C,  -1,    XK_l,                    spawn,                SHCMD("slock") },
-{M,      -1,    XK_g,                    spawn,                SHCMD("xmenu.sh -p 0x0") },
-{A,      -1,    XK_r,                    spawndefault,         {0} },
-{A|S,    -1,    XK_Return,               spawn,                SHCMD("dmenu_run_history -F -l 5 -g 10 -p 'Run'") },
-{A,      -1,    XK_c,                    spawn,                SHCMD("volume-script") },
-{A|C,    -1,    XK_Return,               spawn,                SHCMD("Booky 'st -e nvim' '><' 'Cconfig'") },
-{A|S,    -1,    XK_w,                    spawn,                SHCMD("Booky 'firefox' '_' 'Bconfig'") },
-{A,      -1,    XK_z,                    spawn,                SHCMD("music-changer cmus") },
-{A|S,    XK_d,  XK_s,                    spawn,                SHCMD("switch") },
-{A|S,    XK_d,  XK_c,                    spawn,                SHCMD("calc") },
-{A|S,    XK_d,  XK_p,                    spawn,                SHCMD("passmenu2 -F -p 'Passwords'") },
-{A|S,    XK_d,  XK_v,                    spawn,                SHCMD("manview") },
-{A|S,    XK_d,  XK_q,                    spawn,                SHCMD("shut") },
-{0,      -1,    XF86XK_AudioPrev,        spawn,                SHCMD("playerctl --player cmus previous") },
-{0,      -1,    XF86XK_AudioNext,        spawn,                SHCMD("playerctl --player cmus next") },
-{0,      -1,    XF86XK_AudioPlay,        spawn,                SHCMD("playerctl --player cmus play-pause") },
-{0,      -1,    XF86XK_AudioLowerVolume, spawn,                SHCMD("pamixer --allow-boost -d 1 ; sdwm -v") },
-{0,      -1,    XF86XK_AudioRaiseVolume, spawn,                SHCMD("pamixer --allow-boost -i 1 ; sdwm -v") },
-{A,      -1,    XK_q,                    killclient,           {0} },
-{A|C|S,  -1,    XK_x,                    killpermanent,        {0} },
-{A|S,    -1,    XK_q,                    killunsel,            {0} },
-{M,      -1,    XK_v,                    togglevacant,         {0} },
-{A|C,    -1,    XK_v,                    toggletopbar,         {0} },
-{M|S,    -1,    XK_v,                    togglepadding,        {0} },
-{A|S,    -1,    XK_p,                    togglepreview,        {0} },
-{A,      -1,    XK_n,                    togglebar,            {0} },
-{A|S,    -1,    XK_h,                    setmfact,             { .f = -0.05 } },
-{A|S,    -1,    XK_l,                    setmfact,             { .f = +0.05 } },
-{M|C,    -1,    XK_u,                    setmfact,             { .f = mfact + 1 } },
-{A|S,    -1,    XK_j,                    setcfact,             { .f = +0.25 } },
-{A|S,    -1,    XK_k,                    setcfact,             { .f = -0.25 } },
-{M|C|S,  -1,    XK_u,                    setcfact,             {0} },
-{A,      -1,    XK_bracketleft,          incnmaster,           { .i = +1 } },
-{A,      -1,    XK_bracketright,         incnmaster,           { .i = -1 } },
-{M,      -1,    XK_space,                focusmaster,          {0} },
-{A|C,    -1,    XK_space,                switchcol,            {0} },
-{A,      -1,    XK_h,                    focusdir,             { .i = 0 } },
-{A,      -1,    XK_l,                    focusdir,             { .i = 1 } },
-{A,      -1,    XK_k,                    focusdir,             { .i = 2 } },
-{A,      -1,    XK_j,                    focusdir,             { .i = 3 } },
-{M|S,    -1,    XK_j,                    focusstack,           { .i = +1 } },
-{M|S,    -1,    XK_k,                    focusstack,           { .i = -1 } },
-{A,      -1,    XK_t,                    setlayout,            { .v = &layouts[0] }},
-{A,      -1,    XK_v,                    setlayout,            { .v = &layouts[1] }},
-{A|S,    -1,    XK_f,                    setlayout,            { .v = &layouts[2] }},
-{A,      -1,    XK_d,                    setlayout,            { .v = &layouts[3] }},
-{A,      -1,    XK_g,                    setlayout,            { .v = &layouts[4] }},
-{A,      -1,    XK_b,                    setlayout,            { .v = &layouts[5] }},
-{A|S,    -1,    XK_m,                    setlayout,            { .v = &layouts[6] }},
-{A,      -1,    XK_m,                    setlayout,            { .v = &layouts[7] }},
-{A|S,    -1,    XK_g,                    setlayout,            { .v = &layouts[8] }},
-{A|S,    -1,    XK_t,                    tabmode,              {-1} },
-{A|C,    -1,    XK_i,                    cyclelayout,          { .i = -1 } },
-{A|C,    -1,    XK_p,                    cyclelayout,          { .i = +1 } },
-{A,      -1,    XK_Tab,                  goback,               {0} },
-{A|S,    -1,    XK_bracketright,         viewnext,             {0} },
-{A|S,    -1,    XK_bracketleft,          viewprev,             {0} },
-{A|S,    -1,    XK_a,                    winview,              {0} },
-{A,      -1,    XK_semicolon,            zoom,                 {0} },
-{A|S,    -1,    XK_v,                    transfer,             {0} },
-{M|C,    -1,    XK_j,                    pushdown,             {0} },
-{M|C,    -1,    XK_k,                    pushup,               {0} },
-{A|C,    -1,    XK_r,                    togglefloating,       {0} },
-{A|S,    -1,    XK_space,                unfloatvisible,       {0} },
-{A|S,    -1,    XK_s,                    togglesticky,         {0} },
-{A,      -1,    XK_f,                    togglefullscr,        {0} },
-{A|C,    -1,    XK_f,                    togglefakefullscreen, {0} },
-{A,      -1,    XK_u,                    togglescratch,        { .v = scpclean } },
-{A,      -1,    XK_i,                    togglescratch,        { .v = scpcmus } },
-{A,      -1,    XK_y,                    togglescratch,        { .v = scpcal } },
-{A|M,    -1,    XK_u,                    removescratch,        { .v = scpclean } },
-{A|M,    -1,    XK_i,                    removescratch,        { .v = scpcmus } },
-{A|M,    -1,    XK_y,                    removescratch,        { .v = scpcal } },
-{A|S,    -1,    XK_u,                    setscratch,           { .v = scpclean } },
-{A|S,    -1,    XK_i,                    setscratch,           { .v = scpcmus } },
-{A|S,    -1,    XK_y,                    setscratch,           { .v = scpcal } },
-{A,      -1,    XK_comma,                focusmon,             { .i = -1 } },
-{A,      -1,    XK_period,               focusmon,             { .i = +1 } },
-{A|S,    -1,    XK_comma,                tagmon,               { .i = -1 } },
-{A|S,    -1,    XK_period,               tagmon,               { .i = +1 } },
-{A|S,    -1,    XK_equal,                incrgaps,             { .i = +1 } },
-{A|S,    -1,    XK_minus,                incrgaps,             { .i = -1 } },
-{A|S,    -1,    XK_0,                    defaultgaps,          {0} },
-{A|C,    -1,    XK_0,                    togglegaps,           {0} },
-{A|C,    -1,    XK_equal,                setborderpx,          { .i = +1 } },
-{A|C,    -1,    XK_minus,                setborderpx,          { .i = -1 } },
-{M,      -1,    XK_0,                    setborderpx,          { .i = 0 } },
-{M|S,    -1,    XK_Escape,               quit,                 {0} },
-{A|C|S,  -1,    XK_q,                    quit,                 {1} },
-TAGKEYS( XK_1, 0)
-TAGKEYS( XK_2, 1)
-TAGKEYS( XK_3, 2)
-TAGKEYS( XK_4, 3)
-TAGKEYS( XK_5, 4)
-TAGKEYS( XK_6, 5)
-TAGKEYS( XK_7, 6)
-TAGKEYS( XK_8, 7)
-TAGKEYS( XK_9, 8)};
+Keychord keychords[] = {
+{1, {{A,      XK_Return}},               spawn,                SHCMD("$TERMINAL") },
+{1, {{A|S,    XK_c     }},               spawn,                SHCMD("$TERMINAL htop") },
+{1, {{A|S,    XK_z     }},               spawn,                SHCMD("playerctl play-pause") },
+{1, {{A,      XK_s}},                    spawn,                SHCMD("~/.emacs.d/bin/doom everywhere") },
+{1, {{A,      XK_w}},                    spawn,                SHCMD("xdo activate -N firefox || firefox") },
+{1, {{M,      XK_w}},                    spawn,                SHCMD("xdo activate -N Chromium || chromium") },
+{1, {{A|C,    XK_KP_Down}},              spawn,                SHCMD("xkill") },
+{1, {{A|C,    XK_d}},                    spawn,                SHCMD("discord") },
+{1, {{A|C,    XK_s}},                    spawn,                SHCMD("spotify") },
+{1, {{A|C,    XK_u}},                    spawn,                SHCMD("import my-stuff/Pictures/snips/$(date +'%F-%T').png") },
+{1, {{A,      XK_p}},                    spawn,                SHCMD("pcmanfm") },
+{1, {{A|C,    XK_m}},                    spawn,                SHCMD("multimc") },
+{1, {{A|M|C,  XK_l}},                    spawn,                SHCMD("slock") },
+{1, {{M,      XK_g}},                    spawn,                SHCMD("xmenu.sh -p 0x0") },
+{1, {{A,      XK_r}},                    spawndefault,         {0} },
+{1, {{A|S,    XK_Return}},               spawn,                SHCMD("dmenu_run_history -F -l 5 -g 10 -p 'Run'") },
+{1, {{A,      XK_c}},                    spawn,                SHCMD("volume-script") },
+{1, {{A|C,    XK_Return}},               spawn,                SHCMD("Booky 'st -e nvim' '><' 'Cconfig'") },
+{1, {{A|S,    XK_w}},                    spawn,                SHCMD("Booky 'firefox' '_' 'Bconfig'") },
+{1, {{A,      XK_z}},                    spawn,                SHCMD("cmus-rem") },
+{2, {{A|S,    XK_d}, {0, XK_s}},         spawn,                SHCMD("switch") },
+{2, {{A|S,    XK_d}, {0, XK_c}},         spawn,                SHCMD("calc") },
+{2, {{A|S,    XK_d}, {0, XK_p}},         spawn,                SHCMD("passmenu2 -F -p 'Passwords:'") },
+{2, {{A|S,    XK_d}, {0, XK_m}},         spawn,                SHCMD("manview") },
+{2, {{A|S,    XK_d}, {0, XK_q}},         spawn,                SHCMD("shut") },
+{1, {{0,      XF86XK_AudioPrev}},        spawn,                SHCMD("playerctl --player cmus previous") },
+{1, {{0,      XF86XK_AudioNext}},        spawn,                SHCMD("playerctl --player cmus next") },
+{1, {{0,      XF86XK_AudioPlay}},        spawn,                SHCMD("playerctl --player cmus play-pause") },
+{1, {{0,      XF86XK_AudioLowerVolume}}, spawn,                SHCMD("pamixer --allow-boost -d 1 ; sdwm -v") },
+{1, {{0,      XF86XK_AudioRaiseVolume}}, spawn,                SHCMD("pamixer --allow-boost -i 1 ; sdwm -v") },
+{1, {{A,      XK_q}},                    killclient,           {0} },
+{1, {{A|C|S,  XK_x}},                    killpermanent,        {0} },
+{1, {{A|S,    XK_q}},                    killunsel,            {0} },
+{1, {{M,      XK_v}},                    togglevacant,         {0} },
+{1, {{A|C,    XK_v}},                    toggletopbar,         {0} },
+{1, {{M|S,    XK_v}},                    togglepadding,        {0} },
+{1, {{A|S,    XK_p}},                    togglepreview,        {0} },
+{1, {{A,      XK_n}},                    togglebar,            {0} },
+{1, {{A|S,    XK_h}},                    setmfact,             { .f = -0.05 } },
+{1, {{A|S,    XK_l}},                    setmfact,             { .f = +0.05 } },
+{1, {{M|C,    XK_u}},                    setmfact,             { .f = mfact + 1 } },
+{1, {{A|S,    XK_j}},                    setcfact,             { .f = +0.25 } },
+{1, {{A|S,    XK_k}},                    setcfact,             { .f = -0.25 } },
+{1, {{M|C|S,  XK_u}},                    setcfact,             {0} },
+{1, {{A,      XK_bracketleft}},          incnmaster,           { .i = +1 } },
+{1, {{A,      XK_bracketright}},         incnmaster,           { .i = -1 } },
+{1, {{M,      XK_space}},                focusmaster,          {0} },
+{1, {{A|C,    XK_space}},                switchcol,            {0} },
+{1, {{A,      XK_h}},                    focusdir,             { .i = 0 } },
+{1, {{A,      XK_l}},                    focusdir,             { .i = 1 } },
+{1, {{A,      XK_k}},                    focusdir,             { .i = 2 } },
+{1, {{A,      XK_j}},                    focusdir,             { .i = 3 } },
+{1, {{M|S,    XK_j}},                    focusstack,           { .i = +1 } },
+{1, {{M|S,    XK_k}},                    focusstack,           { .i = -1 } },
+{1, {{A,      XK_t}},                    setlayout,            { .v = &layouts[0] }},
+{1, {{A,      XK_v}},                    setlayout,            { .v = &layouts[1] }},
+{1, {{A|S,    XK_f}},                    setlayout,            { .v = &layouts[2] }},
+{1, {{A,      XK_d}},                    setlayout,            { .v = &layouts[3] }},
+{1, {{A,      XK_g}},                    setlayout,            { .v = &layouts[4] }},
+{1, {{A,      XK_b}},                    setlayout,            { .v = &layouts[5] }},
+{1, {{A|S,    XK_m}},                    setlayout,            { .v = &layouts[6] }},
+{1, {{A,      XK_m}},                    setlayout,            { .v = &layouts[7] }},
+{1, {{A|S,    XK_g}},                    setlayout,            { .v = &layouts[8] }},
+{1, {{A|S,    XK_t}},                    tabmode,              {-1} },
+{1, {{A|C,    XK_i}},                    cyclelayout,          { .i = -1 } },
+{1, {{A|C,    XK_p}},                    cyclelayout,          { .i = +1 } },
+{1, {{A,      XK_Tab}},                  goback,               {0} },
+{1, {{A|S,    XK_bracketright}},         viewnext,             {0} },
+{1, {{A|S,    XK_bracketleft}},          viewprev,             {0} },
+{1, {{A|S,    XK_a}},                    winview,              {0} },
+{1, {{A,      XK_semicolon}},            zoom,                 {0} },
+{1, {{A|S,    XK_v}},                    transfer,             {0} },
+{1, {{M|C,    XK_j}},                    pushdown,             {0} },
+{1, {{M|C,    XK_k}},                    pushup,               {0} },
+{1, {{A|C,    XK_r}},                    togglefloating,       {0} },
+{1, {{A|S,    XK_space}},                unfloatvisible,       {0} },
+{1, {{A|S,    XK_s}},                    togglesticky,         {0} },
+{1, {{A,      XK_f}},                    togglefullscr,        {0} },
+{1, {{A|C,    XK_f}},                    togglefakefullscreen, {0} },
+{1, {{A,      XK_u}},                    togglescratch,        { .v = scpclean } },
+{1, {{A,      XK_i}},                    togglescratch,        { .v = scpcmus } },
+{1, {{A,      XK_y}},                    togglescratch,        { .v = scpcal } },
+{1, {{A|M,    XK_u}},                    removescratch,        { .v = scpclean } },
+{1, {{A|M,    XK_i}},                    removescratch,        { .v = scpcmus } },
+{1, {{A|M,    XK_y}},                    removescratch,        { .v = scpcal } },
+{1, {{A|S,    XK_u}},                    setscratch,           { .v = scpclean } },
+{1, {{A|S,    XK_i}},                    setscratch,           { .v = scpcmus } },
+{1, {{A|S,    XK_y}},                    setscratch,           { .v = scpcal } },
+{1, {{A,      XK_comma}},                focusmon,             { .i = -1 } },
+{1, {{A,      XK_period}},               focusmon,             { .i = +1 } },
+{1, {{A|S,    XK_comma}},                tagmon,               { .i = -1 } },
+{1, {{A|S,    XK_period}},               tagmon,               { .i = +1 } },
+{1, {{A|S,    XK_equal}},                incrgaps,             { .i = +1 } },
+{1, {{A|S,    XK_minus}},                incrgaps,             { .i = -1 } },
+{1, {{A|S,    XK_0}},                    defaultgaps,          {0} },
+{1, {{A|C,    XK_0}},                    togglegaps,           {0} },
+{1, {{A|C,    XK_equal}},                setborderpx,          { .i = +1 } },
+{1, {{A|C,    XK_minus}},                setborderpx,          { .i = -1 } },
+{1, {{M,      XK_0}},                    setborderpx,          { .i = 0 } },
+{1, {{M|S,    XK_Escape}},               quit,                 {0} },
+{1, {{A|C|S,  XK_q}},                    quit,                 {1} },
+TAGKEYS(XK_1, 0)
+TAGKEYS(XK_2, 1)
+TAGKEYS(XK_3, 2)
+TAGKEYS(XK_4, 3)
+TAGKEYS(XK_5, 4)
+TAGKEYS(XK_6, 5)
+TAGKEYS(XK_7, 6)
+TAGKEYS(XK_8, 7)
+TAGKEYS(XK_9, 8)
+};
 
 static Button buttons[] = {
     /* click                event mask      button          function        argument */

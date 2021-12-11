@@ -142,11 +142,15 @@ struct Client {
 
 typedef struct {
     unsigned int mod;
-    KeySym chain;
     KeySym keysym;
+} Key;
+
+typedef struct {
+    unsigned int n;
+    const Key keys[5];
     void (*func)(const Arg *);
     const Arg arg;
-} Key;
+} Keychord;
 
 typedef struct {
     const char * sig;
@@ -454,7 +458,7 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon, *prevmon;
 static Window root, wmcheckwin;
-static KeySym keychain = -1;
+unsigned int currentkey = 0;
 
 static xcb_connection_t *xcon;
 
@@ -1378,7 +1382,7 @@ drawbar(Monitor *m)
     int x, w, stw = 0;
     unsigned int i, occ = 0, urg = 0, n = 0;
     Client *c;
-    char tagdisp[64];
+    char tagdisp[24];
     char *masterclientontag[LENGTH(tags)];
     char ntext[16];
 
@@ -1386,6 +1390,7 @@ drawbar(Monitor *m)
         stw = getsystraywidth();
 
     resizebarwin(m);
+
     for (i = 0; i < LENGTH(tags); i++)
         masterclientontag[i] = NULL;
 
@@ -1405,6 +1410,9 @@ drawbar(Monitor *m)
                 masterclientontag[i] = ch.res_class;
                 if (lcaselbl)
                     masterclientontag[i][0] = tolower(masterclientontag[i][0]);
+                if (strlen(masterclientontag[i]) + strlen(ptagf) > 24) {
+                    masterclientontag[i][24 - strlen(ptagf)] = '\0';
+                }
             }
     }
 
@@ -1420,9 +1428,9 @@ drawbar(Monitor *m)
                 continue;
 
         if (masterclientontag[i])
-            snprintf(tagdisp, 64, ptagf, tags[i], masterclientontag[i]);
+            snprintf(tagdisp, 24, ptagf, tags[i], masterclientontag[i]);
         else
-            snprintf(tagdisp, 64, etagf, tags[i]);
+            snprintf(tagdisp, 24, etagf, tags[i]);
         masterclientontag[i] = tagdisp;
         tagw[i] = w = TEXTW(masterclientontag[i]);
         if (m->vactag)
@@ -1914,21 +1922,16 @@ grabkeys(void)
 {
     updatenumlockmask();
     {
-        unsigned int i, j;
+        unsigned int i, k;
         unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
         KeyCode code;
-        KeyCode chain;
 
         XUngrabKey(dpy, AnyKey, AnyModifier, root);
-        for (i = 0; i < LENGTH(keys); i++)
-            if ((code = XKeysymToKeycode(dpy, keys[i].keysym))) {
-                if (keys[i].chain != -1 &&
-                    ((chain = XKeysymToKeycode(dpy, keys[i].chain))))
-                        code = chain;
-                for (j = 0; j < LENGTH(modifiers); j++)
-                    XGrabKey(dpy, code, keys[i].mod | modifiers[j], root,
-                        True, GrabModeAsync, GrabModeAsync);
-            }
+        for (i = 0; i < LENGTH(keychords); i++)
+            if ((code = XKeysymToKeycode(dpy, keychords[i].keys[currentkey].keysym)))
+                for (k = 0; k < LENGTH(modifiers); k++)
+                    XGrabKey(dpy, code, keychords[i].keys[currentkey].mod | modifiers[k], root,
+                             True, GrabModeAsync, GrabModeAsync);
     }
 }
 
@@ -1954,37 +1957,50 @@ isuniquegeom(XineramaScreenInfo *unique, size_t n, XineramaScreenInfo *info)
 void
 keypress(XEvent *e)
 {
-    unsigned int i, j;
+    XEvent event = *e;
+    Keychord *keychord;
+    unsigned int ran = 0;
     KeySym keysym;
     XKeyEvent *ev;
-    int current = 0;
     unsigned int modifiers[] = { 0, LockMask, numlockmask, numlockmask|LockMask };
 
-    ev = &e->xkey;
-    keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
-    for (i = 0; i < LENGTH(keys); i++) {
-        if (keysym == keys[i].keysym && keys[i].chain == -1
-                && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
-                && keys[i].func)
-            keys[i].func(&(keys[i].arg));
-        else if (keysym == keys[i].chain && keychain == -1
-                && CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
-                && keys[i].func) {
-            current = 1;
-            keychain = keysym;
-            for (j = 0; j < LENGTH(modifiers); j++)
-                XGrabKey(dpy, AnyKey, 0 | modifiers[j], root,
-                        True, GrabModeAsync, GrabModeAsync);
-        } else if (!current && keysym == keys[i].keysym
-                && keychain != -1
-                && keys[i].chain == keychain
-                && keys[i].func)
-            keys[i].func(&(keys[i].arg));
-    }
-    if (!current) {
-        keychain = -1;
+    Keychord *newoptions;
+    Keychord *oldoptions = (Keychord *)malloc(sizeof(keychords));
+    
+    memcpy(oldoptions, keychords, sizeof(keychords));
+    size_t numoption = 0;
+    while(!ran){
+        ev = &event.xkey;
+        keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
+        newoptions = (Keychord *)malloc(0);
+        numoption = 0;
+        for (keychord = oldoptions; keychord->n != 0 && currentkey < 5; keychord = (Keychord *)((char *)keychord + sizeof(Keychord))){
+            if(keysym == keychord->keys[currentkey].keysym
+               && CLEANMASK(keychord->keys[currentkey].mod) == CLEANMASK(ev->state)
+               && keychord->func){
+                if(keychord->n == currentkey +1){
+                    keychord->func(&(keychord->arg));
+                    ran = 1;
+                }else{
+                    numoption++;
+                    newoptions = (Keychord *)realloc(newoptions, numoption * sizeof(Keychord));
+                    memcpy((char *)newoptions + (numoption -1) * sizeof(Keychord),keychord, sizeof(Keychord));
+                }
+            }
+        }
+        currentkey++;
+        if(numoption == 0)
+            break;
         grabkeys();
+        while (running && !XNextEvent(dpy, &event) && !ran)
+            if(event.type == KeyPress)
+                break;
+        free(oldoptions);
+        oldoptions = newoptions;
     }
+    free(newoptions);
+    currentkey = 0;
+    grabkeys();
 }
 
 int
@@ -3074,6 +3090,8 @@ setup(void)
 
     signal(SIGHUP, sighup);
     signal(SIGTERM, sigterm);
+
+ 	putenv("_JAVA_AWT_WM_NONREPARENTING=1");
 
     /* init screen */
     screen = DefaultScreen(dpy);
