@@ -35,7 +35,8 @@ static const unsigned int snap             = 0; /* snap pixel */
 static const int startontag                = 1; /* 0 means no tag active on start */
 static const int decorhints                = 1; /* 1 means respect decoration hints */
 static const int focusonwheel              = 0;
-static const char *fonts[] = { "Operator Mono SSm Lig Nerd Font:size=12:antialias=true:autohint=true" };
+//static const char *fonts[] = { "Operator Mono SSm Lig Nerd Font:size=12:antialias=true:autohint=true" };
+static const char *fonts[] = { "mononoki Nerd Font:size=12:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#4E5579";
 static const char selfg[]                 = "#5fafff";
