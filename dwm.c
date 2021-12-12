@@ -328,7 +328,6 @@ static void setcurrentdesktop(void);
 static void setdesktopnames(void);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
-static void setlasttag(int tagbit);
 static void setlayout(const Arg *arg);
 static void setcfact(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -345,7 +344,6 @@ static void sighup(int unused);
 static void sigterm(int unused);
 static void spawn(const Arg *arg);
 static void switchtag(void);
-static void spawndefault();
 static void spawnscratch(const Arg *arg);
 static void switchcol(const Arg *arg);
 static void swaptags(const Arg *arg);
@@ -462,9 +460,6 @@ unsigned int currentkey = 0;
 
 static xcb_connection_t *xcon;
 
-static int lastchosentag[8];
-static int previouschosentag[8];
-
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -510,7 +505,6 @@ comboview(const Arg *arg)
     if (combo) {
         selmon->tagset[selmon->seltags] |= newtags;
     } else {
-        setlasttag(arg->ui);
         switchtag();
         selmon->seltags ^= 1;    /*toggle tagset*/
         combo = 1;
@@ -2994,24 +2988,6 @@ setfullscreen(Client *c, int fullscreen)
 }
 
 void
-setlasttag(int tagbit) {
-    const int mon = selmon->num;
-    if (tagbit > 0) {
-        int i = 1, pos = 0;
-        while (!(i & tagbit)) {
-            i = i << 1;
-            ++pos;
-        }
-        previouschosentag[mon] = lastchosentag[mon];
-        lastchosentag[mon] = pos;
-    } else {
-        const int tempTag = lastchosentag[mon];
-        lastchosentag[mon] = previouschosentag[mon];
-        previouschosentag[mon] = tempTag;
-    }
-}
-
-void
 setlayout(const Arg *arg)
 {
     if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt]) {
@@ -3326,17 +3302,6 @@ swaptags(const Arg *arg)
 
     focus(NULL);
     arrange(selmon);
-}
-
-void
-spawndefault()
-{
-    const char *app = defaulttagapps[lastchosentag[selmon->num]];
-    if (app) {
-        const char *defaultcmd[] = {app, NULL};
-        Arg a = {.v = defaultcmd};
-        spawn(&a);
-    }
 }
 
 void
@@ -3747,7 +3712,6 @@ toggleview(const Arg *arg)
 
     switchtag();
     selmon->tagset[selmon->seltags] = newtagset;
-    setlasttag(newtagset);
     focus(NULL);
     arrange(selmon);
     updatecurrentdesktop();
@@ -4349,7 +4313,6 @@ view(const Arg *arg)
 
     prevmon = NULL;
     switchtag();
-    setlasttag(arg->ui);
     selmon->seltags ^= 1; /* toggle sel tagset */
     if (arg->ui & TAGMASK) {
         selmon->pertag->prevtag = selmon->pertag->curtag;
@@ -4789,8 +4752,9 @@ transfer(const Arg *arg) {
 void
 insertclient(Client *item, Client *insertItem, int after) {
     Client *c;
+
     if (item == NULL || insertItem == NULL || item == insertItem) return;
-    detach(insertItem);
+        detach(insertItem);
     if (!after && selmon->clients == item) {
         attach(insertItem);
         return;

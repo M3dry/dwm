@@ -35,8 +35,7 @@ static const unsigned int snap             = 0; /* snap pixel */
 static const int startontag                = 1; /* 0 means no tag active on start */
 static const int decorhints                = 1; /* 1 means respect decoration hints */
 static const int focusonwheel              = 0;
-//static const char *fonts[] = { "Operator Mono SSm Lig Nerd Font:size=12:antialias=true:autohint=true" };
-static const char *fonts[] = { "mononoki Nerd Font:size=12:antialias=true:autohint=true" };
+static const char *fonts[] = { "Operator Mono SSm Lig Book:size=12:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#4E5579";
 static const char selfg[]                 = "#5fafff";
@@ -127,12 +126,9 @@ static const char *colors[][10]  = {
 };
 
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-
 static const char ptagf[] = "[%s:%s]";
 static const char etagf[] = "%s";
 static const int lcaselbl = 0;
-
-static const char *defaulttagapps[] = { "firefox", NULL, NULL, "chromium", NULL, NULL, "spotify", "discord", "gimp" };
 
 static const char *scpclean[] = {"u", NULL};
 static const char *scpcmus[]  = {"i", "st", "-c", "scpcmus",  "-t", "cmusSCP", "-e", "cmus", NULL};
@@ -240,7 +236,6 @@ Keychord keychords[] = {
 {1, {{A|C,    XK_m}},                    spawn,                SHCMD("multimc") },
 {1, {{A|M|C,  XK_l}},                    spawn,                SHCMD("slock") },
 {1, {{M,      XK_g}},                    spawn,                SHCMD("xmenu.sh -p 0x0") },
-{1, {{A,      XK_r}},                    spawndefault,         {0} },
 {1, {{A|S,    XK_Return}},               spawn,                SHCMD("dmenu_run_history -F -l 5 -g 10 -p 'Run'") },
 {1, {{A,      XK_c}},                    spawn,                SHCMD("volume-script") },
 {1, {{A|C,    XK_Return}},               spawn,                SHCMD("Booky 'st -e nvim' '><' 'Cconfig'") },
