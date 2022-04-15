@@ -25,23 +25,25 @@ static void getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int
 static void getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr);
 static void setgaps(int oh, int ov, int ih, int iv);
 
-struct vactags {
+struct Pertag {
     unsigned int curtag, prevtag; /* current and previous tag */
-    int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
-    float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
-    unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
-    const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
-    Bool showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
-    Client *prevzooms[LENGTH(tags) + 1]; /* store zoom information */
-    unsigned int vacant[LENGTH(tags) + 1];
-    int enablegaps[LENGTH(tags) + 1];
-    unsigned int gaps[LENGTH(tags) + 1];
-    unsigned int vertpd[LENGTH(tags) + 1];
-    unsigned int sidepd[LENGTH(tags) + 1];
-    unsigned int topbar[LENGTH(tags) + 1];
-    unsigned int smartgaps[LENGTH(tags) + 1];
-    unsigned int vactags[LENGTH(tags) + 1];
-    unsigned int borderpx[LENGTH(tags) + 1];
+    int nmasters[LENGTH(tags)]; /* number of windows in master area */
+    float mfacts[LENGTH(tags)]; /* mfacts per tag */
+    unsigned int sellts[LENGTH(tags)]; /* selected layouts */
+    const Layout *ltidxs[LENGTH(tags)][2]; /* matrix of tags and layouts indexes  */
+    unsigned int ltidx[LENGTH(tags)]; /* layout index */
+    Bool showbars[LENGTH(tags)]; /* display bar for the current tag */
+    Client *prevzooms[LENGTH(tags)]; /* store zoom information */
+    unsigned int vacant[LENGTH(tags)];
+    int enablegaps[LENGTH(tags)];
+    unsigned int gaps[LENGTH(tags)];
+    unsigned int vertpd[LENGTH(tags)];
+    unsigned int sidepd[LENGTH(tags)];
+    unsigned int tpadding[LENGTH(tags)];
+    unsigned int topbar[LENGTH(tags)];
+    unsigned int smartgaps[LENGTH(tags)];
+    unsigned int vactags[LENGTH(tags)];
+    unsigned int borderpx[LENGTH(tags)];
 };
 
 void
@@ -829,9 +831,11 @@ tile(Monitor *m)
     for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
         if (i < m->nmaster) {
             resize(c, mx, my, mw - (2*c->bw), mh * (c->cfact / mfacts) + (i < mrest ? 1 : 0) - (2*c->bw), 0);
-            my += HEIGHT(c) + ih;
+            if ((my + HEIGHT(c) + ih) < m->wh)
+                my += HEIGHT(c) + ih;
         } else {
             resize(c, sx, sy, sw - (2*c->bw), sh * (c->cfact / sfacts) + ((i - m->nmaster) < srest ? 1 : 0) - (2*c->bw), 0);
-            sy += HEIGHT(c) + ih;
+            if ((sy + HEIGHT(c) + ih) < m->wh)
+            	sy += HEIGHT(c) + ih;
         }
 }
