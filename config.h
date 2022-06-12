@@ -252,7 +252,6 @@ static Keychord *keychords[] = {
 &((Keychord){1, {{P, A|S,   XK_z}},                       spawn,             SHCMD("audio-changer") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_z}},         spawn,             SHCMD("cmus-rem") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_v}},         spawn,             SHCMD("volume-script") }),
-&((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_s}},         spawn,             SHCMD("switch") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_c}},         spawn,             SHCMD("calc") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_p}},         spawn,             SHCMD("passmenu2 -F -p 'Passwords:'") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_m}},         spawn,             SHCMD("manview") }),
