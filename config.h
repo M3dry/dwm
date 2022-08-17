@@ -33,7 +33,7 @@ static const unsigned int snap             = 0; /* snap pixel */
 static const int startontag                = 1; /* 0 means no tag active on start */
 static const int decorhints                = 1; /* 1 means respect decoration hints */
 static const int focusonwheel              = 0;
-static const char *fonts[] = { "Operator Mono SSm Lig Book:size=12:antialias=true:autohint=true" };
+static const char *fonts[] = { "ComicCodeLigatures Nerd Font:size=10:antialias=true:autohint=true" };
 
 static const char normfg[]                = "#4e5579";
 static const char selfg[]                 = "#5fafff";
@@ -164,9 +164,9 @@ static const Rule rules[] = {
     { "Gimp",     NULL,       NULL,          NULL,   1 << 8,   3,          1,         1,         0,          0,         1,        -1, 0 },
     { NULL,       NULL,       "glxgears",    NULL,   0,        0,          1,         0,         0,          0,         1,        -1, 0 },
     /* General windows */
-    { NULL,       "Navigator",NULL,          NULL,   1,        0,          0,         0,         1,          0,         1,         0, 0 },
-    { NULL,       "chromium", NULL,          NULL,   1 << 3,   0,          0,         0,         1,          0,         1,         0, 0 },
-    { NULL,       "discord",  NULL,          NULL,   1,        0,          0,         0,         0,          0,         0,         1, 0 },
+    { NULL,       "Navigator",NULL,          NULL,   1,        0,          0,         0,         1,          0,         1,         1, 0 },
+    { NULL,       "chromium", NULL,          NULL,   1 << 3,   0,          0,         0,         1,          0,         1,         1, 0 },
+    // { NULL,       "discord",  NULL,          NULL,   1,        0,          0,         0,         0,          0,         0,         1, 0 },
     /* Wintype */
     { NULL,       NULL,       NULL, WTYPE "DIALOG",  0,        0,          1,         1,         0,          0,         0,        -1, 0 },
     { NULL,       NULL,       NULL, WTYPE "UTILITY", 0,        0,          1,         1,         0,          0,         0,        -1, 0 },
@@ -246,12 +246,11 @@ static Keychord *keychords[] = {
 &((Keychord){1, {{P, A|C,   XK_m}},                       spawn,             SHCMD("multimc") }),
 &((Keychord){1, {{P, A|C,   XK_n}},                       spawn,             SHCMD("dunstctl close") }),
 &((Keychord){1, {{P, A|M|C, XK_l}},                       spawn,             SHCMD("slock") }),
-&((Keychord){1, {{P, M,     XK_g}},                       spawn,             SHCMD("xmenu.sh -p 0x0") }),
+&((Keychord){1, {{P, M,     XK_g}},                       spawn,             SHCMD("xmenu.sh") }),
 &((Keychord){1, {{P, A|S,   XK_Return}},                  spawn,             SHCMD("dmenu_run_history -F -l 5 -g 10 -p 'Run'") }),
-&((Keychord){1, {{P, A|S,   XK_w}},                       spawn,             SHCMD("Booky 'firefox' '_' 'Bconfig'") }),
 &((Keychord){1, {{P, A|S,   XK_z}},                       spawn,             SHCMD("audio-changer") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_z}},         spawn,             SHCMD("cmus-rem") }),
-&((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_v}},         spawn,             SHCMD("volume-script") }),
+&((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_v}},         spawn,             SHCMD("volume") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_c}},         spawn,             SHCMD("calc") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_p}},         spawn,             SHCMD("passmenu2 -F -p 'Passwords:'") }),
 &((Keychord){2, {{P, A|S,   XK_d}, {P, 0, XK_m}},         spawn,             SHCMD("manview") }),

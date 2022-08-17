@@ -745,7 +745,7 @@ buttonpress(XEvent *e)
         selmon = m;
         focus(NULL);
     }
-    for (c = m->clients; c; c = c->next)
+    for (c = selmon->clients; c; c = c->next)
         if (ISVISIBLE(c))
             n++;
 
@@ -755,19 +755,19 @@ buttonpress(XEvent *e)
             selmon->previewshow = 0;
         }
         i = 0;
-        x = LENGTH(m->ltsymbol) + blw - 15;
+        x = LENGTH(selmon->ltsymbol) + blw - 15;
 
-        if (m->vactag) {
-            for (c = m->clients; c; c = c->next)
+        if (selmon->vactag) {
+            for (c = selmon->clients; c; c = c->next)
                 occ |= c->tags == 255 ? 0 : c->tags;
             do {
                 /* do not reserve space for vacant tags */
-                if (!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
+                if (!(occ & 1 << i || selmon->tagset[selmon->seltags] & 1 << i))
                     continue;
                 x += tagw[i];
             } while (ev->x >= x && ++i < LENGTH(tags));
 
-            if (ev->x < LENGTH(m->ltsymbol) + blw) {
+            if (ev->x < LENGTH(selmon->ltsymbol) + blw) {
                 click = ClkLtSymbol;
             } else if (i < LENGTH(tags)) {
                 click = ClkTagBar;
@@ -781,7 +781,7 @@ buttonpress(XEvent *e)
                 x += tagw[i];
             while (ev->x >= x && ++i < LENGTH(tags));
 
-            if (ev->x < LENGTH(m->ltsymbol) + blw) {
+            if (ev->x < LENGTH(selmon->ltsymbol) + blw) {
                 click = ClkLtSymbol;
             } else if (i < LENGTH(tags)) {
                 click = ClkTagBar;
@@ -801,7 +801,7 @@ buttonpress(XEvent *e)
                 ++i;
             else
                 break;
-            if (i >= m->ntabs) break;
+            if (i >= selmon->ntabs) break;
         }
         if (c) {
             click = ClkTabBar;
